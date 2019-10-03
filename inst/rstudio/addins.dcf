@@ -1,0 +1,4 @@
+Name: Source p5.R file
+Description: Source a p5.R file
+Binding: source_p5_addin
+Interactive: false

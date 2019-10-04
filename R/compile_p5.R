@@ -53,6 +53,6 @@ str_rules <- function() {
   list(
     f(x, gsub(x, pattern = "%[*][*]%", replacement = "**")),
     f(x, gsub(x, pattern = "%%", replacement = "%")),
-    rewrite_new, rewrite_dot
+    rewrite_new, rewrite_dot, rewrite_for_loop
   )
 }

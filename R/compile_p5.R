@@ -1,7 +1,8 @@
 #' Compile p5 R file into a JS file
 #' @param input A character string; the input file.
-#' @param output A character string; the output file.
-#' @keywords internal
+#' @param output A character string; the output file. When the
+#' output is "", the result is printed to the standard output.
+#' @export
 compile_p5_r <- function(input, output = "") {
   parse(file = input) %>%
     purrr::map(rewrite_ast, rules = ast_rules()) %>%

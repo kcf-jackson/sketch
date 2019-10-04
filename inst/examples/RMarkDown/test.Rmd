@@ -1,0 +1,21 @@
+---
+title: "The `p5sketch` R package"
+author: "Chun Fung (Jackson) Kwok"
+date: "05/10/2019"
+output: html_document
+---
+
+```{r setup, echo = F}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(p5sketch)
+load_p5js()  # this inserts the link to p5.js, and it needs to be called only once per document.
+```
+
+
+## R Markdown
+
+This is a demo of inserting a p5 sketch into an RMD file.
+```{r, echo=F, warning=F, message = F}
+insert_sketch("p5_canvas", "sketch_on_rmd.R")
+```

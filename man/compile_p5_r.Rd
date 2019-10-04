@@ -9,9 +9,9 @@ compile_p5_r(input, output = "")
 \arguments{
 \item{input}{A character string; the input file.}
 
-\item{output}{A character string; the output file.}
+\item{output}{A character string; the output file. When the
+output is "", the result is printed to the standard output.}
 }
 \description{
 Compile p5 R file into a JS file
 }
-\keyword{internal}

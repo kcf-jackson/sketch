@@ -1,7 +1,7 @@
 Package: p5sketch
 Type: Package
 Title: An R interface to p5.js
-Version: 0.1.9
+Version: 0.2.6
 Author: Chun Fung (Jackson) Kwok
 Maintainer: Chun Fung (Jackson) Kwok <kwokcf@unimelb.edu.au>
 Description: Creates static / animated sketches and illustrations embeddable in
@@ -16,4 +16,5 @@ Imports:
     purrr,
     rstudioapi,
     stringr,
-    pryr
+    pryr,
+    htmltools

@@ -15,7 +15,7 @@ rewrite_KW <- function(x, pat, rewrite) {
 
 
 rewrite_new <- function(x) {
-    pattern <- "[a-zA-Z_]+[$]new"
+    pattern <- "[a-zA-Z0-9_]+[$]new"
     rewrite <- function(x) {
         x %>%
             split_str(split = "[$]") %>%
@@ -31,7 +31,7 @@ rewrite_dot <- function(x) {
 }
 
 rewrite_for_loop <- function(x) {
-    pattern <- "[(][a-z]+ in [^{]+"
-    rewrite <- f(x, gsub("[$]", ".", x))
+    pattern <- "[(][a-zA-Z0-9_]+ in [^{]+"
+    rewrite <- f(x, gsub("in", "of", x))
     rewrite_KW(x, pattern, rewrite)
 }

@@ -13,7 +13,6 @@ copy_active_to_tempfile <- function() {
 }
 
 
-#--------------------------------------------------------------------
 #' Source a p5.R file
 #' @param index_r A character string; path to the R file.
 #' @param debug T or F; if T, print compiled code on screen.

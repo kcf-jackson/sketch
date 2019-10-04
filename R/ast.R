@@ -55,6 +55,3 @@ as_list <- function(ast) {
     ast
   }
 }
-
-
-f <- pryr::f

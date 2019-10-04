@@ -2,10 +2,10 @@
 #' @param input A character string; the input file.
 #' @param output A character string; the output file.
 #' @keywords internal
-compile_p5r <- function(input, output) {
+compile_p5_r <- function(input, output = "") {
   parse(file = input) %>%
     purrr::map(rewrite_ast, rules = ast_rules()) %>%
-    purrr::map(deparse) %>%
+    purrr::map(deparse, width.cutoff = 200L) %>%
     purrr::map(rewrite_str, rules = str_rules()) %>%
     unlist() %>%
     write(file = output)
@@ -29,7 +29,6 @@ ast_rules <- function() {
   list(
     f(x, subst(x, pattern = "<-", replacement = "=")),
     f(x, subst(x, pattern = "<<-", replacement = "=")),
-    f(x, subst(x, pattern = "$", replacement = "%.%")),
     f(x, subst(x, pattern = "^", replacement = "%**%")),
     f(x, subst(x, pattern = ":", replacement = "seq_by")),
     f(x, subst(x, pattern = "pi", replacement = "Math.PI")),
@@ -52,25 +51,8 @@ rewrite_str <- function(str, rules) {
 
 str_rules <- function() {
   list(
-    f(x, gsub(x, pattern = " %.% ", replacement = ".")),
     f(x, gsub(x, pattern = "%[*][*]%", replacement = "**")),
-    # f(x, gsub(x, pattern = " %,% ", replacement = ", ")),
-    f(x, gsub(x, pattern = "%%", replacement = "%"))
+    f(x, gsub(x, pattern = "%%", replacement = "%")),
+    rewrite_new, rewrite_dot
   )
-}
-
-
-#' Apply a list of functions sequentially
-#' @param value initial value.
-#' @param function_list a list of functions.
-#' @param preprocess a function for preprocessing the value.
-#' @param postprocess a function for postprocessing the value.
-#' @keywords internal
-freduce <- function(value, function_list,
-                    preprocess = identity,
-                    postprocess = identity) {
-  value %>%
-    preprocess() %>%
-    magrittr::freduce(function_list) %>%
-    postprocess()
 }

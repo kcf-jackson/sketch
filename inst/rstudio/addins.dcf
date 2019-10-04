@@ -1,4 +1,4 @@
 Name: Source p5.R file
 Description: Source a p5.R file
-Binding: source_p5_addin
+Binding: source_active
 Interactive: false

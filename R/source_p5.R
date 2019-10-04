@@ -1,29 +1,37 @@
-source_p5_addin <- function() {
-  source_p5_r(source_active())
+#' Source active file
+#' @export
+source_active <- function() {
+  source_p5_r(copy_active_to_tempfile())
 }
 
 
-#--------------------------------------------------------------------
-# Source a p5.R file
-source_p5_r <- function(index_r, keep = F) {
-  temp_file <- tempfile()
-  index_js <- compile_p5r(index_r, temp_file)
-  if (keep) file.copy(temp_file, getwd())
-  source_p5_js(index_js)
-}
-
-
-#--------------------------------------------------------------------
-# Source active file
-source_active <- function(file = "index.js") {
+copy_active_to_tempfile <- function() {
   x <- rstudioapi::getSourceEditorContext()$contents
-  temp_file <- file.path(tempdir(), file)
+  temp_file <- tempfile()
   write(x, file = temp_file)
   temp_file
 }
 
 
-# Source a p5.js file
+#--------------------------------------------------------------------
+#' Source a p5.R file
+#' @param index_r A character string; path to the R file.
+#' @param debug T or F; if T, print compiled code on screen.
+#' @export
+source_p5_r <- function(index_r, debug = F) {
+  if (debug) {
+    index_js <- compile_p5_r(index_r, output = "")  # print to console
+    invisible(index_js)
+  } else {
+    index_js <- compile_p5_r(index_r, tempfile())
+    source_p5_js(index_js)
+  }
+}
+
+
+#' Source a p5.js file
+#' @param index_js A character string; path to the JS file.
+#' @export
 source_p5_js <- function(index_js) {
   index_html <- index_html()
 

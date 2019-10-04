@@ -24,7 +24,7 @@ draw <- function() {
         yspeed <<- yspeed * -1
     }
 
-    stroke(0);
-    fill(175);
-    ellipse(x, y, 48, 48);
+    stroke(0)
+    fill(175)
+    ellipse(x, y, 48, 48)
 }

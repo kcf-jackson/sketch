@@ -49,5 +49,5 @@ source_p5_js <- function(index_js) {
 
 
 index_html <- function() {
-  system.file("template/index.html", package = "sketch")
+  system.file("template/index.html", package = "p5sketch")
 }

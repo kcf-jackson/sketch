@@ -1,15 +1,9 @@
-map <- function(.x, .f) Map(.f, .x)
-map_chr <- function(.x, .f) unlist(Map(.f, .x))
-map2_chr <- function(.x, .y, .f) unlist(Map(.f, .x, .y))
-compose <- function(f, g) { function(...) f(g(...)) }
-
-
 #' Parse R Expressions
 #' @param x A character string. The text to parse.
 parse0 <- function(x) parse(text = x)[[1]]
 
 
-#' Expression Deparsing for R
+#' Expression Deparsing for JS
 #' @param ast A language object.
 deparse0 <- function(ast) {
   if (is.call(ast)) {
@@ -87,7 +81,7 @@ deparse_wrap <- function(ast) {
 
 deparse_wrap_sb <- function(ast) {
   # case "[" and "[["
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   sym <- sym_ls[1]
   paste0(
     sym_ls[2],
@@ -99,7 +93,7 @@ deparse_wrap_sb <- function(ast) {
 
 deparse_wrap_rb <- function(ast) {
   # Case '('
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   sym <- sym_ls[1]
   paste0(
     sym,
@@ -110,7 +104,7 @@ deparse_wrap_rb <- function(ast) {
 
 deparse_wrap_cb <- function(ast) {
   # Case '{'
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   sym <- sym_ls[1]
   increase_indent <- function(x) {
     indent <- "   "
@@ -142,7 +136,7 @@ deparse_prefix <- function(ast) {
 }
 
 deparse_default <- function(ast) {
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   paste0(
     sym_ls[1],
     "(",
@@ -152,7 +146,7 @@ deparse_default <- function(ast) {
 }
 
 deparse_for <- function(ast) {
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   paste(
     sym_ls[1],
     glue::glue("({sym_ls[2]} of {sym_ls[3]})"),
@@ -161,7 +155,7 @@ deparse_for <- function(ast) {
 }
 
 deparse_if <- function(ast) {
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   has_else <- function(x) length(x) == 4
   out <- paste(
     sym_ls[1],
@@ -179,8 +173,8 @@ deparse_if <- function(ast) {
 deparse_function <- function(ast) {
 
   deparse_arg <- function(alist0) {
-    alist1 <- map(alist0, deparse)
-    alist2 <- map2_chr(
+    alist1 <- purrr::map(alist0, deparse)
+    alist2 <- purrr::map2_chr(
       .x = names(alist1),
       .y = alist1,
       .f = function(x, y) {
@@ -194,7 +188,7 @@ deparse_function <- function(ast) {
     paste(alist2, collapse = ", ")
   }
 
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   paste0(
     deparse0(ast[[1]]),
     "(", deparse_arg(ast[[2]]), ") ",
@@ -203,7 +197,7 @@ deparse_function <- function(ast) {
 }
 
 deparse_while <- function(ast) {
-  sym_ls <- map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse0)
   paste(
     sym_ls[1],
     glue::glue("({sym_ls[2]})"),

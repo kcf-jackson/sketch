@@ -17,13 +17,13 @@ compile_p5_r <- function(input, output = "") {
 rewrite <- function(ast) {
   ast %>%
     rewrite_new() %>%
-    rewrite_by_subst(subst_rules())
+    rewrite_by_subst()
 }
 
 
 # Rewriting AST by simple substitution
-rewrite_by_subst <- function(ast, rules) {
-  magrittr::freduce(ast, rules)
+rewrite_by_subst <- function(ast) {
+  magrittr::freduce(ast, subst_rules)
 }
 
 subst_rules <- function() {

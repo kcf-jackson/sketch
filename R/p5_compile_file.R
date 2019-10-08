@@ -23,7 +23,7 @@ rewrite <- function(ast) {
 
 # Rewriting AST by simple substitution
 rewrite_by_subst <- function(ast) {
-  magrittr::freduce(ast, subst_rules)
+  magrittr::freduce(ast, subst_rules())
 }
 
 subst_rules <- function() {

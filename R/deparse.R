@@ -112,7 +112,7 @@ deparse_wrap_cb <- function(ast) {
     paste(
       indent,
       gsub(x = x, pattern = "\n", replacement = indent_nl)
-    )
+    )   # `gsub` is fine here since '\n' in quoted string becomes '\\n'
   }
 
   paste(
@@ -131,6 +131,8 @@ deparse_prefix <- function(ast) {
          "if" = deparse_if(ast),
          "function" = deparse_function(ast),
          "while" = deparse_while(ast),
+         "list" = deparse_list(ast),
+         "data.frame" = deparse_df(ast),
          deparse_default(ast)
   )
 }
@@ -203,6 +205,52 @@ deparse_while <- function(ast) {
     glue::glue("({sym_ls[2]})"),
     sym_ls[3]
   )
+}
+
+deparse_list <- function(ast) {
+
+  deparse_arg <- function(alist0) {
+    alist1 <- purrr::map(alist0, deparse)
+    alist2 <- purrr::map2_chr(
+      .x = names(alist1),
+      .y = alist1,
+      .f = function(x, y) {
+        if (x == "") {
+          warning("All elements in a list must be named to convert into JavaScript properly.")
+          glue::glue("{y}")
+        } else {
+          glue::glue("{x}: {y}")
+        }
+      }
+    )
+    paste(alist2, collapse = ", ")
+  }
+
+  sym_ls <- purrr::map_chr(ast, deparse0)
+  paste0("{ ", deparse_arg(ast[-1]), " }")
+}
+
+deparse_df <- function(ast) {
+
+  deparse_arg <- function(alist0) {
+    alist1 <- purrr::map(alist0, deparse)
+    alist2 <- purrr::map2_chr(
+      .x = names(alist1),
+      .y = alist1,
+      .f = function(x, y) {
+        if (x == "") {
+          warning("All columns in a dataframe must be named to convert into JavaScript properly.")
+          glue::glue("{y}")
+        } else {
+          glue::glue("{x}: {y}")
+        }
+      }
+    )
+    paste(alist2, collapse = ", ")
+  }
+
+  sym_ls <- purrr::map_chr(ast, deparse0)
+  paste0("new dfjs.DataFrame({ ", deparse_arg(ast[-1]), " })")  # should dfjs be hard coded? interface needed?
 }
 
 

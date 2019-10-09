@@ -1,9 +1,9 @@
-#' Compile p5 R file into a JS file
+#' Compile an R file into a JS file
 #' @param input A character string; the input file.
 #' @param output A character string; the output file. When the
 #' output is "", the result is printed to the standard output.
 #' @export
-compile_p5_r <- function(input, output = "") {
+compile_r <- function(input, output = "") {
   parse(file = input) %>%
     purrr::map(rewrite) %>%
     purrr::map(deparse0) %>%
@@ -71,24 +71,3 @@ rewrite_new <- function(ast) {
     ast
   }
 }
-
-
-# # Unit test
-# unit_test <- function(x) {
-#   f <- function(x) rewrite(parse0(x))
-#   g <- compose(deparse, f)
-#   h <- compose(deparse0, f)
-#   cat("==========Test==========", "\n")
-#   cat("Input             : ", x, "\n")
-#   cat("Output (deparse)  : ", g(x), "\n")
-#   cat("Output (deparse0) : ", h(x), "\n")
-# }
-# unit_test("a <- x <<- 10")
-# unit_test("a <<- b <- 3 + 4")
-# unit_test("3^2 + 14")
-# unit_test("1:10 + 120")
-# unit_test("3 * pi - 3")
-# unit_test("self$abc(123)")
-# unit_test("123 %% 5 == 4")
-# unit_test("obj_1$method_1(x)")
-# unit_test("obj_1$new(x, y)")

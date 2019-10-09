@@ -1,7 +1,7 @@
-Package: p5sketch
+Package: sketch
 Type: Package
-Title: An R interface to p5.js
-Version: 0.2.9
+Title: Animated and embeddable sketches in R
+Version: 0.4.0
 Author: Chun Fung (Jackson) Kwok
 Maintainer: Chun Fung (Jackson) Kwok <kwokcf@unimelb.edu.au>
 Description: Creates static / animated sketches and illustrations embeddable in
@@ -17,4 +17,7 @@ Imports:
     rstudioapi,
     stringr,
     htmltools,
-    glue
+    glue,
+    base64enc
+Suggests: 
+    testthat

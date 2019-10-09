@@ -1,4 +1,5 @@
 #' Import functions
 #' @name imports
 #' @importFrom magrittr %>%
-utils::globalVariables("x")
+#' @importFrom utils tail
+utils::globalVariables(c("x", "."))

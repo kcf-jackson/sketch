@@ -209,11 +209,11 @@ deparse_while <- function(ast) {
 
 deparse_list <- function(ast) {
 
-  deparse_arg <- function(alist0) {
-    alist1 <- purrr::map(alist0, deparse)
-    alist2 <- purrr::map2_chr(
-      .x = names(alist1),
-      .y = alist1,
+  deparse_arg <- function(list0) {
+    list1 <- purrr::map(list0, deparse0)
+    list2 <- purrr::map2_chr(
+      .x = names(list1),
+      .y = list1,
       .f = function(x, y) {
         if (x == "") {
           warning("All elements in a list must be named to convert into JavaScript properly.")
@@ -223,10 +223,9 @@ deparse_list <- function(ast) {
         }
       }
     )
-    paste(alist2, collapse = ", ")
+    paste(list2, collapse = ", ")
   }
 
-  sym_ls <- purrr::map_chr(ast, deparse0)
   paste0("{ ", deparse_arg(ast[-1]), " }")
 }
 

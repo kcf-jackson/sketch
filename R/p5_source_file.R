@@ -23,7 +23,7 @@ source_p5_r <- function(index_r, debug = F) {
     invisible(index_js)
   } else {
     index_js <- compile_p5_r(index_r, tempfile())
-    source_p5_js(index_js)
+    source_p5_js(index_js, load_js_lib(index_r))
   }
 }
 
@@ -31,8 +31,8 @@ source_p5_r <- function(index_r, debug = F) {
 #' Source a p5.js file
 #' @param index_js A character string; path to the JS file.
 #' @export
-source_p5_js <- function(index_js) {
-  index_html <- index_html()
+source_p5_js <- function(index_js, ...) {
+  index_html <- htmltools::html_print(html_template(...), viewer = NULL)
 
   temp_dir <- tempdir()
   temp_html <- file.path(temp_dir, "index.html")
@@ -47,6 +47,32 @@ source_p5_js <- function(index_js) {
 }
 
 
-index_html <- function() {
-  system.file("template/index.html", package = "p5sketch")
+html_template <- function(...) {
+  htmltools::tagList(
+    htmltools::tags$html(
+      htmltools::tags$head(
+        htmltools::tags$script(src = src("math")),
+        htmltools::tags$script(src = src("dataframe")),
+        htmltools::tags$script(src = src("p5")),
+        ...,
+        htmltools::tags$script(src = "http://127.0.0.1:8080/utils.js")
+      ),
+      htmltools::tags$body(
+        htmltools::tags$div(id = "p5_canvas"),
+        htmltools::tags$script(src = "./index.js")
+      )
+    )
+  )
+}
+
+
+#' Get the source link of a JavaScript library
+#' @param x A character string; name of the JavaScript library
+#' @export
+src <- function(x) {
+  switch(x,
+         "dataframe" = "https://gmousse.github.io/dataframe-js/dist/dataframe.min.js",
+         "math" = "https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.2.2/math.min.js",
+         "p5" = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"
+  )
 }

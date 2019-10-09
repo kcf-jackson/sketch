@@ -190,7 +190,6 @@ deparse_function <- function(ast) {
     paste(alist2, collapse = ", ")
   }
 
-  sym_ls <- purrr::map_chr(ast, deparse0)
   paste0(
     deparse0(ast[[1]]),
     "(", deparse_arg(ast[[2]]), ") ",
@@ -248,7 +247,6 @@ deparse_df <- function(ast) {
     paste(alist2, collapse = ", ")
   }
 
-  sym_ls <- purrr::map_chr(ast, deparse0)
   paste0("new dfjs.DataFrame({ ", deparse_arg(ast[-1]), " })")  # should dfjs be hard coded? interface needed?
 }
 

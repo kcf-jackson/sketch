@@ -80,17 +80,19 @@ rewrite_new <- function(ast) {
 #' @export
 compile_data <- function(input, output) {
     if (missing(output)) output <- tempfile()
-    to_json(read_file(input), output)
+    write(to_json(input), file = output)
+    output
 }
 
 
-to_json <- function(input, output) {
-    if (missing(output)) output <- tempfile()
-    sym <- gsub(x = basename(input), pattern = "[.]", replacement = "_")
-    json <- jsonlite::toJSON(input, dataframe = "columns")
-    data_js <- glue::glue({"{sym} = new dfjs.DataFrame({json})"})
-    write(data_js, file = output)
-    output
+to_json <- function(input) {
+    fname <- basename(input)
+    sym <- gsub(x = fname, pattern = "[.]", replacement = "_")
+
+    contents <- read_file(input)
+    json <- jsonlite::toJSON(contents, dataframe = "columns")
+
+    glue::glue({"{sym} = new dfjs.DataFrame({json})"})
 }
 # Unit test
 # print(to_json(read.csv("mtcars.csv"), "", assign_to = "myVar"))

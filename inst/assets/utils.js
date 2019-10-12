@@ -66,3 +66,9 @@ function printArray(x) {
         console.log(line);
     }
 }
+
+
+// Basic R functions
+function length(x) {
+    return x.length;
+}

@@ -1,4 +1,4 @@
-Name: Source p5.R file
-Description: Source a p5.R file
+Name: Source sketch R file
+Description: Source a sketch R file
 Binding: source_active
 Interactive: false

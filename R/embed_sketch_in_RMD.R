@@ -1,13 +1,13 @@
-#' Load js library into an RMD document
-#' @param src A character string; the link to the js library.
+#' Load JavaScript / CSS / R Sketch Script / CSV file into an RMD document
+#' @param x A character string; the link / path to the JS / CSS / R script / CSV file
 #' @export
 #' @examples
 #' \dontrun{
-#' load_js(src = src("p5"))
-#' load_js(src = "https://cdn.plot.ly/plotly-latest.min.js")
+#' load_script(src("p5"))
+#' load_script("https://cdn.plot.ly/plotly-latest.min.js")
 #' }
-load_js <- function(src) {
-  htmltools::doRenderTags(htmltools::tags$script(src = src))
+load_script <- function(x) {
+  htmltools::doRenderTags(convert_src(x))
 }
 
 

@@ -71,3 +71,32 @@ rewrite_new <- function(ast) {
     ast
   }
 }
+
+
+#====================================================================
+#' Compile a data file into a JS file
+#' @param input A character string; the path to the input file.
+#' @param output A character string; the path to the output file.
+#' @export
+compile_data <- function(input, output) {
+    if (missing(output)) output <- tempfile()
+    to_json(read_file(input), output)
+}
+
+
+to_json <- function(input, output) {
+    if (missing(output)) output <- tempfile()
+    sym <- gsub(x = basename(input), pattern = "[.]", replacement = "_")
+    json <- jsonlite::toJSON(input, dataframe = "columns")
+    data_js <- glue::glue({"{sym} = new dfjs.DataFrame({json})"})
+    write(data_js, file = output)
+    output
+}
+# Unit test
+# print(to_json(read.csv("mtcars.csv"), "", assign_to = "myVar"))
+# print(to_json(read.table("mtcars.txt"), "", assign_to = "myVar"))
+
+
+read_file <- function(x) {
+    read.csv(x)
+}

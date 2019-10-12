@@ -23,7 +23,8 @@ source_r <- function(file, debug = F) {
     invisible(index_js)
   } else {
     index_js <- compile_r(file, tempfile())
-    source_js(index_js, js_lib(file))
+    asset_tags <- assets(file)   # this line is needed to keep the working directory unchanged
+    source_js(index_js, asset_tags)
   }
 }
 

@@ -35,24 +35,40 @@ subst_rules <- function() {
     make_rule("<-", "="),
     make_rule("<<-", "="),
     make_rule("^", "**"),
-    make_rule(":", "seq_by"),
     make_rule("pi", "Math.pi"),
     make_rule("self", "this"),
     make_rule("%%", "%"),
-    make_rule("$", ".")
+    make_rule("$", "."),
+    make_rule(":", "R.seq_by"),
+    make_rule("seq", "R.seq_by"),
+    make_rule("c", "R.c"),
+    make_rule("matrix", "R.matrix"),
+    make_rule("print", "R.print"),
+    make_rule("length", "R.length"),
+    # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
+    make_rule("TRUE", "true"),
+    make_rule("FALSE", "false"),
+    make_rule("declare", "let"),
+    make_rule("%instanceof%", "instanceof")
   )
 }
 
 subst <- function(ast, pattern, replacement) {
-  if (is.call(ast)) {
-    as.call(purrr::map(ast, ~subst(.x, pattern, replacement)))
-  } else {
-    if (rlang::is_symbol(ast, pattern)) {
-      as.symbol(replacement)
-    } else {
-      ast
+    if (rlang::is_call(ast)) {
+      return(as.call(purrr::map(ast, ~subst(.x, pattern, replacement))))
     }
-  }
+
+    if (rlang::is_symbol(ast, pattern)) {
+      return(as.symbol(replacement))
+    }
+
+    if (rlang::is_syntactic_literal(ast)) {
+      if (is.null(ast))   return(ast)
+      if (is.na(ast))     return(ast)
+      if (ast == pattern) return(as.symbol(replacement))
+    }
+
+    ast
 }
 
 

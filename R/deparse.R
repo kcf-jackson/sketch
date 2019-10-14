@@ -289,8 +289,8 @@ deparse_let <- function(ast) {
 # Symbols table / mapping
 space_symbol <- function(chr) {
   space <- c("=", "+", "-", "*",
-             #"%%", "^",                # R specific
-             "%", "**", "instanceof"    # Javascript specific
+             #"%%", "^",                 # R specific
+             "%", "**", "instanceof",    # Javascript specific
              "==", "!=", "<", ">", "<=", ">=",
              "&&", "||", "&", "|")
   no_space <- c(

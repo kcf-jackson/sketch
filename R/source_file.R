@@ -16,15 +16,17 @@ copy_active_to_tempfile <- function() {
 #' Source a p5.R file
 #' @param file A character string; path to the R file.
 #' @param debug T or F; if T, print compiled code on screen.
+#' @param launch_browser A character string; "viewer" or "browser", which calls
+#' `rstudioapi::viewer` and `utils::browserURL` respectively.
 #' @export
-source_r <- function(file, debug = F) {
+source_r <- function(file, debug = F, launch_browser = "viewer") {
   if (debug) {
     index_js <- compile_r(file, output = "")  # print to console
     invisible(index_js)
   } else {
     index_js <- compile_r(file, tempfile())
     asset_tags <- assets(file)   # this line is needed to keep the working directory unchanged
-    source_js(index_js, asset_tags)
+    source_js(index_js, asset_tags, launch_browser = launch_browser)
   }
 }
 
@@ -33,8 +35,10 @@ source_r <- function(file, debug = F) {
 #' @param file A character string; path to the JS file.
 #' @param ... An optional list of shiny tags to be added to the <head> of
 #' the html template.
+#' @param launch_browser A character string; "viewer" or "browser", which calls
+#' `rstudioapi::viewer` and `utils::browserURL` respectively.
 #' @export
-source_js <- function(file, ...) {
+source_js <- function(file, ..., launch_browser = "viewer") {
   index_html <- htmltools::html_print(html_template(...), viewer = NULL)
 
   temp_dir <- tempdir()
@@ -46,5 +50,9 @@ source_js <- function(file, ...) {
     overwrite = T
   )
 
-  getOption("viewer")(temp_html)
+  if (launch_browser == "viewer") {
+    rstudioapi::viewer(temp_html)
+  } else {
+    utils::browseURL(temp_html)
+  }
 }

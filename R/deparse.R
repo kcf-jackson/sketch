@@ -27,8 +27,8 @@ deparse0 <- function(ast) {
 
 is_infix <- function(ast) {
   infix_ops <- c("=", "+", "-", "*", "/",
-                 #"%%", "^", "$", "@",   # R specific
-                 "%", "**", ".",         # Javascript specific
+                 #"%%", "^", "$", "@",          # R specific
+                 "%", "**", ".", "instanceof",  # Javascript specific
                  "==", "!=", "<", ">", "<=", ">=", "!",
                  "&&", "||", "&", "|", ":")
   is_custom_infix <- function(x) {
@@ -133,6 +133,7 @@ deparse_prefix <- function(ast) {
          "while" = deparse_while(ast),
          "list" = deparse_list(ast),
          "data.frame" = deparse_df(ast),
+         "let" = deparse_let(ast),
          deparse_default(ast)
   )
 }
@@ -151,7 +152,7 @@ deparse_for <- function(ast) {
   sym_ls <- purrr::map_chr(ast, deparse0)
   paste(
     sym_ls[1],
-    glue::glue("({sym_ls[2]} of {sym_ls[3]})"),
+    glue::glue("(let {sym_ls[2]} of {sym_ls[3]})"),
     sym_ls[4]
   )
 }
@@ -173,7 +174,6 @@ deparse_if <- function(ast) {
 }
 
 deparse_function <- function(ast) {
-
   deparse_arg <- function(alist0) {
     alist1 <- purrr::map(alist0, deparse)
     alist2 <- purrr::map2_chr(
@@ -207,21 +207,27 @@ deparse_while <- function(ast) {
 }
 
 deparse_list <- function(ast) {
-
   deparse_arg <- function(list0) {
     list1 <- purrr::map(list0, deparse0)
-    list2 <- purrr::map2_chr(
-      .x = names(list1),
-      .y = list1,
-      .f = function(x, y) {
-        if (x == "") {
-          warning("All elements in a list must be named to convert into JavaScript properly.")
-          glue::glue("{y}")
-        } else {
-          glue::glue("{x}: {y}")
+
+    labels <- names(list1)
+    if (is.null(labels)) {
+      list2 <- purrr::map_chr(list1, function(y) { glue::glue("{y}") })
+      warning("All elements in a list must be named to convert into JavaScript properly.")
+    } else {
+      list2 <- purrr::map2_chr(
+        .x = labels,
+        .y = list1,
+        .f = function(x, y) {
+          if (x == "") {
+            warning("All elements in a list must be named to convert into JavaScript properly.")
+            glue::glue("{y}")
+          } else {
+            glue::glue("{x}: {y}")
+          }
         }
-      }
-    )
+      )
+    }
     paste(list2, collapse = ", ")
   }
 
@@ -229,33 +235,62 @@ deparse_list <- function(ast) {
 }
 
 deparse_df <- function(ast) {
+  deparse_arg <- function(list0) {
+    list1 <- purrr::map(list0, deparse)
 
-  deparse_arg <- function(alist0) {
-    alist1 <- purrr::map(alist0, deparse)
-    alist2 <- purrr::map2_chr(
-      .x = names(alist1),
-      .y = alist1,
-      .f = function(x, y) {
-        if (x == "") {
-          warning("All columns in a dataframe must be named to convert into JavaScript properly.")
-          glue::glue("{y}")
-        } else {
-          glue::glue("{x}: {y}")
-        }
-      }
-    )
-    paste(alist2, collapse = ", ")
+    labels <- names(list1)
+    if (is.null(labels)) {
+      list2 <- purrr::map_chr(list1, function(y) { glue::glue("{y}") })
+      warning("All elements in a list must be named to convert into JavaScript properly.")
+    } else {
+      list2 <- purrr::map2_chr(
+        .x = names(list1),
+        .y = list1,
+        .f = function(x, y) {
+          if (x == "") {
+            warning("All columns in a dataframe must be named to convert into JavaScript properly.")
+            glue::glue("{y}")
+          } else {
+            glue::glue("{x}: {y}")
+          }
+        })
+    }
+    paste(list2, collapse = ", ")
   }
 
   paste0("new dfjs.DataFrame({ ", deparse_arg(ast[-1]), " })")  # should dfjs be hard coded? interface needed?
 }
 
+deparse_let <- function(ast) {
+  deparse_arg <- function(list0) {
+    list1 <- purrr::map(list0, deparse0)
+    labels <- names(list1)
+    if (is.null(labels)) {
+      list2 <- purrr::map_chr(list1, function(y) { glue::glue("{y}") })
+    } else {
+      list2 <- purrr::map2_chr(
+        .x = names(list1),
+        .y = list1,
+        .f = function(x, y) {
+          if (x == "") {
+            glue::glue("{y}")
+          } else {
+            glue::glue("{x} = {y}")
+          }
+        }
+      )
+    }
+    paste(list2, collapse = ", ")
+  }
+
+  paste("let", deparse_arg(ast[-1]))  # should dfjs be hard coded? interface needed?
+}
 
 # Symbols table / mapping
 space_symbol <- function(chr) {
   space <- c("=", "+", "-", "*",
-             #"%%", "^",        # R specific
-             "%", "**",        # Javascript specific
+             #"%%", "^",                # R specific
+             "%", "**", "instanceof"    # Javascript specific
              "==", "!=", "<", ">", "<=", ">=",
              "&&", "||", "&", "|")
   no_space <- c(

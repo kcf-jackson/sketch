@@ -7,8 +7,8 @@ html_template <- function(...) {
             htmltools::tags$head(
                 htmltools::tags$script(src = src("math")),
                 htmltools::tags$script(src = src("dataframe")),
-                ...,
-                htmltools::tags$script(src = utils)
+                htmltools::tags$script(src = utils),
+                ...
             ),
             htmltools::tags$body(
                 htmltools::tags$div(id = "new_sketch"),

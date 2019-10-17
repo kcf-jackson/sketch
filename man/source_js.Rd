@@ -4,13 +4,16 @@
 \alias{source_js}
 \title{Source a p5.js file}
 \usage{
-source_js(file, ...)
+source_js(file, ..., launch_browser = "viewer")
 }
 \arguments{
 \item{file}{A character string; path to the JS file.}
 
 \item{...}{An optional list of shiny tags to be added to the <head> of
 the html template.}
+
+\item{launch_browser}{A character string; "viewer" or "browser", which calls
+`rstudioapi::viewer` and `utils::browserURL` respectively.}
 }
 \description{
 Source a p5.js file

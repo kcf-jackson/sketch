@@ -37,7 +37,7 @@ convert_src <- function(x) {
             link(href = x)
 
         } else {
-            stop("Web support only works for JS and CSS links.")
+            stop("Web support only works for JavaScript and CSS links.")
         }
     } else {
         if (is_javascript(x)) {
@@ -59,7 +59,7 @@ convert_src <- function(x) {
             script(src = URI)
 
         } else {
-            stop("Script must be one of JavaScript, CSS, RScript and CSV")
+            stop("Script must be one of JavaScript, CSS, RScript and CSV.")
         }
     }
 }

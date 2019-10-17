@@ -11,11 +11,9 @@ deparse0 <- function(ast) {
     if (is_infix(ast)) {
       deparse_infix(ast)
     }
-
     else if (is_wrap(ast)) {
       deparse_wrap(ast)
     }
-
     else {
       deparse_prefix(ast)
     }
@@ -27,8 +25,8 @@ deparse0 <- function(ast) {
 
 is_infix <- function(ast) {
   infix_ops <- c("=", "+", "-", "*", "/",
-                 #"%%", "^", "$", "@",          # R specific
-                 "%", "**", ".", "instanceof",  # Javascript specific
+                 #"%%", "^", "$", "@",                # R specific
+                 "%", "**", ".", "instanceof", "=>",  # Javascript specific
                  "==", "!=", "<", ">", "<=", ">=", "!",
                  "&&", "||", "&", "|", ":")
   is_custom_infix <- function(x) {
@@ -134,6 +132,7 @@ deparse_prefix <- function(ast) {
          "list" = deparse_list(ast),
          "data.frame" = deparse_df(ast),
          "let" = deparse_let(ast),
+         "dataURI" = deparse_dataURI(ast),
          deparse_default(ast)
   )
 }
@@ -286,11 +285,20 @@ deparse_let <- function(ast) {
   paste("let", deparse_arg(ast[-1]))  # should dfjs be hard coded? interface needed?
 }
 
+deparse_dataURI <- function(ast) {
+  if (!is.character(ast[[2]])) {
+    stop("The argument inside the \"dataURI\" call is not a character string.
+         Note that our \"compiler\" only does static code analysis.")
+  }
+  paste0('"', base64enc::dataURI(file = ast[[2]]), '"')
+}
+
+
 # Symbols table / mapping
 space_symbol <- function(chr) {
   space <- c("=", "+", "-", "*",
-             #"%%", "^",                 # R specific
-             "%", "**", "instanceof",    # Javascript specific
+             #"%%", "^",                      # R specific
+             "%", "**", "instanceof", "=>",   # Javascript specific
              "==", "!=", "<", ">", "<=", ">=",
              "&&", "||", "&", "|")
   no_space <- c(

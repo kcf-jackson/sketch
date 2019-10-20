@@ -24,9 +24,10 @@ extract_src <- function(x) {
 #' @keywords internal
 convert_src <- function(x) {
     # JS, CSS: local or web,  R, CSV: local only.
-    # web links are kept as-is; local are turned into URI.
+    # web links are kept as-is; local are turned into URI (except CSS is kept in-line).
     script  <- htmltools::tags$script
     link    <- htmltools::tags$link
+    style   <- htmltools::tags$style
     dataURI <- base64enc::dataURI
 
     if (is_web_link(x)) {
@@ -45,8 +46,8 @@ convert_src <- function(x) {
             script(src = URI)
 
         } else if (is_css(x)) {
-            URI <- dataURI(file = x)
-            link(href = URI)
+            content <- paste(readLines(x), collapse = "\n")
+            style(content)
 
         } else if (is_r_script(x)) {
             index_js <- compile_r(x, tempfile())

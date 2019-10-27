@@ -290,7 +290,22 @@ deparse_dataURI <- function(ast) {
     stop("The argument inside the \"dataURI\" call is not a character string.
          Note that our \"compiler\" only does static code analysis.")
   }
-  paste0('"', base64enc::dataURI(file = ast[[2]]), '"')
+  fname <- ast[[2]]
+  mime_type <- detect_mime(fname)
+  paste0('"', base64enc::dataURI(file = fname, mime = mime_type), '"')
+}
+
+detect_mime <- function(fname) {
+  # reference: https://www.freeformatter.com/mime-types-list.html
+  switch(extname(fname),
+         "svg"  = "image/svg+xml",
+         "bmp"  = "image/bmp",
+         "jpeg" = "image/jpeg",
+         "jpg"  = "image/jpeg",
+         "tiff" = "image/tiff",
+         "gif"  = "image/gif",
+         "png"  = "image/png",
+         "")   # default case
 }
 
 

@@ -3,6 +3,7 @@
 export(compile_data)
 export(compile_r)
 export(insert_sketch)
+export(let)
 export(load_script)
 export(source_active)
 export(source_js)

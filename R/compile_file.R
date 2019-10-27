@@ -145,8 +145,8 @@ cond_subst <- function(ast, pattern, replacement) {
 rewrite_new <- function(ast) {
   if (rlang::is_call(ast)) {
     if (rlang::is_call(ast, "$")) {
-      cvar <- deparse(ast[[2]])
-      cop <- deparse(ast[[3]])
+      cvar <- deparseR(ast[[2]])
+      cop <- deparseR(ast[[3]])
       if (cop == "new") {
         return(as.symbol(glue::glue("new {cvar}")))
       }

@@ -2,6 +2,9 @@
 #' @param x A character string. The text to parse.
 parse0 <- function(x) parse(text = x)[[1]]
 
+#' Deparse R Expressions
+#' @param expr any R expression.
+deparseR <- function(expr) deparse(expr, width.cutoff = 500L)
 
 #' Expression Deparsing for JS
 #' @param ast A language object.
@@ -19,7 +22,7 @@ deparse0 <- function(ast) {
     }
 
   } else {
-    deparse(ast)
+    deparseR(ast)
   }
 }
 
@@ -33,15 +36,15 @@ is_infix <- function(ast) {
     grepl(pattern = "%[^%]+%", x = x)
   }
 
-  sym <- deparse(ast[[1]])
-  (sym %in% infix_ops) || is_custom_infix(sym)
+  sym <- deparseR(ast[[1]])
+  isTRUE(sym %in% infix_ops) || is_custom_infix(sym)
 }
 
 is_wrap <- function(ast) {
   wrap_ops <- c("{", "(", "[", "[[")
 
-  sym <- deparse(ast[[1]])
-  (sym %in% wrap_ops)
+  sym <- deparseR(ast[[1]])
+  isTRUE(sym %in% wrap_ops)
 }
 
 
@@ -123,7 +126,9 @@ deparse_wrap_cb <- function(ast) {
 
 
 deparse_prefix <- function(ast) {
-  sym <- deparse(ast[[1]])
+  sym <- deparseR(ast[[1]])
+  if (length(sym) > 1) return(deparse_default(ast)) # guard
+
   switch(sym,
          "for" = deparse_for(ast),
          "if" = deparse_if(ast),
@@ -174,7 +179,7 @@ deparse_if <- function(ast) {
 
 deparse_function <- function(ast) {
   deparse_arg <- function(alist0) {
-    alist1 <- purrr::map(alist0, deparse)
+    alist1 <- purrr::map(alist0, deparseR)
     alist2 <- purrr::map2_chr(
       .x = names(alist1),
       .y = alist1,
@@ -235,7 +240,7 @@ deparse_list <- function(ast) {
 
 deparse_df <- function(ast) {
   deparse_arg <- function(list0) {
-    list1 <- purrr::map(list0, deparse)
+    list1 <- purrr::map(list0, deparseR)
 
     labels <- names(list1)
     if (is.null(labels)) {

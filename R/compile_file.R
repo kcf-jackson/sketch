@@ -60,6 +60,13 @@ subst <- function(ast, pattern, replacement) {
       if (ast == pattern) return(as.symbol(replacement))
     }
 
+    # Handle the pairlist special case
+    if (is.pairlist(ast)) {
+      ast2 <- as.pairlist(purrr::map(ast, ~subst(.x, pattern, replacement)))
+      names(ast2) <- names(ast)
+      return(ast2)
+    }
+
     ast
 }
 
@@ -85,7 +92,7 @@ cond_subst_rules <- function() {
     make_rule( "print", "R.print"),
     make_rule("length", "R.length"),
     # Math.js
-    make_rule(  "pi", "Math.pi"),
+    make_rule(  "pi", "Math.PI"),
     make_rule( "sin", "Math.sin"),
     make_rule( "cos", "Math.cos"),
     make_rule( "tan", "Math.tan"),
@@ -97,7 +104,9 @@ cond_subst_rules <- function() {
     make_rule("atan", "Math.atan"),
     make_rule("asinh", "Math.asinh"),
     make_rule("acosh", "Math.acosh"),
-    make_rule("atanh", "Math.atanh")
+    make_rule("atanh", "Math.atanh"),
+    make_rule("min", "Math.min"),
+    make_rule("max", "Math.max")
     # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
   )
 }
@@ -119,6 +128,13 @@ cond_subst <- function(ast, pattern, replacement) {
     if (is.null(ast))   return(ast)
     if (is.na(ast))     return(ast)
     if (ast == pattern) return(as.symbol(replacement))
+  }
+
+  # Handle the pairlist special case
+  if (is.pairlist(ast)) {
+    ast2 <- as.pairlist(purrr::map(ast, ~cond_subst(.x, pattern, replacement)))
+    names(ast2) <- names(ast)
+    return(ast2)
   }
 
   ast
@@ -158,16 +174,15 @@ to_json <- function(input) {
     fname <- basename(input)
     sym <- gsub(x = fname, pattern = "[.]", replacement = "_")
 
-    contents <- read_file(input)
-    json <- jsonlite::toJSON(contents, dataframe = "columns")
-
-    glue::glue({"{sym} = new dfjs.DataFrame({json})"})
-}
-# Unit test
-# print(to_json(read.csv("mtcars.csv"), "", assign_to = "myVar"))
-# print(to_json(read.table("mtcars.txt"), "", assign_to = "myVar"))
-
-
-read_file <- function(x) {
-    read.csv(x)
+    if (is_csv(input)) {
+      contents <- read.csv(input)
+      json <- jsonlite::toJSON(contents, dataframe = "columns")
+      glue::glue({"const {sym} = new dfjs.DataFrame({json})"})
+    } else if (is_json(input)) {
+      contents <- jsonlite::read_json(input)
+      json <- jsonlite::toJSON(contents, dataframe = "columns", auto_unbox = T)
+      glue::glue({"const {sym} = {json}"})
+    } else {
+      stop("The package only supports CSV and JSON data files at the moment.")
+    }
 }

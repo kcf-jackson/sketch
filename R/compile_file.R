@@ -41,6 +41,7 @@ subst_rules <- function() {
     make_rule(":", "R.seq_by"),
     make_rule("%instanceof%", "instanceof"),
     make_rule("%=>%", "=>"),
+    make_rule("%+%", "+"),
     make_rule("self", "this")
   )
 }
@@ -91,6 +92,7 @@ cond_subst_rules <- function() {
     make_rule("matrix", "R.matrix"),
     make_rule( "print", "R.print"),
     make_rule("length", "R.length"),
+    make_rule(   "map", "R.map"),
     # Math.js
     make_rule(  "pi", "Math.PI"),
     make_rule( "sin", "Math.sin"),
@@ -106,7 +108,9 @@ cond_subst_rules <- function() {
     make_rule("acosh", "Math.acosh"),
     make_rule("atanh", "Math.atanh"),
     make_rule("min", "Math.min"),
-    make_rule("max", "Math.max")
+    make_rule("max", "Math.max"),
+    make_rule("round", "Math.round"),
+    make_rule("abs", "Math.abs")
     # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
   )
 }

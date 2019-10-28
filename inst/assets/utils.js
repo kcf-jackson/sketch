@@ -71,15 +71,15 @@ const R = (function() {
 
 
     // Basic R functions
-    function length(x) {
-        return x.length;
-    }
+    function length(x) { return x.length; }
+    function map(x, f) { return x.map(f); }
 
     return {
         seq_by: seq_by,
         c: c,
         matrix: matrix,
         print: print,
-        length: length
+        length: length,
+        map: map
     };
 })();

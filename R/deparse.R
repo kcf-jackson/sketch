@@ -138,6 +138,7 @@ deparse_prefix <- function(ast) {
          "data.frame" = deparse_df(ast),
          "let" = deparse_let(ast),
          "dataURI" = deparse_dataURI(ast),
+         "ifelse" = deparse_ifelse(ast),
          deparse_default(ast)
   )
 }
@@ -311,6 +312,12 @@ detect_mime <- function(fname) {
          "gif"  = "image/gif",
          "png"  = "image/png",
          "")   # default case
+}
+
+
+deparse_ifelse <- function(ast) {
+  sym_ls <- purrr::map_chr(ast, deparse0)
+  glue::glue("{sym_ls[2]} ? {sym_ls[3]} : {sym_ls[4]}")
 }
 
 

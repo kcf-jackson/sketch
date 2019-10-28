@@ -1,4 +1,5 @@
 html_template <- function(...) {
+    args <- c(...)
     utils <- base64enc::dataURI(
         file = system.file("assets/utils.js", package = "sketch")
     )
@@ -7,11 +8,12 @@ html_template <- function(...) {
             htmltools::tags$head(
                 htmltools::tags$script(src = src("math")),
                 htmltools::tags$script(src = src("dataframe")),
-                htmltools::tags$script(src = utils)
+                htmltools::tags$script(src = utils),
+                args$head,
             ),
             htmltools::tags$body(
                 htmltools::tags$div(id = "new_sketch"),
-                ...,   # hotfix
+                args$body,
                 htmltools::tags$script(src = "./index.js")
             )
         )

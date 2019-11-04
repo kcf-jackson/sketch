@@ -1,29 +1,19 @@
-#' Load JavaScript / CSS / R Sketch Script / CSV file into an RMD document
-#' @param x A character string; the link / path to the JS / CSS / R script / CSV file
-#' @export
-#' @examples
-#' \dontrun{
-#' load_script(src("p5"))
-#' load_script("https://cdn.plot.ly/plotly-latest.min.js")
-#' }
-load_script <- function(x) {
-  htmltools::doRenderTags(convert_src(x))
-}
-
-
 #' Insert a sketch into an RMD document
-#' @param id A character string; the id for the <div> that contains
-#' the sketch. This must match with the id used in the sketch file.
-#' @param sketch_path A character string; the path to the sketch file.
+#' @param file A character string; the path to the sketch file.
+#' @param id A character string; an unique identifier for the sketch file.
+#' @param ... (Optional) Other attributes to pass to iframes.
+#' @note This function creates a temporary folder at the working directory.
 #' @export
-insert_sketch <- function(id = "new_sketch", sketch_path) {
-    index_js <- compile_r(sketch_path, tempfile())
+insert_sketch <- function(file, id, ...) {
+    html_file <- source_r(file = file, launch_browser = NULL)
+
+    temp_dir <- "./sketch_tmp/"
+    if (!file.exists(temp_dir)) dir.create(temp_dir)
+
+    temp_file <- file.path(temp_dir, paste0(id, ".html"))
+    file.copy(html_file$html, temp_file, overwrite = F)
+
     htmltools::doRenderTags(
-        list(
-            htmltools::div(id = id),
-            htmltools::tags$script(
-                paste(readLines(index_js), collapse = "\n")
-            )
-        )
+      htmltools::tags$iframe(src = temp_file, style="border: none;", ...)
     )
 }

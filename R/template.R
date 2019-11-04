@@ -9,12 +9,11 @@ html_template <- function(...) {
                 htmltools::tags$script(src = src("math")),
                 htmltools::tags$script(src = src("dataframe")),
                 htmltools::tags$script(src = utils),
-                args$head,
+                args$head
             ),
             htmltools::tags$body(
                 htmltools::tags$div(id = "new_sketch"),
-                args$body,
-                htmltools::tags$script(src = "./index.js")
+                args$body
             )
         )
     )

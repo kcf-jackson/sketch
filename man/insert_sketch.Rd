@@ -4,14 +4,18 @@
 \alias{insert_sketch}
 \title{Insert a sketch into an RMD document}
 \usage{
-insert_sketch(id = "new_sketch", sketch_path)
+insert_sketch(file, id, ...)
 }
 \arguments{
-\item{id}{A character string; the id for the <div> that contains
-the sketch. This must match with the id used in the sketch file.}
+\item{file}{A character string; the path to the sketch file.}
 
-\item{sketch_path}{A character string; the path to the sketch file.}
+\item{id}{A character string; an identifier for the sketch file.}
+
+\item{...}{(Optional) Other attributes to pass to iframes.}
 }
 \description{
 Insert a sketch into an RMD document
+}
+\note{
+This function creates temporary files at the working directory.
 }

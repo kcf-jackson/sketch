@@ -11,8 +11,9 @@ source_r(file, debug = F, launch_browser = "viewer")
 
 \item{debug}{T or F; if T, print compiled code on screen.}
 
-\item{launch_browser}{A character string; "viewer" or "browser", which calls
-`rstudioapi::viewer` and `utils::browserURL` respectively.}
+\item{launch_browser}{A character string; "viewer" or "browser", which
+calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+`NULL` to suppress display.}
 }
 \description{
 Source a p5.R file

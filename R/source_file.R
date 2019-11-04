@@ -16,8 +16,9 @@ copy_active_to_tempfile <- function() {
 #' Source a p5.R file
 #' @param file A character string; path to the R file.
 #' @param debug T or F; if T, print compiled code on screen.
-#' @param launch_browser A character string; "viewer" or "browser", which calls
-#' `rstudioapi::viewer` and `utils::browserURL` respectively.
+#' @param launch_browser A character string; "viewer" or "browser", which
+#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+#' `NULL` to suppress display.
 #' @export
 source_r <- function(file, debug = F, launch_browser = "viewer") {
   if (debug) {
@@ -35,24 +36,31 @@ source_r <- function(file, debug = F, launch_browser = "viewer") {
 #' @param file A character string; path to the JS file.
 #' @param ... An optional list of shiny tags to be added to the <head> of
 #' the html template.
-#' @param launch_browser A character string; "viewer" or "browser", which calls
-#' `rstudioapi::viewer` and `utils::browserURL` respectively.
+#' @param launch_browser A character string; "viewer" or "browser", which
+#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+#' `NULL` to suppress display.
 #' @export
 source_js <- function(file, ..., launch_browser = "viewer") {
-  index_html <- htmltools::html_print(html_template(...), viewer = NULL)
+  asset_tags <- c(...)
+  fileURI <- base64enc::dataURI(file = file, mime = "application/javascript")
+
+  asset_tags$body <- append(
+    asset_tags$body,
+    list(htmltools::tags$script(src = fileURI))
+  )
+  index_html <- htmltools::html_print(html_template(asset_tags), viewer = NULL)
 
   temp_dir <- tempdir()
   temp_html <- file.path(temp_dir, "index.html")
-  temp_js <- file.path(temp_dir, "index.js")
-  file.copy(
-    from = c(index_html, file),
-    to = c(temp_html, temp_js),
-    overwrite = T
-  )
+  file.copy(from = index_html, to = temp_html, overwrite = T)
 
-  if (launch_browser == "viewer") {
-    rstudioapi::viewer(temp_html)
-  } else {
-    utils::browseURL(temp_html)
+  if (!is.null(launch_browser)) {
+    if (launch_browser == "viewer") {
+      rstudioapi::viewer(temp_html)
+    } else {
+      utils::browseURL(temp_html)
+    }
   }
+
+  invisible(list(html = temp_html))
 }

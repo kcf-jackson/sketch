@@ -14,14 +14,15 @@ assets <- function(file) {
         purrr::map(convert_src) %>%
         sort_list(r_indicator, c("body", "head"))
     low_level_assets <- purrr::map(src_lines[r_indicator], assets)
-    if (purrr::is_empty(low_level_assets)) {
-        return(top_level_assets)
-    }
 
-    join_list(
-        top_level_assets,
-        purrr::reduce(low_level_assets, join_list)
-    )
+    if (purrr::is_empty(low_level_assets)) {
+        top_level_assets
+    } else {
+        join_list(
+            top_level_assets,
+            purrr::reduce(low_level_assets, join_list)
+        )
+    }
 }
 
 join_list <- function(x, y) {
@@ -30,20 +31,10 @@ join_list <- function(x, y) {
     list(head = c(x$head, y$head), body = c(x$body, y$body))
 }
 
+# Assets are moved to the top, R scripts are moved to the bottom
 sort_list <- function(x, indicator, names) {
     setNames(list(x[indicator], x[!indicator]), names)
 }
-# Flatten nested list of shiny tags
-# flatten <- function(x) {
-#     if (is_shiny_tag(x)) {
-#         list(x)
-#     } else {
-#         unlist(purrr::map(x, flatten), recursive = FALSE)
-#     }
-# }
-#
-# is_shiny_tag <- function(x) class(x) == "shiny.tag"
-#
 
 
 # Takes string input:    "#! load_script('https://abc/def.js')"

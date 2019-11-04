@@ -12,8 +12,9 @@ source_js(file, ..., launch_browser = "viewer")
 \item{...}{An optional list of shiny tags to be added to the <head> of
 the html template.}
 
-\item{launch_browser}{A character string; "viewer" or "browser", which calls
-`rstudioapi::viewer` and `utils::browserURL` respectively.}
+\item{launch_browser}{A character string; "viewer" or "browser", which
+calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+`NULL` to suppress display.}
 }
 \description{
 Source a p5.js file

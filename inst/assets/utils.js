@@ -73,6 +73,21 @@ const R = (function() {
     // Basic R functions
     function length(x) { return x.length; }
     function map(x, f) { return x.map(f); }
+    function reduce(x, f) { return x.reduce(f); }
+
+    function all(x) {
+      for (let i of x) {
+        if (!i) return(false);
+      }
+      return(true);
+    }
+
+    function any(x) {
+      for (let i of x) {
+        if (i) return(true);
+      }
+      return(false);
+    }
 
     return {
         seq_by: seq_by,
@@ -80,6 +95,9 @@ const R = (function() {
         matrix: matrix,
         print: print,
         length: length,
-        map: map
+        map: map,
+        reduce: reduce,
+        all: all,
+        any: any
     };
 })();

@@ -136,9 +136,11 @@ deparse_prefix <- function(ast) {
          "while" = deparse_while(ast),
          "list" = deparse_list(ast),
          "data.frame" = deparse_df(ast),
+         # Special forms
          "let" = deparse_let(ast),
          "dataURI" = deparse_dataURI(ast),
          "ifelse" = deparse_ifelse(ast),
+         "lambda" = deparse_lambda(ast),
          deparse_default(ast)
   )
 }
@@ -314,10 +316,22 @@ detect_mime <- function(fname) {
          "")   # default case
 }
 
-
 deparse_ifelse <- function(ast) {
   sym_ls <- purrr::map_chr(ast, deparse0)
   glue::glue("{sym_ls[2]} ? {sym_ls[3]} : {sym_ls[4]}")
+}
+
+deparse_lambda <- function(ast) {
+  sym_ls <- purrr::map_chr(ast, deparse0)
+  l <- length(sym_ls)
+  args <- sym_ls[-c(1, l)]
+  body <- sym_ls[[l]]
+  if (purrr::is_empty(args)) {
+    glue::glue("function() {{ return {body}; }}")
+  } else {
+    args <- paste(args, collapse = ", ")
+    glue::glue("function({args}) {{ return {body}; }}")
+  }
 }
 
 

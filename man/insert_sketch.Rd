@@ -9,7 +9,7 @@ insert_sketch(file, id, ...)
 \arguments{
 \item{file}{A character string; the path to the sketch file.}
 
-\item{id}{A character string; an identifier for the sketch file.}
+\item{id}{A character string; an unique identifier for the sketch file.}
 
 \item{...}{(Optional) Other attributes to pass to iframes.}
 }
@@ -17,5 +17,5 @@ insert_sketch(file, id, ...)
 Insert a sketch into an RMD document
 }
 \note{
-This function creates temporary files at the working directory.
+This function creates a temporary folder at the working directory.
 }

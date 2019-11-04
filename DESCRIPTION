@@ -1,7 +1,7 @@
 Package: sketch
 Type: Package
 Title: Animated and embeddable sketches in R
-Version: 0.5.0
+Version: 0.5.8
 Author: Chun Fung (Jackson) Kwok
 Maintainer: Chun Fung (Jackson) Kwok <kwokcf@unimelb.edu.au>
 Description: Creates static / animated / interactive sketches and illustrations 

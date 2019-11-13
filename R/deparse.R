@@ -33,7 +33,7 @@ is_infix <- function(ast) {
                  "==", "!=", "<", ">", "<=", ">=", "!",
                  "&&", "||", "&", "|", ":")
   is_custom_infix <- function(x) {
-    grepl(pattern = "%[^%]+%", x = x)
+    grepl(pattern = "^%[^%]+%$", x = x)
   }
 
   sym <- deparseR(ast[[1]])
@@ -50,7 +50,7 @@ is_wrap <- function(ast) {
 
 # Deparse functions
 deparse_infix <- function(ast) {
-  sym <- as.character(ast[[1]])
+  sym <- deparse0(ast[[1]])
 
   # handle negative sign as unary operator
   if (length(ast) == 2) {
@@ -70,7 +70,7 @@ deparse_infix <- function(ast) {
 
 
 deparse_wrap <- function(ast) {
-  sym <- as.character(ast[[1]])
+  sym <- deparse0(ast[[1]])
   switch(sym,
          "["  = deparse_wrap_sb(ast),
          "[[" = deparse_wrap_sb(ast),
@@ -126,7 +126,7 @@ deparse_wrap_cb <- function(ast) {
 
 
 deparse_prefix <- function(ast) {
-  sym <- deparseR(ast[[1]])
+  sym <- deparse0(ast[[1]])
   if (length(sym) > 1) return(deparse_default(ast)) # guard
 
   switch(sym,

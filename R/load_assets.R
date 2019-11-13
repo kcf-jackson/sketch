@@ -28,7 +28,7 @@ assets <- function(file) {
 join_list <- function(x, y) {
     if (purrr::is_empty(x)) return(list())
     if (purrr::is_empty(y)) return(x)
-    list(head = c(x$head, y$head), body = c(x$body, y$body))
+    list(head = c(x$head, y$head), body = c(y$body, x$body))  # order is strict
 }
 
 # Assets are moved to the top, R scripts are moved to the bottom

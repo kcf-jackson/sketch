@@ -41,8 +41,7 @@ subst_rules <- function() {
     make_rule(":", "R.seq_by"),
     make_rule("%instanceof%", "instanceof"),
     make_rule("%=>%", "=>"),
-    make_rule("%+%", "+"),
-    make_rule("self", "this")
+    make_rule("%+%", "+")
   )
 }
 
@@ -55,14 +54,16 @@ subst <- function(ast, pattern, replacement) {
       return(as.symbol(replacement))
     }
 
-    if (rlang::is_syntactic_literal(ast)) {
-      if (is.null(ast))   return(ast)
-      if (is.na(ast))     return(ast)
-      if (ast == pattern) return(as.symbol(replacement))
-    }
+    # No longer needed. Literal should now go under conditional rewriting.
+    # Unconditional rewriting should only apply to special binary operators.
+    # if (rlang::is_syntactic_literal(ast)) {
+    #   if (is.null(ast))   return(ast)
+    #   if (is.na(ast))     return(ast)
+    #   if (ast == pattern) return(as.symbol(replacement))
+    # }
 
     # Handle the pairlist special case
-    if (is.pairlist(ast)) {
+    if (rlang::is_pairlist(ast)) {
       ast2 <- as.pairlist(purrr::map(ast, ~subst(.x, pattern, replacement)))
       names(ast2) <- names(ast)
       return(ast2)
@@ -86,6 +87,7 @@ cond_subst_rules <- function() {
     make_rule("TRUE", "true"),
     make_rule("FALSE", "false"),
     make_rule("declare", "let"),
+    make_rule("self", "this"),
     # R-like functions
     make_rule(   "seq", "R.seq_by"),
     make_rule(     "c", "R.c"),
@@ -113,7 +115,12 @@ cond_subst_rules <- function() {
     make_rule("min", "Math.min"),
     make_rule("max", "Math.max"),
     make_rule("round", "Math.round"),
-    make_rule("abs", "Math.abs")
+    make_rule("ceiling", "Math.ceil"),
+    make_rule("floor", "Math.floor"),
+    make_rule("abs", "Math.abs"),
+    make_rule("JS_NULL", "null"),
+    make_rule("JS_UNDEFINED", "undefined"),
+    make_rule("JS_NA", "NaN")
     # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
   )
 }
@@ -121,6 +128,10 @@ cond_subst_rules <- function() {
 cond_subst <- function(ast, pattern, replacement) {
   if (rlang::is_call(ast)) {
     if (rlang::is_call(ast, '.')) {
+      # '.' needs special handling because almost anything can go after '.' in JavaScript (including keywords!)
+      # It is helpful to assume that things appeared after '.' should be treated as if they are quoted strings,
+      # and hence, no rewriting should be applied to them.
+      ast[[2]] <- cond_subst(ast[[2]], pattern, replacement)
       return(ast)
     } else {
       return(as.call(purrr::map(ast, ~cond_subst(.x, pattern, replacement))))
@@ -138,7 +149,7 @@ cond_subst <- function(ast, pattern, replacement) {
   }
 
   # Handle the pairlist special case
-  if (is.pairlist(ast)) {
+  if (rlang::is_pairlist(ast)) {
     ast2 <- as.pairlist(purrr::map(ast, ~cond_subst(.x, pattern, replacement)))
     names(ast2) <- names(ast)
     return(ast2)

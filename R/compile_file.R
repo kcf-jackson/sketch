@@ -120,7 +120,9 @@ cond_subst_rules <- function() {
     make_rule("abs", "Math.abs"),
     make_rule("JS_NULL", "null"),
     make_rule("JS_UNDEFINED", "undefined"),
-    make_rule("JS_NA", "NaN")
+    make_rule("JS_NA", "NaN"),
+    # jQuery
+    make_rule("jQuery", "$")
     # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
   )
 }

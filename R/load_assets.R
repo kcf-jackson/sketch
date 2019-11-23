@@ -40,7 +40,24 @@ sort_list <- function(x, indicator, names) {
 # Takes string input:    "#! load_script('https://abc/def.js')"
 # Returns string output: "https://abc/def.js"
 extract_src <- function(x) {
-    parse0(substring(x, 3))[[2]]
+    args <- parse0(substring(x, 3))[[2]]
+    if (args[[1]] %in% c('src', 'sketch::src')) {
+        src(args[[2]])
+    } else {
+        args
+    }
+    # Potential refactoring in the future:
+    # - Handle optional arguments
+    # - `convert_src` may need to be changed accordingly
+    #
+    # ast <- as.list(parse0(substring(x, 3)))
+    # ret <- if (is.null(ast$src)) ast[[2]] else ast$src
+    #
+    # # Post-processing
+    # if (!is.null(ast$cache)) {
+    #     attr(ret, "cache") <- ast$cache
+    # }
+    # ret
 }
 
 

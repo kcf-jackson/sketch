@@ -98,6 +98,7 @@ cond_subst_rules <- function() {
     make_rule("reduce", "R.reduce"),
     make_rule(   "all", "R.all"),
     make_rule(   "any", "R.any"),
+    make_rule( "runif", "R.runif"),
     # Math.js
     make_rule(  "pi", "Math.PI"),
     make_rule( "sin", "Math.sin"),

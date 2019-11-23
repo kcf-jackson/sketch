@@ -89,6 +89,14 @@ const R = (function() {
       return(false);
     }
 
+    function runif(n, min = 0, max = 1) {
+        var res = [];
+        for (var i = 1; i <= n; i++) {
+            res.push(min + Math.random() * (max - min));
+        }
+        return res;
+    }
+
     return {
         seq_by: seq_by,
         c: c,
@@ -98,6 +106,7 @@ const R = (function() {
         map: map,
         reduce: reduce,
         all: all,
-        any: any
+        any: any,
+        runif: runif
     };
 })();

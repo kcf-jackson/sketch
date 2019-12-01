@@ -24,7 +24,7 @@ only the R syntax.
 
 ## Index
 
-1.  [Preliminaries](#section-1)
+1.  [Preliminaries](#1-Preliminaries)
     
     [1.1 Installation](#section-1-1)
     

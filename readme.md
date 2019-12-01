@@ -26,9 +26,9 @@ only the R syntax.
 
 1.  [Preliminaries](#1-Preliminaries)
     
-    [1.1 Installation](#section-1-1)
+    [1.1 Installation](#11-Installation)
     
-    [1.2 Run ta sketch R file](#section-1-2)
+    [1.2 Run a sketch R file](#12-RunasketchRfile)
     
     [1.3 Embed a sketch R file in RMarkDown document](#section-1-3)
 

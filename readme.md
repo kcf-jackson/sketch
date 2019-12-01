@@ -40,7 +40,7 @@ only the R syntax.
     
     [2.3 d3.js](#23-d3js)
     
-    [2.4 JQuery](#24-JQuery)
+    [2.4 JQuery Quiz](#24-JQuery-Quiz)
 
 3.  [Notes](#3-Notes)
     

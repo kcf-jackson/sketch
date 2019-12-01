@@ -28,25 +28,25 @@ only the R syntax.
     
     [1.1 Installation](#11-Installation)
     
-    [1.2 Run a sketch R file](#12-RunasketchRfile)
+    [1.2 Run a sketch R file](#12-Run-a-sketch-R-file)
     
-    [1.3 Embed a sketch R file in RMarkDown document](#section-1-3)
+    [1.3 Embed a sketch R file in RMarkDown document](#13-Embed-a-sketch-R-file-in-RMarkDown-document)
 
-2.  [Basic examples](#section-2)
+2.  [Basic examples](#2-Basic-examples)
     
-    [2.1 p5.js](#section-2-1)
+    [2.1 p5.js](#21-p5js)
     
-    [2.2 DOM manipulation](#section-2-2)
+    [2.2 DOM manipulation](#22-DOM-manipulation)
     
-    [2.3 d3.js](#section-2-3)
+    [2.3 d3.js](#23-d3js)
     
-    [2.4 JQuery](#section-2-4)
+    [2.4 JQuery](#24-JQuery)
 
-3.  [Notes](#section-3)
+3.  [Notes](#3-Notes)
     
-    [3.1 Special operators](#section-3-1)
+    [3.1 Special operators](#31-Special-operators)
     
-    [3.2 Common pitfalls (of writing JS in R)](#section-3-2)
+    [3.2 Common pitfalls (of writing JS in R)](#32-common-pitfalls-of-writing-js-in-r)
 
 -----
 

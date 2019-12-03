@@ -21,4 +21,5 @@ Imports:
     base64enc,
     jsonlite
 Suggests: 
-    testthat
+    testthat,
+    covr

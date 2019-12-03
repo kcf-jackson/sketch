@@ -4,11 +4,11 @@ parse0 <- function(x) parse(text = x)[[1]]
 
 #' Deparse R Expressions
 #' @param expr any R expression.
-deparseR <- function(expr) deparse(expr, width.cutoff = 500L)
+deparse_r <- function(expr) deparse(expr, width.cutoff = 500L)
 
 #' Expression Deparsing for JS
 #' @param ast A language object.
-deparse0 <- function(ast) {
+deparse_js <- function(ast) {
   if (is.call(ast)) {
 
     if (is_infix(ast)) {
@@ -22,7 +22,7 @@ deparse0 <- function(ast) {
     }
 
   } else {
-    deparseR(ast)
+    deparse_r(ast)
   }
 }
 
@@ -36,41 +36,44 @@ is_infix <- function(ast) {
     grepl(pattern = "^%[^%]+%$", x = x)
   }
 
-  sym <- deparseR(ast[[1]])
+  sym <- deparse_r(ast[[1]])
   isTRUE(sym %in% infix_ops) || is_custom_infix(sym)
 }
 
 is_wrap <- function(ast) {
   wrap_ops <- c("{", "(", "[", "[[")
 
-  sym <- deparseR(ast[[1]])
+  sym <- deparse_r(ast[[1]])
   isTRUE(sym %in% wrap_ops)
 }
 
 
 # Deparse functions
 deparse_infix <- function(ast) {
-  sym <- deparse0(ast[[1]])
+  sym <- deparse_js(ast[[1]])
 
-  # handle negative sign as unary operator
+  # Special case 1: handle negative sign as unary operator
   if (length(ast) == 2) {
     return(paste0(
       sym,
-      deparse0(ast[[2]])
+      deparse_js(ast[[2]])
     ))
   }
 
-  paste(
-    deparse0(ast[[2]]),
-    sym,
-    deparse0(ast[[3]]),
-    sep = space_symbol(sym)
-  )
+  lhs <- deparse_js(ast[[2]])
+  rhs <- deparse_js(ast[[3]])
+
+  # Special case 2: handle `new` operator
+  if (rlang::is_call(ast, ".") && (rhs == "new")) {
+    return(glue::glue("new {lhs}"))
+  }
+
+  paste(lhs, sym, rhs, sep = space_symbol(sym))
 }
 
 
 deparse_wrap <- function(ast) {
-  sym <- deparse0(ast[[1]])
+  sym <- deparse_js(ast[[1]])
   switch(sym,
          "["  = deparse_wrap_sb(ast),
          "[[" = deparse_wrap_sb(ast),
@@ -82,7 +85,7 @@ deparse_wrap <- function(ast) {
 
 deparse_wrap_sb <- function(ast) {
   # case "[" and "[["
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   sym <- sym_ls[1]
   paste0(
     sym_ls[2],
@@ -94,7 +97,7 @@ deparse_wrap_sb <- function(ast) {
 
 deparse_wrap_rb <- function(ast) {
   # Case '('
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   sym <- sym_ls[1]
   paste0(
     sym,
@@ -105,7 +108,7 @@ deparse_wrap_rb <- function(ast) {
 
 deparse_wrap_cb <- function(ast) {
   # Case '{'
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   sym <- sym_ls[1]
   increase_indent <- function(x) {
     indent <- "   "
@@ -126,7 +129,7 @@ deparse_wrap_cb <- function(ast) {
 
 
 deparse_prefix <- function(ast) {
-  sym <- deparse0(ast[[1]])
+  sym <- deparse_js(ast[[1]])
   if (length(sym) > 1) return(deparse_default(ast)) # guard
 
   switch(sym,
@@ -141,12 +144,13 @@ deparse_prefix <- function(ast) {
          "dataURI" = deparse_dataURI(ast),
          "ifelse" = deparse_ifelse(ast),
          "lambda" = deparse_lambda(ast),
+         "math.subtract" = deparse_math_subtract(ast),
          deparse_default(ast)
   )
 }
 
 deparse_default <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   paste0(
     sym_ls[1],
     "(",
@@ -156,7 +160,7 @@ deparse_default <- function(ast) {
 }
 
 deparse_for <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   paste(
     sym_ls[1],
     glue::glue("(let {sym_ls[2]} of {sym_ls[3]})"),
@@ -165,7 +169,7 @@ deparse_for <- function(ast) {
 }
 
 deparse_if <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   has_else <- function(x) length(x) == 4
   out <- paste(
     sym_ls[1],
@@ -182,7 +186,7 @@ deparse_if <- function(ast) {
 
 deparse_function <- function(ast) {
   deparse_arg <- function(alist0) {
-    alist1 <- purrr::map(alist0, deparseR)
+    alist1 <- purrr::map(alist0, deparse_r)
     alist2 <- purrr::map2_chr(
       .x = names(alist1),
       .y = alist1,
@@ -198,14 +202,14 @@ deparse_function <- function(ast) {
   }
 
   paste0(
-    deparse0(ast[[1]]),
+    deparse_js(ast[[1]]),
     "(", deparse_arg(ast[[2]]), ") ",
-    deparse0(ast[[3]])
+    deparse_js(ast[[3]])
   )
 }
 
 deparse_while <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   paste(
     sym_ls[1],
     glue::glue("({sym_ls[2]})"),
@@ -215,7 +219,7 @@ deparse_while <- function(ast) {
 
 deparse_list <- function(ast) {
   deparse_arg <- function(list0) {
-    list1 <- purrr::map(list0, deparse0)
+    list1 <- purrr::map(list0, deparse_js)
 
     labels <- names(list1)
     if (is.null(labels)) {
@@ -243,7 +247,7 @@ deparse_list <- function(ast) {
 
 deparse_df <- function(ast) {
   deparse_arg <- function(list0) {
-    list1 <- purrr::map(list0, deparseR)
+    list1 <- purrr::map(list0, deparse_r)
 
     labels <- names(list1)
     if (is.null(labels)) {
@@ -270,7 +274,7 @@ deparse_df <- function(ast) {
 
 deparse_let <- function(ast) {
   deparse_arg <- function(list0) {
-    list1 <- purrr::map(list0, deparse0)
+    list1 <- purrr::map(list0, deparse_js)
     labels <- names(list1)
     if (is.null(labels)) {
       list2 <- purrr::map_chr(list1, function(y) { glue::glue("{y}") })
@@ -317,12 +321,12 @@ detect_mime <- function(fname) {
 }
 
 deparse_ifelse <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   glue::glue("{sym_ls[2]} ? {sym_ls[3]} : {sym_ls[4]}")
 }
 
 deparse_lambda <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse0)
+  sym_ls <- purrr::map_chr(ast, deparse_js)
   l <- length(sym_ls)
   args <- sym_ls[-c(1, l)]
   body <- sym_ls[[l]]
@@ -331,6 +335,15 @@ deparse_lambda <- function(ast) {
   } else {
     args <- paste(args, collapse = ", ")
     glue::glue("function({args}) {{ return {body}; }}")
+  }
+}
+
+deparse_math_subtract <- function(ast) {
+  if (length(ast) == 2) {
+    num <- deparse_js(ast[[2]])
+    glue::glue("-{num}")
+  } else {
+    deparse_default(ast)
   }
 }
 

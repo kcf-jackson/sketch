@@ -28,6 +28,21 @@ testthat::test_that("Rewriting R to JavaScript", {
   unit_test("-3 + 4", "math.add(-3, 4)")
   unit_test("-2 + 3 - 4", "math.subtract(math.add(-2, 3), 4)")
   unit_test("-(2 + 3) - 4", "math.subtract(-(math.add(2, 3)), 4)")
+  unit_test("abc$abc[0]", "abc.abc[0]")
+  unit_test("if (TRUE) f(x)", "if (true) f(x)")
+  unit_test("if (TRUE) f(x) else g(x)", "if (true) f(x) else g(x)")
+  unit_test("let (x)", "let x")
+  unit_test("let (x = 3)", "let x = 3")
+  unit_test("declare (x)", "let x")
+  unit_test("declare (y = 4)", "let y = 4")
+  unit_test("for (i in iterables) { x }", "for (let i of iterables) {\n    x\n}")
+  unit_test("list(x = 1, y = 2)", "{ x: 1, y: 2 }")
+  unit_test("data.frame(x = 2, y = 2)", "new dfjs.DataFrame({ x: 2, y: 2 })")
+  unit_test("ifelse(test, yes, no)", "test ? yes : no")
+  unit_test("lambda(x, sin(x))", "function(x) { return math.sin(x); }")
+  unit_test("function(b, c) {}", "function(b, c) {\n    \n}")
+  unit_test("while (TRUE) { do(x) }", "while (true) {\n    do(x)\n}")
+  unit_test("abc %op% abc", "abc %op% abc")
 
   # Test that function arguments are rewritten
   unit_test("function(b = TRUE, c = FALSE) {}", "function(b = true, c = false) {\n    \n}")
@@ -39,4 +54,5 @@ testthat::test_that("Rewriting R to JavaScript", {
   unit_test("a$length", "a.length")
   unit_test("obj_1$length <- length(abcde)", "obj_1.length = R.length(abcde)")
   unit_test("length(obj_1$length$max)", "R.length(obj_1.length.max)")
+
 })

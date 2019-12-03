@@ -75,6 +75,39 @@ const R = (function() {
     function map(x, f) { return x.map(f); }
     function reduce(x, f) { return x.reduce(f); }
 
+    function runif(n, min = 0, max = 1) {
+        var res = [];
+        for (var i = 1; i <= n; i++) {
+            res.push(min + Math.random() * (max - min));
+        }
+        return res;
+    }
+
+    // genericGroup
+    function signif(x, n) {
+        function signif0(x) {
+            return(parseFloat(x.toPrecision(n)));
+        }
+
+        if (typeof(x) == "number") {
+            return(signif0(x));
+        }
+
+        else if (x instanceof Array) {
+            return(map(x, signif0));
+        }
+
+        else {
+            throw "Currently only supports scalar and array.";
+        }
+    }
+
+    function cospi(x) { return math.cos(math.multiply(x, math.pi)); }
+    function sinpi(x) { return math.sin(math.multiply(x, math.pi)); }
+    function tanpi(x) { return math.tan(math.multiply(x, math.pi)); }
+
+    function range(x) { return [math.min(x), math.max(x)]; }
+
     function all(x) {
       for (let i of x) {
         if (!i) return(false);
@@ -89,12 +122,10 @@ const R = (function() {
       return(false);
     }
 
-    function runif(n, min = 0, max = 1) {
-        var res = [];
-        for (var i = 1; i <= n; i++) {
-            res.push(min + Math.random() * (max - min));
-        }
-        return res;
+    function lgamma(x) { return math.log(math.gamma(x)); }
+
+    function lchoose(n, k) {
+      return math.log(math.combination(n, k));
     }
 
     return {
@@ -105,8 +136,17 @@ const R = (function() {
         length: length,
         map: map,
         reduce: reduce,
+
+        runif: runif,
+        // genericGroup
+        signif: signif,
+        cospi: cospi,
+        sinpi: sinpi,
+        tanpi: tanpi,
         all: all,
         any: any,
-        runif: runif
+        range: range,
+        lgamma: lgamma,
+        lchoose: lchoose
     };
 })();

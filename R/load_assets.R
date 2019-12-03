@@ -1,6 +1,8 @@
 # Take a sketch R file as input and extract the resources links as
 # provided by the user with the '#!' header.
 assets <- function(file) {
+    is_src_line <- function(x) substr(x, 1, 2) == "#!"
+
     file_lines <- readLines(file)
     keep <- purrr::map_lgl(file_lines, is_src_line)
 
@@ -110,31 +112,4 @@ convert_src <- function(x) {
             stop("Script must be one of JavaScript, CSS, RScript, JSON and CSV.")
         }
     }
-}
-
-
-#====================================================================
-# Predicate functions
-is_src_line <- function(x) substr(x, 1, 2) == "#!"
-
-
-is_web_link <- function(x) {
-    has_prefix(x, "http://") || has_prefix(x, "https://")
-}
-is_local <- function(x) !is_web_link(x)
-
-
-is_javascript <- function(x) extname(x) == "js"
-is_r_script   <- function(x) extname(x) == "r"
-is_css        <- function(x) extname(x) == "css"
-is_json       <- function(x) extname(x) == "json"
-is_csv        <- function(x) extname(x) == "csv"
-is_font       <- function(x) extname(x) %in% c("woff", "ttf", "eot", "otf")
-
-
-# Check if input 'x' has the prefix 'y'
-has_prefix <- function(x, y) substr(x, 1, nchar(y)) == y
-extname <- function(x) {
-    filename <- basename(x)
-    tolower(tail(unlist(strsplit(filename, "[.]")), 1))
 }

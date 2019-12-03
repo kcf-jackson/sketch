@@ -6,7 +6,7 @@
 compile_r <- function(input, output = "") {
   parse(file = input) %>%
     purrr::map(rewrite) %>%
-    purrr::map(deparse0) %>%
+    purrr::map(deparse_js) %>%
     unlist() %>%
     write(file = output)
   output
@@ -16,33 +16,36 @@ compile_r <- function(input, output = "") {
 # Interface for AST rewriting
 rewrite <- function(ast) {
   ast %>%
-    rewrite_new() %>%
     rewrite_by_subst() %>%
-    rewrite_by_cond_subst()   # order of the function calls matters
+    rewrite_by_cond_subst()  # order of the function calls matters
 }
 
 
 # Rewriting AST by simple substitution
 rewrite_by_subst <- function(ast) {
-  magrittr::freduce(ast, subst_rules())
-}
-
-subst_rules <- function() {
   make_rule <- function(from, to) {
     function(x) subst(x, pattern = from, replacement = to)
   }
-  list(
+
+  subst_rules <- list(
     # Binary operators
     make_rule("<-", "="),
     make_rule("<<-", "="),
-    make_rule("^", "**"),
-    make_rule("%%", "%"),
+    make_rule("+", "math.add"),
+    make_rule("-", "math.subtract"),
+    make_rule("*", "math.multiply"),
+    make_rule("/", "math.divide"),
+    # make_rule("^", "**"),
+    make_rule("^", "math.pow"),
+    make_rule("%%", "math.mod"),
     make_rule("$", "."),
     make_rule(":", "R.seq_by"),
     make_rule("%instanceof%", "instanceof"),
     make_rule("%=>%", "=>"),
     make_rule("%+%", "+")
   )
+
+  magrittr::freduce(ast, subst_rules)
 }
 
 subst <- function(ast, pattern, replacement) {
@@ -50,17 +53,17 @@ subst <- function(ast, pattern, replacement) {
       return(as.call(purrr::map(ast, ~subst(.x, pattern, replacement))))
     }
 
-    if (rlang::is_symbol(ast, pattern)) {
-      return(as.symbol(replacement))
+    if (rlang::is_symbol(ast)) {
+      if (rlang::is_symbol(ast, pattern)) {
+        return(as.symbol(replacement))
+      } else {
+        return(ast)
+      }
     }
 
-    # No longer needed. Literal should now go under conditional rewriting.
-    # Unconditional rewriting should only apply to special binary operators.
-    # if (rlang::is_syntactic_literal(ast)) {
-    #   if (is.null(ast))   return(ast)
-    #   if (is.na(ast))     return(ast)
-    #   if (ast == pattern) return(as.symbol(replacement))
-    # }
+    if (rlang::is_syntactic_literal(ast)) {
+      return(ast)
+    }
 
     # Handle the pairlist special case
     if (rlang::is_pairlist(ast)) {
@@ -69,20 +72,22 @@ subst <- function(ast, pattern, replacement) {
       return(ast2)
     }
 
-    ast
+    # Handle reference to source code
+    if (class(ast) == "srcref") {
+      return(ast)
+    }
+
+    stop("The line should not be reached, please submit an issue with the input on github. Thanks!")
 }
 
 
 # Conditional substitute
 rewrite_by_cond_subst <- function(ast) {
-  magrittr::freduce(ast, cond_subst_rules())
-}
-
-cond_subst_rules <- function() {
   make_rule <- function(from, to) {
     function(x) cond_subst(x, pattern = from, replacement = to)
   }
-  list(
+
+  cond_subst_rules <- list(
     # Base Javascript
     make_rule("TRUE", "true"),
     make_rule("FALSE", "false"),
@@ -96,36 +101,75 @@ cond_subst_rules <- function() {
     make_rule("length", "R.length"),
     make_rule(   "map", "R.map"),
     make_rule("reduce", "R.reduce"),
-    make_rule(   "all", "R.all"),
-    make_rule(   "any", "R.any"),
+
     make_rule( "runif", "R.runif"),
-    # Math.js
-    make_rule(  "pi", "Math.PI"),
-    make_rule( "sin", "Math.sin"),
-    make_rule( "cos", "Math.cos"),
-    make_rule( "tan", "Math.tan"),
-    make_rule( "sinh", "Math.sinh"),
-    make_rule( "cosh", "Math.cosh"),
-    make_rule( "tanh", "Math.tanh"),
-    make_rule("asin", "Math.asin"),
-    make_rule("acos", "Math.acos"),
-    make_rule("atan", "Math.atan"),
-    make_rule("asinh", "Math.asinh"),
-    make_rule("acosh", "Math.acosh"),
-    make_rule("atanh", "Math.atanh"),
-    make_rule("min", "Math.min"),
-    make_rule("max", "Math.max"),
-    make_rule("round", "Math.round"),
-    make_rule("ceiling", "Math.ceil"),
-    make_rule("floor", "Math.floor"),
-    make_rule("abs", "Math.abs"),
+    make_rule(    "pi", "math.pi"),
+    # base::groupGeneric
+    # Group "Math" ----
+    make_rule(    "abs", "math.abs"),
+    make_rule(   "sign", "math.sign"),
+    make_rule(   "sqrt", "math.sqrt"),
+    make_rule(  "floor", "math.floor"),
+    make_rule("ceiling", "math.ceil"),
+    make_rule(  "trunc", "math.fix"),
+    make_rule(  "round", "math.round"),
+    make_rule( "signif", "R.signif"),
+
+    make_rule( "exp", "math.exp"),
+    make_rule( "log", "math.log"),
+    make_rule( "expm1", "math.expm1"),
+    make_rule( "log1p", "math.log1p"),
+    make_rule( "cos", "math.cos"),
+    make_rule( "sin", "math.sin"),
+    make_rule( "tan", "math.tan"),
+    make_rule( "cos", "R.cospi"),
+    make_rule( "sin", "R.sinpi"),
+    make_rule( "tan", "R.tanpi"),
+    make_rule("acos", "math.acos"),
+    make_rule("asin", "math.asin"),
+    make_rule("atan", "math.atan"),
+
+    make_rule( "cosh", "math.cosh"),
+    make_rule( "sinh", "math.sinh"),
+    make_rule( "tanh", "math.tanh"),
+    make_rule("acosh", "math.acosh"),
+    make_rule("asinh", "math.asinh"),
+    make_rule("atanh", "math.atanh"),
+
+    make_rule("lgamma", "R.lgamma"),
+    make_rule("gamma", "math.gamma"),
+    # Missing digamma, trigamma
+    # Missing cumsum, cumprod, cummax, cummin
+
+    # Group "Summary" ----
+    make_rule(  "all", "R.all"),
+    make_rule(  "any", "R.any"),
+    make_rule(  "sum", "math.sum"),
+    make_rule( "prod", "math.prod"),
+    make_rule(  "min", "math.min"),
+    make_rule(  "max", "math.max"),
+    make_rule("range", "R.range"),
+
+    # Extra ----
+    make_rule( "log10", "math.log10"),
+    make_rule( "log2", "math.log2"),
+    # Missing beta, lbeta, psigamma
+    make_rule("choose", "math.combinations"),
+    make_rule("lchoose", "R.lchoose"),
+    make_rule("factorial", "math.factorial"),
+    make_rule("lfactorial", "R.lfactorial"),
+
+    # JavaScript ----
+    # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
     make_rule("JS_NULL", "null"),
     make_rule("JS_UNDEFINED", "undefined"),
     make_rule("JS_NA", "NaN"),
-    # jQuery
+
+    # jQuery ----
     make_rule("jQuery", "$")
-    # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
   )
+
+  magrittr::freduce(ast, cond_subst_rules)
 }
 
 cond_subst <- function(ast, pattern, replacement) {
@@ -141,14 +185,19 @@ cond_subst <- function(ast, pattern, replacement) {
     }
   }
 
-  if (rlang::is_symbol(ast, pattern)) {
-    return(as.symbol(replacement))
+  if (rlang::is_symbol(ast)) {
+    if (rlang::is_symbol(ast, pattern)) {
+      return(as.symbol(replacement))
+    } else {
+      return(ast)
+    }
   }
 
   if (rlang::is_syntactic_literal(ast)) {
     if (is.null(ast))   return(ast)
     if (is.na(ast))     return(ast)
     if (ast == pattern) return(as.symbol(replacement))
+    return(ast)
   }
 
   # Handle the pairlist special case
@@ -158,24 +207,12 @@ cond_subst <- function(ast, pattern, replacement) {
     return(ast2)
   }
 
-  ast
-}
-
-
-# Rewriting AST (special form)
-rewrite_new <- function(ast) {
-  if (rlang::is_call(ast)) {
-    if (rlang::is_call(ast, "$")) {
-      cvar <- deparseR(ast[[2]])
-      cop <- deparseR(ast[[3]])
-      if (cop == "new") {
-        return(as.symbol(glue::glue("new {cvar}")))
-      }
-    }
-    as.call(purrr::map(ast, rewrite_new))
-  } else {
-    ast
+  # Handle reference to source code
+  if (class(ast) == "srcref") {
+    return(ast)
   }
+
+  stop("The line should not be reached, please submit an issue with the input on github. Thanks!")
 }
 
 

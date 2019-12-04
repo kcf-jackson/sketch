@@ -35,7 +35,7 @@ rewrite_by_subst <- function(ast) {
     make_rule("-", "math.subtract"),
     make_rule("*", "math.multiply"),
     make_rule("/", "math.divide"),
-    # make_rule("^", "**"),
+    make_rule("[", "math.subset"),
     make_rule("^", "math.pow"),
     make_rule("%%", "math.mod"),
     make_rule("$", "."),

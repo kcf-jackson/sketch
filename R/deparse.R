@@ -52,13 +52,15 @@ is_wrap <- function(ast) {
 deparse_infix <- function(ast) {
   sym <- deparse_js(ast[[1]])
 
-  # Special case 1: handle negative sign as unary operator
-  if (length(ast) == 2) {
-    return(paste0(
-      sym,
-      deparse_js(ast[[2]])
-    ))
-  }
+  # Not needed anymore since `-` maps to `math.subtract`, this is
+  # fixed in the prefix case.
+  # # Special case 1: handle negative sign as unary operator
+  # if (length(ast) == 2) {
+  #   return(paste0(
+  #     sym,
+  #     deparse_js(ast[[2]])
+  #   ))
+  # }
 
   lhs <- deparse_js(ast[[2]])
   rhs <- deparse_js(ast[[3]])
@@ -145,6 +147,7 @@ deparse_prefix <- function(ast) {
          "ifelse" = deparse_ifelse(ast),
          "lambda" = deparse_lambda(ast),
          "math.subtract" = deparse_math_subtract(ast),
+         "math.subset" = deparse_math_subset(ast),
          deparse_default(ast)
   )
 }
@@ -345,6 +348,12 @@ deparse_math_subtract <- function(ast) {
   } else {
     deparse_default(ast)
   }
+}
+
+deparse_math_subset <- function(ast) {
+  obj <- deparse_js(ast[[2]])
+  ind <- deparse_js(ast[[3]])
+  glue::glue("math.subset({obj}, math.index({ind}))")
 }
 
 

@@ -28,7 +28,7 @@ testthat::test_that("Rewriting R to JavaScript", {
   unit_test("-3 + 4", "math.add(-3, 4)")
   unit_test("-2 + 3 - 4", "math.subtract(math.add(-2, 3), 4)")
   unit_test("-(2 + 3) - 4", "math.subtract(-(math.add(2, 3)), 4)")
-  unit_test("abc$abc[0]", "abc.abc[0]")
+  unit_test("abc$abc[0]", "math.subset(abc.abc, math.index(0))")
   unit_test("if (TRUE) f(x)", "if (true) f(x)")
   unit_test("if (TRUE) f(x) else g(x)", "if (true) f(x) else g(x)")
   unit_test("let (x)", "let x")

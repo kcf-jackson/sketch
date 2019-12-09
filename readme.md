@@ -1,4 +1,12 @@
 
+<!-- badges: start -->
+
+[![Travis build
+status](https://travis-ci.org/kcf-jackson/sketch.svg?branch=master)](https://travis-ci.org/kcf-jackson/sketch)
+[![Codecov test
+coverage](https://codecov.io/gh/kcf-jackson/sketch/branch/master/graph/badge.svg)](https://codecov.io/gh/kcf-jackson/sketch?branch=master)
+<!-- badges: end -->
+
 ## Preview for developers
 
 Warning: the package has not reached stable version.
@@ -14,10 +22,42 @@ only the R syntax.
 
 ![](./man/figures/ast_transform.png)
 
+### Basic conversion from R to JavaScript
+
+The package current has ~56 AST rewriting rules. Here are a list of the
+basic
+ones.
+
+|       Description       |                                 R                                 |                            JavaScript                             |
+| :---------------------: | :---------------------------------------------------------------: | :---------------------------------------------------------------: |
+| Assignment of variable  |                             `x <- 1`                              |                          `let x; x = 1`                           |
+| Access object attribute |                              `obj$x`                              |                              `obj.x`                              |
+|    Vector (JS Array)    |                        `c(1, 2, 3, 4, 5)`                         |                         `[1, 2, 3, 4, 5]`                         |
+|    List (JS Object)     |                       `list(x = 1, y = 2)`                        |                           `{x:1, y:2}`                            |
+|      Conditionals       | `if (cond) {...}` <br/> `else if (cond) {...}` <br/> `else {...}` | `if (cond) {...}` <br/> `else if (cond) {...}` <br/> `else {...}` |
+|        For-loop         |                    `for (x in iterable) {...}`                    |                  `for (let x of iterable) {...}`                  |
+|       While-loop        |                       `while (cond) {...}`                        |                       `while (cond) {...}`                        |
+
+Note that the conversion is not perfect, e.g.
+
+  - R vector cannot be nested, while JS array can be nested.
+    
+      - `c(1, 2, c(3,4), 5)` is the same as `c(1, 2, 3, 4, 5)`, but
+      - `[1, 2, [3, 4], 5]` is not the same as `[1, 2, 3, 4, 5]`.
+
+  - R list can be unnamed, but JS object must be fully named.
+    
+      - But don’t worry, when you try to convert an R unnamed list to JS
+        object, `sketch` will warn you about it :)
+
 -----
 
 ## News
 
+  - 2019-12-09:
+      - Switched to `math.js` to support vectorised operations.
+      - Added R `groupGeneric` functions.
+      - Added Travis CI and code coverage.
   - 2019-12-01: Added `readme.md`: “Preview for developers”
 
 -----
@@ -28,7 +68,7 @@ only the R syntax.
     
     [1.1 Installation](#section-1-1)
     
-    [1.2 Run ta sketch R file](#section-1-2)
+    [1.2 Run a sketch R file](#section-1-2)
     
     [1.3 Embed a sketch R file in RMarkDown document](#section-1-3)
 
@@ -270,7 +310,7 @@ document$querySelector("body")$onclick <- function() {
 #### helper.R
 
 ``` r
-# Create a new DOM element with class and innerText
+# Create a new DOM element with id
 dom <- function(tag, id) {
     declare (el)
     el <- document$createElement(tag)

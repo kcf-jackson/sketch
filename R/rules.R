@@ -22,7 +22,7 @@ basic_rules <- function() {
         make_rule("TRUE", "true"),
         make_rule("FALSE", "false"),
         make_rule("declare", "let"),
-        make_rule("self", "this"),
+        make_rule("self", "this")
     )
 }
 
@@ -38,11 +38,12 @@ default_rules <- function() {
         make_rule("-", "R.subtract"),
         make_rule("*", "R.multiply"),
         make_rule("/", "R.divide"),
-        make_rule("[", "R.subset"),
+        make_rule("[[", "R.extract2"),
+        make_rule("[", "R.extract"),
         make_rule("^", "R.pow"),
         make_rule("%%", "R.mod"),
         make_rule("$", "."),
-        make_rule(":", "R.seq_by"),
+        make_rule(":", "R.seq"),
         make_rule("%instanceof%", "instanceof"),
         make_rule("%=>%", "=>"),
         make_rule("%+%", "+"),
@@ -54,9 +55,9 @@ default_rules <- function() {
         make_rule("declare", "let"),
         make_rule("self", "this"),
         # R-like functions
-        make_rule(   "seq", "R.seq_by"),
+        make_rule(   "seq", "R.seq"),
         make_rule(     "c", "R.c"),
-        make_rule("matrix", "R.matrix"),
+        make_rule("matrix", "R.matrix2"),
         make_rule( "print", "R.print"),
         make_rule("length", "R.length"),
         make_rule(   "map", "R.map"),

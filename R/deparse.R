@@ -1,390 +1,107 @@
-#' Parse R Expressions
-#' @param x A character string. The text to parse.
-parse0 <- function(x) parse(text = x)[[1]]
+# typed-deparser := (predicate, deparse)
+# where
+#   predicate :: ast -> bool
+#   deparse   :: ast -> string
+#
+# The corresponding types in R are:
+#   ast <--> lang; bool <--> logical; string <--> character.
+#
+# A list of typed-deparser must satisfy that
+# 1. it is non-empty,
+# 2. each member is a typed-deparser
 
-#' Deparse R Expressions
-#' @param expr any R expression.
-deparse_r <- function(expr) deparse(expr, width.cutoff = 500L)
 
 #' Expression Deparsing for JS
-#' @param ast A language object.
-deparse_js <- function(ast) {
-  if (is.call(ast)) {
-
-    if (is_infix(ast)) {
-      deparse_infix(ast)
+#' @param ast language object.
+#' @param deparsers A list of "typed" deparsers.
+#' @return A character string.
+# deparse_js :: ast -> [typed-deparser] -> char
+deparse_js <- function(ast, deparsers) {
+  for (deparser in deparsers) { # use for-loop to avoid nested recursion
+    if (deparser$predicate(ast)) {
+      return(deparser$deparse(ast, deparsers))
     }
-    else if (is_wrap(ast)) {
-      deparse_wrap(ast)
-    }
-    else {
-      deparse_prefix(ast)
-    }
-
-  } else {
-    deparse_r(ast)
   }
-}
-
-is_infix <- function(ast) {
-  infix_ops <- c("=", "+", "-", "*", "/",
-                 #"%%", "^", "$", "@",                # R specific
-                 "%", "**", ".", "instanceof", "=>",  # Javascript specific
-                 "==", "!=", "<", ">", "<=", ">=", "!",
-                 "&&", "||", "&", "|", ":")
-  is_custom_infix <- function(x) {
-    grepl(pattern = "^%[^%]+%$", x = x)
-  }
-
-  sym <- deparse_r(ast[[1]])
-  isTRUE(sym %in% infix_ops) || is_custom_infix(sym)
-}
-
-is_wrap <- function(ast) {
-  wrap_ops <- c("{", "(", "[", "[[")
-
-  sym <- deparse_r(ast[[1]])
-  isTRUE(sym %in% wrap_ops)
+  stop("The program reaches the end of the list of deparsers
+  you provided; it means you have provided an input that no
+  deparser in the list can handle. You should check your input
+  or add the relevant deparser to the list of deparsers.")
 }
 
 
-# Deparse functions
-deparse_infix <- function(ast) {
-  sym <- deparse_js(ast[[1]])
-
-  # Not needed anymore since `-` maps to `math.subtract`, this is
-  # fixed in the prefix case.
-  # # Special case 1: handle negative sign as unary operator
-  # if (length(ast) == 2) {
-  #   return(paste0(
-  #     sym,
-  #     deparse_js(ast[[2]])
-  #   ))
-  # }
-
-  lhs <- deparse_js(ast[[2]])
-  rhs <- deparse_js(ast[[3]])
-
-  # Special case 2: handle `new` operator
-  if (rlang::is_call(ast, ".") && (rhs == "new")) {
-    return(glue::glue("new {lhs}"))
-  }
-
-  paste(lhs, sym, rhs, sep = space_symbol(sym))
-}
-
-
-deparse_wrap <- function(ast) {
-  sym <- deparse_js(ast[[1]])
-  switch(sym,
-         "["  = deparse_wrap_sb(ast),
-         "[[" = deparse_wrap_sb(ast),
-         "("  = deparse_wrap_rb(ast),
-         "{"  = deparse_wrap_cb(ast),
-         stop(glue::glue("Haven't implemented deparse for symbol '{sym}'"))
-  )
-}
-
-deparse_wrap_sb <- function(ast) {
-  # case "[" and "[["
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  sym <- sym_ls[1]
-  paste0(
-    sym_ls[2],
-    sym,
-    paste0(sym_ls[-(1:2)], collapse = sep_symbol(sym)),
-    close_symbol(sym)
-  )
-}
-
-deparse_wrap_rb <- function(ast) {
-  # Case '('
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  sym <- sym_ls[1]
-  paste0(
-    sym,
-    paste0(sym_ls[-1], collapse = sep_symbol(sym)),
-    close_symbol(sym)
-  )
-}
-
-deparse_wrap_cb <- function(ast) {
-  # Case '{'
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  sym <- sym_ls[1]
-  increase_indent <- function(x) {
-    indent <- "   "
-    indent_nl <- paste0("\n", indent, " ")
-    paste(
-      indent,
-      gsub(x = x, pattern = "\n", replacement = indent_nl)
-    )   # `gsub` is fine here since '\n' in quoted string becomes '\\n'
-  }
-
-  paste(
-    sym,
-    paste0(increase_indent(sym_ls[-1]), collapse = sep_symbol(sym)),
-    close_symbol(sym),
-    sep = "\n"
+#' A minimal list of deparsers for deparsing JavaScript
+#' @export
+basic_deparsers <- function() {
+  list(
+    # JavaScript object literal
+    "list"    = make_deparser(is_call_list, deparse_list),
+    # Keywords
+    "let"    = make_deparser(is_call_let, deparse_let),
+    "for"    = make_deparser(is_call_for, deparse_for),
+    "if"     = make_deparser(is_call_if, deparse_if),
+    "while"  = make_deparser(is_call_while, deparse_while),
+    "function" = make_deparser(is_call_function, deparse_function),
+    # Operators
+    "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
+    "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
+    # Basic
+    "call"   = make_deparser(is_call, deparse_call),
+    "symbol" = make_deparser(is_sym, deparse_sym)
   )
 }
 
 
-deparse_prefix <- function(ast) {
-  sym <- deparse_js(ast[[1]])
-  if (length(sym) > 1) return(deparse_default(ast)) # guard
-
-  switch(sym,
-         "for" = deparse_for(ast),
-         "if" = deparse_if(ast),
-         "function" = deparse_function(ast),
-         "while" = deparse_while(ast),
-         "list" = deparse_list(ast),
-         "data.frame" = deparse_df(ast),
-         # Special forms
-         "let" = deparse_let(ast),
-         "dataURI" = deparse_dataURI(ast),
-         "ifelse" = deparse_ifelse(ast),
-         "lambda" = deparse_lambda(ast),
-         "math.subtract" = deparse_math_subtract(ast),
-         "math.subset" = deparse_math_subset(ast),
-         deparse_default(ast)
+#' A list of default deparsers for deparsing JavaScript
+#' @export
+default_deparsers <- function() {
+  # Order is strict and the deparsers must be arranged such that the
+  # specialised ones are at the top and the general ones are at the
+  # bottom. This list acts like a sieve, and only inputs that do not
+  # get caught at the top will fall to the bottom.
+  list(
+    # Library functions
+    "R.add" = make_deparser(is_call_add, deparse_add),
+    "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
+    "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extractAssign),
+    "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
+    "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
+    "R.extract" = make_deparser(is_call_extract, deparse_extract),
+    # Special forms
+    "lambda" = make_deparser(is_call_lambda, deparse_lambda),
+    "ifelse" = make_deparser(is_call_ifelse, deparse_ifelse),
+    "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
+    "new"  = make_deparser(is_call_new, deparse_new),
+    "let"  = make_deparser(is_call_let, deparse_let),
+    # Data structure
+    "list" = make_deparser(is_call_list, deparse_list),
+    "data.frame" = make_deparser(is_call_df, deparse_df),
+    # Keywords
+    "for"    = make_deparser(is_call_for, deparse_for),
+    "if"     = make_deparser(is_call_if, deparse_if),
+    "while"  = make_deparser(is_call_while, deparse_while),
+    "function" = make_deparser(is_call_function, deparse_function),
+    # Operators
+    "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
+    "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
+    # Basic
+    "call"   = make_deparser(is_call, deparse_call),
+    "symbol" = make_deparser(is_sym, deparse_sym)
   )
 }
 
-deparse_default <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  paste0(
-    sym_ls[1],
-    "(",
-    paste0(sym_ls[-1], collapse = ", "),
-    ")"
-  )
-}
 
-deparse_for <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  paste(
-    sym_ls[1],
-    glue::glue("(let {sym_ls[2]} of {sym_ls[3]})"),
-    sym_ls[4]
-  )
-}
-
-deparse_if <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  has_else <- function(x) length(x) == 4
-  out <- paste(
-    sym_ls[1],
-    glue::glue("({sym_ls[2]})"),
-    sym_ls[3]
-  )
-
-  if (has_else(sym_ls)) {
-    paste(out, "else", sym_ls[4])
-  } else {
-    out
-  }
-}
-
-deparse_function <- function(ast) {
-  deparse_arg <- function(alist0) {
-    alist1 <- purrr::map(alist0, deparse_r)
-    alist2 <- purrr::map2_chr(
-      .x = names(alist1),
-      .y = alist1,
-      .f = function(x, y) {
-        if (y == "") {
-          glue::glue("{x}")
-        } else {
-          glue::glue("{x} = {y}")
-        }
-      }
-    )
-    paste(alist2, collapse = ", ")
-  }
-
-  paste0(
-    deparse_js(ast[[1]]),
-    "(", deparse_arg(ast[[2]]), ") ",
-    deparse_js(ast[[3]])
-  )
-}
-
-deparse_while <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  paste(
-    sym_ls[1],
-    glue::glue("({sym_ls[2]})"),
-    sym_ls[3]
-  )
-}
-
-deparse_list <- function(ast) {
-  deparse_arg <- function(list0) {
-    list1 <- purrr::map(list0, deparse_js)
-
-    labels <- names(list1)
-    if (is.null(labels)) {
-      list2 <- purrr::map_chr(list1, function(y) { glue::glue("{y}") })
-      warning("All elements in a list must be named to convert into JavaScript properly.")
-    } else {
-      list2 <- purrr::map2_chr(
-        .x = labels,
-        .y = list1,
-        .f = function(x, y) {
-          if (x == "") {
-            warning("All elements in a list must be named to convert into JavaScript properly.")
-            glue::glue("{y}")
-          } else {
-            glue::glue("{x}: {y}")
-          }
-        }
-      )
-    }
-    paste(list2, collapse = ", ")
-  }
-
-  paste0("{ ", deparse_arg(ast[-1]), " }")
-}
-
-deparse_df <- function(ast) {
-  deparse_arg <- function(list0) {
-    list1 <- purrr::map(list0, deparse_r)
-
-    labels <- names(list1)
-    if (is.null(labels)) {
-      list2 <- purrr::map_chr(list1, function(y) { glue::glue("{y}") })
-      warning("All elements in a list must be named to convert into JavaScript properly.")
-    } else {
-      list2 <- purrr::map2_chr(
-        .x = names(list1),
-        .y = list1,
-        .f = function(x, y) {
-          if (x == "") {
-            warning("All columns in a dataframe must be named to convert into JavaScript properly.")
-            glue::glue("{y}")
-          } else {
-            glue::glue("{x}: {y}")
-          }
-        })
-    }
-    paste(list2, collapse = ", ")
-  }
-
-  paste0("new dfjs.DataFrame({ ", deparse_arg(ast[-1]), " })")  # should dfjs be hard coded? interface needed?
-}
-
-deparse_let <- function(ast) {
-  deparse_arg <- function(list0) {
-    list1 <- purrr::map(list0, deparse_js)
-    labels <- names(list1)
-    if (is.null(labels)) {
-      list2 <- purrr::map_chr(list1, function(y) { glue::glue("{y}") })
-    } else {
-      list2 <- purrr::map2_chr(
-        .x = names(list1),
-        .y = list1,
-        .f = function(x, y) {
-          if (x == "") {
-            glue::glue("{y}")
-          } else {
-            glue::glue("{x} = {y}")
-          }
-        }
-      )
-    }
-    paste(list2, collapse = ", ")
-  }
-
-  paste("let", deparse_arg(ast[-1]))  # should dfjs be hard coded? interface needed?
-}
-
-deparse_dataURI <- function(ast) {
-  if (!is.character(ast[[2]])) {
-    stop("The argument inside the \"dataURI\" call is not a character string.
-         Note that our \"compiler\" only does static code analysis.")
-  }
-  fname <- ast[[2]]
-  mime_type <- detect_mime(fname)
-  paste0('"', base64enc::dataURI(file = fname, mime = mime_type), '"')
-}
-
-detect_mime <- function(fname) {
-  # reference: https://www.freeformatter.com/mime-types-list.html
-  switch(extname(fname),
-         "svg"  = "image/svg+xml",
-         "bmp"  = "image/bmp",
-         "jpeg" = "image/jpeg",
-         "jpg"  = "image/jpeg",
-         "tiff" = "image/tiff",
-         "gif"  = "image/gif",
-         "png"  = "image/png",
-         "")   # default case
-}
-
-deparse_ifelse <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  glue::glue("{sym_ls[2]} ? {sym_ls[3]} : {sym_ls[4]}")
-}
-
-deparse_lambda <- function(ast) {
-  sym_ls <- purrr::map_chr(ast, deparse_js)
-  l <- length(sym_ls)
-  args <- sym_ls[-c(1, l)]
-  body <- sym_ls[[l]]
-  if (purrr::is_empty(args)) {
-    glue::glue("function() {{ return {body}; }}")
-  } else {
-    args <- paste(args, collapse = ", ")
-    glue::glue("function({args}) {{ return {body}; }}")
-  }
-}
-
-deparse_math_subtract <- function(ast) {
-  if (length(ast) == 2) {
-    num <- deparse_js(ast[[2]])
-    glue::glue("-{num}")
-  } else {
-    deparse_default(ast)
-  }
-}
-
-deparse_math_subset <- function(ast) {
-  obj <- deparse_js(ast[[2]])
-  ind <- deparse_js(ast[[3]])
-  glue::glue("math.subset({obj}, math.index({ind}))")
+#' A constructor for a "typed" deparser
+#'
+#' @param predicate_fun A function that takes a "lang" object and return a logical.
+#' @param deparse_fun A function that takes a "lang" object and return a character string.
+#' @return A list; a deparser ready to be dispatched by "type".
+#'
+#' @export
+make_deparser <- function(predicate_fun, deparse_fun) {
+  list(predicate = predicate_fun, deparse = deparse_fun)
 }
 
 
-# Symbols table / mapping
-space_symbol <- function(chr) {
-  space <- c("=", "+", "-", "*",
-             #"%%", "^",                      # R specific
-             "%", "**", "instanceof", "=>",   # Javascript specific
-             "==", "!=", "<", ">", "<=", ">=",
-             "&&", "||", "&", "|")
-  no_space <- c(
-    #"$", "@",   # R specific
-    ".",         # Javascript specific
-    ":", "/", "!"
-  )
-
-  if (chr %in% space) return(" ")
-  if (chr %in% no_space) return("")
-  return(" ")  # custom infix operator
-}
-
-close_symbol <- function(chr) {
-  if (chr == "(") return(")")
-  if (chr == "{") return("}")
-  if (chr == "[") return("]")
-  if (chr == "[[") return("]]")
-}
-
-sep_symbol <- function(chr) {
-  if (chr == "(") return(", ")
-  if (chr == "{") return("\n")
-  if (chr == "[") return(", ")
-  if (chr == "[[") return(", ")
+`%&&%` <- function(p1, p2) {
+  function(ast) p1(ast) && p2(ast)
 }

@@ -1,54 +1,75 @@
 # Take a sketch R file as input and extract the resources links as
 # provided by the user with the '#!' header.
+#
+# Instead of implementing 'async' loading of script, we move the sketch
+# files to the bottom of the body.
+#
+# assets_list := [head: [shiny.tag], body: [shiny.tag]]
+# assets :: file -> assets_list
 assets <- function(file) {
-    is_src_line <- function(x) substr(x, 1, 2) == "#!"
-
-    file_lines <- readLines(file)
-    keep <- purrr::map_lgl(file_lines, is_src_line)
-
-    src_lines <- file_lines[keep] %>%
-        purrr::map_chr(extract_src)
-
-    r_indicator <- src_lines %>%
-        purrr::map_lgl(is_r_script)
-
-    top_level_assets <- src_lines %>%
-        purrr::map(convert_src) %>%
-        sort_list(r_indicator, c("body", "head"))
-    low_level_assets <- purrr::map(src_lines[r_indicator], assets)
-
-    if (purrr::is_empty(low_level_assets)) {
-        top_level_assets
-    } else {
-        join_list(
-            top_level_assets,
-            purrr::reduce(low_level_assets, join_list)
-        )
+    is_header <- Vectorize(function(x) substr(x, 1, 2) == "#!")
+    is_sketch <- Vectorize(is_r_script)
+    filter <- function(x, pred) x[pred(x)]
+    # Sort a list into two lists according to a predicate functions
+    sort_list <- function(x, indicator, names) {
+        setNames(list(x[indicator], x[!indicator]), names)
     }
+
+
+    headers <- file %>%
+        readLines() %>%
+        filter(is_header) %>%
+        purrr::map_chr(extract_src)
+    if (purrr::is_empty(headers)) {
+        return(list(head = NULL, body = NULL))
+    }
+
+    sketch_ind <- is_sketch(headers)
+    parent_assets <- headers %>%
+        purrr::map(convert_src) %>%
+        # Assets are moved to the top, R scripts are moved to the bottom
+        sort_list(sketch_ind, c("body", "head"))
+
+    # Recursively build the assets dependencies in other sketch R files
+    children_assets <- purrr::map(headers[sketch_ind], assets)
+    if (purrr::is_empty(children_assets)) {
+        return(parent_assets)
+    }
+
+    join_list(
+        parent_assets,
+        purrr::reduce(children_assets, join_list)
+    )
 }
 
+# join_list :: assets_list -> assets_list -> assets_list
 join_list <- function(x, y) {
-    if (purrr::is_empty(x)) return(list())
-    if (purrr::is_empty(y)) return(x)
+    if (purrr::is_empty(x) || purrr::is_empty(y)) {
+        stop("The input cannot be an empty list.")
+    }
     list(head = c(x$head, y$head), body = c(y$body, x$body))  # order is strict
 }
 
-# Assets are moved to the top, R scripts are moved to the bottom
-sort_list <- function(x, indicator, names) {
-    setNames(list(x[indicator], x[!indicator]), names)
-}
 
-
+# Extract assets link
+#
 # Takes string input:    "#! load_script('https://abc/def.js')"
 # Returns string output: "https://abc/def.js"
+#
+# Takes string input:    "#! load_library('p5')"
+# Returns string output: "https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"
+#
+# extract_src :: char -> char
 extract_src <- function(x) {
-    args <- parse0(substring(x, 3))[[2]]
-    if (args[[1]] %in% c('src', 'sketch::src')) {
-        src(args[[2]])
+    ast <- rlang::parse_expr(substring(x, 3))
+    if (rlang::is_call(ast, 'load_library')) {
+        src(ast[[2]])
+    } else if (rlang::is_call(ast, 'load_script')) {
+        ast[[2]]
     } else {
-        args
+        stop(glue::glue("Command '{deparse(ast[[1]])}' is not supported."))
     }
-    # Potential refactoring in the future:
+    # Potential future development:
     # - Handle optional arguments
     # - `convert_src` may need to be changed accordingly
     #
@@ -64,10 +85,14 @@ extract_src <- function(x) {
 
 
 #' Load JavaScript / CSS / R Sketch Script / CSV file
+#'
 #' @param x A character string; the link / path to the JS / CSS / R script / CSV file.
 #' @param renderer function; the function to render the shiny tag object.
 #' Use `htmltools::doRenderTags` for RMD, and `identity` for `html_template`.
+#'
 #' @keywords internal
+#'
+# convert_src :: char -> shiny.tag
 convert_src <- function(x) {
     # JS, CSS: local or web,  R, CSV: local only.
     # web links are kept as-is; local are turned into URI (except CSS is kept in-line).
@@ -109,7 +134,7 @@ convert_src <- function(x) {
             script(src = URI)
 
         } else {
-            stop("Script must be one of JavaScript, CSS, RScript, JSON and CSV.")
+            stop("Script must be one of JavaScript, CSS, sketch, JSON and CSV.")
         }
     }
 }

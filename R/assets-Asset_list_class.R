@@ -1,4 +1,4 @@
-# A type for a list of HTML tags divided into head and body
+# A type for a list of shiny.tag divided into head and body
 
 # Constructor for "asset_list"
 # asset_list := [head: [shiny.tag], body: [shiny.tag]]
@@ -25,6 +25,26 @@ c.asset_list <- function(x, y) {
     )  # order is strict
 }
 
+# Add element to the head
+# append_to_head :: asset_list -> shiny.tag -> integer -> asset_list
+append_to_head <- function(x, shiny_tag, after) {
+    if (missing(after)) after <- length(ahead(x))
+    asset_list(
+        head = append(ahead(x), list(shiny_tag), after),
+        body = abody(x)
+    )
+}
+
+# Add element to the body
+# append_to_body :: asset_list -> shiny.tag -> integer -> asset_list
+append_to_body <- function(x, shiny_tag, after) {
+    if (missing(after)) after <- length(abody(x))
+    asset_list(
+        head = ahead(x),
+        body = append(abody(x), list(shiny_tag), after)
+    )
+}
+
 # Turn a list into an "asset_list"
 # as_asset_list: [[shiny.tag], [shiny.tag]] => asset_list
 as_asset_list <- function(x) {
@@ -35,16 +55,13 @@ as_asset_list <- function(x) {
 }
 
 # Apply a function to each element of a list
-map <- function(x, f, ...) {
-    UseMethod("map", x)
-}
+map <- function(x, f, ...) UseMethod("map", x)
 map.asset_list <- function(x, f, ...) {
     asset_list(
         head = Map(f, ahead(x), ...),
         body = Map(f, abody(x), ...)
     )
 }
-
 
 # html_builder :: asset_list -> [shiny.tag]
 html_builder <- function(x) {
@@ -55,25 +72,3 @@ html_builder <- function(x) {
         )
     )
 }
-
-
-# html_template <- function(...) {
-#     args <- c(...)
-#     utils <- base64enc::dataURI(
-#         file = system.file("assets/utils.js", package = "sketch")
-#     )
-#     htmltools::tagList(
-#         htmltools::tags$html(
-#             htmltools::tags$head(
-#                 htmltools::tags$script(src = src("math")),
-#                 htmltools::tags$script(src = src("dataframe")),
-#                 htmltools::tags$script(src = utils),
-#                 args$head
-#             ),
-#             htmltools::tags$body(
-#                 htmltools::tags$div(id = "new_sketch"),
-#                 args$body
-#             )
-#         )
-#     )
-# }

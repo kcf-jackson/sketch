@@ -12,9 +12,11 @@
 
 
 #' Expression Deparsing for JS
+#'
 #' @param ast language object.
 #' @param deparsers A list of "typed" deparsers.
 #' @return A character string.
+#'
 # deparse_js :: ast -> [typed-deparser] -> char
 deparse_js <- function(ast, deparsers) {
   for (deparser in deparsers) { # use for-loop to avoid nested recursion

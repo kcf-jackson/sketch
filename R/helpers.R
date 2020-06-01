@@ -8,7 +8,8 @@ src <- function(x) {
            "p5" = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js",
            "plotly" = "https://cdn.plot.ly/plotly-latest.min.js",
            "chart" = "https://cdn.jsdelivr.net/npm/chart.js@2.8.0",
-           "d3" = "https://d3js.org/d3.v5.min.js"
+           "d3" = "https://d3js.org/d3.v5.min.js",
+           stop(glue::glue("Library '{x}' does not exist."))
     )
 }
 

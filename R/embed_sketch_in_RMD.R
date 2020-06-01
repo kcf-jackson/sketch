@@ -1,8 +1,11 @@
 #' Insert a sketch into an RMD document
+#'
 #' @param file A character string; the path to the sketch file.
 #' @param id A character string; an unique identifier for the sketch file.
 #' @param ... (Optional) Other attributes to pass to iframes.
+#'
 #' @note This function creates a temporary folder at the working directory.
+#'
 #' @export
 insert_sketch <- function(file, id, ...) {
     html_file <- source_r(file = file, launch_browser = NULL)

@@ -1,7 +1,7 @@
 Package: sketch
 Type: Package
 Title: Interactive sketches in R
-Version: 0.5.8
+Version: 0.8.4
 Author: Chun Fung (Jackson) Kwok
 Maintainer: Chun Fung (Jackson) Kwok <kwokcf@unimelb.edu.au>
 Description: Creates static / animated / interactive sketches and illustrations 
@@ -9,7 +9,7 @@ Description: Creates static / animated / interactive sketches and illustrations
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Imports: 
     magrittr,
     rlang,

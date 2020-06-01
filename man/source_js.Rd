@@ -2,20 +2,20 @@
 % Please edit documentation in R/source_file.R
 \name{source_js}
 \alias{source_js}
-\title{Source a p5.js file}
+\title{Source a sketch R file}
 \usage{
 source_js(file, ..., launch_browser = "viewer")
 }
 \arguments{
-\item{file}{A character string; path to the JS file.}
+\item{file}{A character string; path to the compiled JS file.}
 
 \item{...}{An optional list of shiny tags to be added to the <head> of
-the html template.}
+the html template. This is needed mostly to insert other dependencies.}
 
 \item{launch_browser}{A character string; "viewer" or "browser", which
 calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-`NULL` to suppress display.}
+"NULL" to suppress display.}
 }
 \description{
-Source a p5.js file
+Source a sketch R file
 }

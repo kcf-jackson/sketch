@@ -2,10 +2,15 @@
 % Please edit documentation in R/source_file.R
 \name{source_active}
 \alias{source_active}
-\title{Source active file}
+\title{Source active file in RStudio}
 \usage{
-source_active()
+source_active(launch_browser = "viewer")
+}
+\arguments{
+\item{launch_browser}{A character string; "viewer" or "browser", which
+calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+`NULL` to suppress display.}
 }
 \description{
-Source active file
+Source active file in RStudio
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/source_file.R
 \name{source_r}
 \alias{source_r}
-\title{Source a p5.R file}
+\title{Source a sketch R file}
 \usage{
 source_r(file, debug = F, launch_browser = "viewer")
 }
@@ -16,5 +16,6 @@ calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
 `NULL` to suppress display.}
 }
 \description{
-Source a p5.R file
+This function compiles a sketch R file, resolves the
+dependencies and serves it in the viewer.
 }

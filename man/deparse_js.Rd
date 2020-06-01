@@ -4,10 +4,15 @@
 \alias{deparse_js}
 \title{Expression Deparsing for JS}
 \usage{
-deparse_js(ast)
+deparse_js(ast, deparsers)
 }
 \arguments{
-\item{ast}{A language object.}
+\item{ast}{language object.}
+
+\item{deparsers}{A list of "typed" deparsers.}
+}
+\value{
+A character string.
 }
 \description{
 Expression Deparsing for JS

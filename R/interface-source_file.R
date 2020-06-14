@@ -36,7 +36,7 @@ source_r <- function(file, debug = F, launch_browser = "viewer") {
   } else {
     index_js <- compile_r(file, tempfile())
     asset_tags <- assets(file)   # this line is needed to keep the working directory unchanged
-    source_js(index_js, asset_tags, launch_browser = launch_browser)
+    source_js(index_js, c(default_tags(), asset_tags), launch_browser = launch_browser)
   }
 }
 
@@ -63,10 +63,9 @@ source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewe
 }
 
 default_tags <- function() {
-  rjs <- system.file("assets/utils.js", package = "sketch")
+  rjs <- system.file("assets/R-browser.js", package = "sketch")
   asset_list(
     head = list(
-      htmltools::tags$script(src = src("math")),
       htmltools::tags$script(src = src("dataframe")),
       js_to_shiny_tag(rjs)
     ),

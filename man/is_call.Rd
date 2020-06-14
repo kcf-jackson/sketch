@@ -31,3 +31,6 @@ has to match at least one of them, otherwise \code{is_call()} returns
 \description{
 Predicate for calls
 }
+\note{
+This function is imported from `rlang`.
+}

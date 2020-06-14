@@ -20,3 +20,10 @@ src <- function(x) {
 #' @param ... Any arguments
 #' @export
 let <- declare <- function(...) { invisible(NULL) }
+
+
+#' Parse R code
+#' @inheritParams rlang::parse_expr
+#' @note This function is imported from `rlang`.
+#' @export
+parse_expr <- rlang::parse_expr

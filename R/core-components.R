@@ -25,6 +25,7 @@ deparse_sym <- function(ast, ...) {
 # Deparser for calls ---------------------------------------
 #' Predicate for calls
 #' @inheritParams rlang::is_call
+#' @note This function is imported from `rlang`.
 is_call <- rlang::is_call
 
 #' Deparser for calls
@@ -316,7 +317,7 @@ is_call_df <- function(ast) is_call(ast, "data.frame")
 #' @rdname deparsers_component
 deparse_df <- function(ast, ...) {
   err_msg <- "All columns in a dataframe must be named to convert into JavaScript properly."
-  paste0("R.dataframe({ ", deparse_df_arg(ast[-1], err_msg, ...), " })")
+  paste0("R.data_frame({ ", deparse_df_arg(ast[-1], err_msg, ...), " })")
 }
 
 #' Deparser for the arguments in a "data.frame" call
@@ -398,7 +399,8 @@ detect_mime <- function(fname) {
   # 1. https://www.iana.org/assignments/media-types/media-types.xhtml
   # 2. https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
   # 3. https://www.freeformatter.com/mime-types-list.html
-  # TODO: add a full list?
+  # TODO: Add a full mime-type list?
+  # A partial list is available at https://github.com/yihui/mime, but it is GPL-protected.
   switch(extname(fname),
          "svg" = "image/svg+xml",
          "bmp" = "image/bmp",
@@ -500,16 +502,16 @@ deparse_extract <- function(ast, ...) {
   ind <- purrr::map_chr(ast[-c(1,2)], deparse_js, ...)
   ind <- replace_empty_index(ind, obj)
   if (length(ind) > 1) {
-    ind <- paste("[", paste(ind, collapse = ", "), "]", sep = "")
+    ind <- paste(ind, collapse = ", ")
   }
-  glue::glue("R.extract({obj}, {ind})")
+  glue::glue("R.extract({obj}, [{ind}])")
 }
 
 replace_empty_index <- function(x, obj) {
   ind <- which(x == "")
   if (!purrr::is_empty(ind)) {
     x[ind] <- purrr::map_chr(ind, function(i) {
-      glue::glue("R.range(0, R.size({obj})[{i - 1}])")
+      glue::glue("R.emptyIndex({obj}, {i - 1})")  # -1 for JavaScript
     })
   }
   x
@@ -519,17 +521,19 @@ replace_empty_index <- function(x, obj) {
 #' Predicate for the "extractAssign" operator
 #' @rdname predicate_component
 is_call_extractAssign <- function(ast) {
-  is_call(ast, c("<-", "=")) && is_call(ast[[3]], "R.extract")
+  is_call(ast, c("<-", "=")) && is_call(ast[[2]], "R.extract")
 }
 
 #' Deparser for the "extractAssign" operator
 #' @rdname deparsers_component
 deparse_extractAssign <- function(ast, ...) {
-  obj <- deparse_js(ast[[2]], ...)
+  obj <- deparse_js(ast[[2]][[2]], ...)
   val <- deparse_js(ast[[3]], ...)
-  ind <-purrr::map_chr(ast[-(1:3)], deparse_js, ...)
+  # browser()
+  ind <- purrr::map_chr(ast[[2]][-c(1,2)], deparse_js, ...)
+  ind <- replace_empty_index(ind, obj)
   if (length(ind) > 1) {
-    ind <- paste("[", paste(ind, collapse = ", "), "]", sep = "")
+    ind <- paste(ind, collapse = ", ")
   }
   glue::glue("R.extractAssign({obj}, {val}, [{ind}])")
 }
@@ -543,17 +547,34 @@ is_call_extract2 <- function(ast) is_call(ast, "R.extract2")
 #' @rdname deparsers_component
 deparse_extract2 <- function(ast, ...) {
   if (length(ast) > 3) {
+    # extract2 only takes one index argument (can be scalar or vector)
     stop("Incorrect number of subscripts")
   }
   obj <- deparse_js(ast[[2]], ...)
-  ind <- deparse_js(ast[[3]], ...) %>%
-    replace_empty_index(obj)
+  ind <- deparse_js(ast[[3]], ...)
+  if (ind == "") return("null")
+
   glue::glue("R.extract2({obj}, {ind})")
 }
 
 
-#' Predicate for the "extractAssign" operator
+#' Predicate for the "extract2Assign" operator
 #' @rdname predicate_component
 is_call_extract2Assign <- function(ast) {
-  is_call(ast, c("<-", "=")) && is_call(ast[[3]], "R.extract2")
+  is_call(ast, c("<-", "=")) && is_call(ast[[2]], "R.extract2")
+}
+
+#' Deparser for the "extract2Assign" operator
+#' @rdname deparsers_component
+deparse_extract2Assign <- function(ast, ...) {
+  if (length(ast[[2]]) > 3) {
+    # extract2 only takes one index argument (can be scalar or vector)
+    stop("Incorrect number of subscripts")
+  }
+  ind <- deparse_js(ast[[2]][[3]], ...)
+  if (ind == "") stop("[[ ]] with missing subscript")
+
+  obj <- deparse_js(ast[[2]][[2]], ...)
+  val <- deparse_js(ast[[3]], ...)
+  glue::glue("R.extract2Assign({obj}, {val}, {ind})")
 }

@@ -42,6 +42,7 @@ default_rules <- function() {
         make_rule("[", "R.extract"),
         make_rule("^", "R.pow"),
         make_rule("%%", "R.mod"),
+        make_rule("::", "."),
         make_rule("$", "."),
         make_rule(":", "R.seq"),
         make_rule("%instanceof%", "instanceof"),
@@ -124,7 +125,7 @@ default_rules <- function() {
         # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
         make_rule("JS_NULL", "null"),
         make_rule("JS_UNDEFINED", "undefined"),
-        make_rule("JS_NA", "NaN"),
+        make_rule("JS_NAN", "NaN"),
         make_rule("JS_Array", "["),
 
         # jQuery ----

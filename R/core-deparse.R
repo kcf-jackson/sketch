@@ -64,9 +64,9 @@ default_deparsers <- function() {
     # Library functions
     "R.add" = make_deparser(is_call_add, deparse_add),
     "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
-    "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extractAssign),
-    "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
+    "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extract2Assign),
     "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
+    "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
     "R.extract" = make_deparser(is_call_extract, deparse_extract),
     # Special forms
     "lambda" = make_deparser(is_call_lambda, deparse_lambda),

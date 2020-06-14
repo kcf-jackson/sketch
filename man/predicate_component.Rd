@@ -105,5 +105,5 @@ Predicate for the "extractAssign" operator
 
 Predicate for the "extract2" operator
 
-Predicate for the "extractAssign" operator
+Predicate for the "extract2Assign" operator
 }

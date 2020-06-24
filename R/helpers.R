@@ -15,6 +15,7 @@ src <- function(x) {
 
 
 #' Empty functions
+#' @rdname empty-functions
 #' @description This function does nothing. It is created to ensure
 #' the keywords `let` and `declare` are defined.
 #' @param ... Any arguments
@@ -27,3 +28,9 @@ let <- declare <- function(...) { invisible(NULL) }
 #' @note This function is imported from `rlang`.
 #' @export
 parse_expr <- rlang::parse_expr
+
+
+script  <- htmltools::tags$script
+link    <- htmltools::tags$link
+style   <- htmltools::tags$style
+dataURI <- base64enc::dataURI

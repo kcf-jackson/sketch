@@ -2,6 +2,11 @@
 
 # Constructor for "asset_list"
 # asset_list := [head: [shiny.tag], body: [shiny.tag]]
+#
+# Note that no functions actually require the knowledge of
+# how shiny.tag is implemented. Hence the type `shiny.tag`
+# can be replaced by a generic type `a`, i.e.
+# asset_list := [head: [a], body: [a]]
 asset_list <- function(head = NULL, body = NULL) {
     structure(
         list(head = head, body = body),

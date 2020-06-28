@@ -12,16 +12,6 @@ convert_src <- function(x, processors = default_processors()) {
     }
 }
 
-#' List of handlers for processing the '#!' header
-#' @export
-default_processors <- function() {
-    list(
-        make_processor(load_library_pred, load_library_proc),
-        make_processor(load_script_pred, load_script_proc),
-        make_processor(always_true, load_error_proc)
-    )
-}
-
 #' Make a handle to process header
 #'
 #' @param pred A function, taking a string and returning a logical.
@@ -33,6 +23,16 @@ make_processor <- function(pred, fun) {
     list(predicate = pred, process = fun)
 }
 
+#' List of handlers for processing the '#!' header
+#' @export
+default_processors <- function() {
+    list(
+        make_processor(load_library_pred, load_library_proc),
+        make_processor(load_script_pred, load_script_proc),
+        make_processor(load_data_pred, load_data_proc),
+        make_processor(always_true, load_error_proc)
+    )
+}
 
 #=====================================================================
 # load_library_pred :: char -> logical
@@ -40,25 +40,42 @@ load_library_pred <- function(x) {
     ast <- rlang::parse_expr(x)
     rlang::is_call(ast, "load_library")
 }
+# load_library_proc :: char -> shiny.tag
+# Delegate to `load_library`
+load_library_proc <- purrr::compose(eval, rlang::parse_expr)
 
 # load_script_pred :: char -> logical
 load_script_pred <- function(x) {
     ast <- rlang::parse_expr(x)
     rlang::is_call(ast, "load_script")
 }
-
-# load_library_proc :: char -> shiny.tag
-# Delegate to `load_library`
-load_library_proc <- purrr::compose(eval, rlang::parse_expr)
-
 # load_script_proc :: char -> shiny.tag
 # Delegate to `load_script`
 load_script_proc <- purrr::compose(eval, rlang::parse_expr)
+
+# load_data_pred :: char -> logical
+load_data_pred <- function(x) {
+    ast <- rlang::parse_expr(x)
+    rlang::is_call(ast, "load_data")
+}
+# load_data_proc :: char -> shiny.tag
+# Delegate to `load_data`
+load_data_proc <- purrr::compose(eval, rlang::parse_expr)
+
+# Load error messages
+# load_error_proc :: char -> IO()
+load_error_proc <- function(x) {
+    ast <- rlang::parse_expr(x)
+    stop(glue::glue("Command '{deparse(ast[[1]])}' is not supported."))
+}
+
 
 #' Header functions
 #' @rdname empty-headers
 #' @param package A character string; name of a JavaScript library.
 #' @param src A character string; the full web/local path to a JavaScript library.
+#' @param x A character string; the full path to the file containing the data.
+#' @param cache A character string; the full path to the cache file.
 #' @param ... Additional arguments to pass to header processor.
 # load_library :: char -> ... -> shiny.tag
 load_library <- function(package, ...) load_script(src(package), ...)
@@ -67,11 +84,10 @@ load_library <- function(package, ...) load_script(src(package), ...)
 # load_script :: char -> ... -> shiny.tag
 load_script <- function(src, ...) to_shiny_tag(src = src, ...)
 
-# Load error messages
-# load_error_proc :: char -> IO()
-load_error_proc <- function(x) {
-    ast <- rlang::parse_expr(x)
-    stop(glue::glue("Command '{deparse(ast[[1]])}' is not supported."))
+#' @rdname empty-headers
+load_data <- function(x, cache, ...) {
+    index_js <- compile_data(x, cache, ...)
+    script(src = dataURI(file = index_js))
 }
 
 
@@ -97,11 +113,10 @@ to_shiny_tag <- function(src, ...) {
         if (is_javascript(src)) return(load_local_js(src, ...))
         if (is_css(src))        return(load_local_css(src, ...))
         if (is_r_script(src))   return(load_sketch_script(src, ...))
-        if (is_data(src))       return(load_local_data(src, ...))
     }
 
     stop("Web support only works for JavaScript, CSS and Web-fonts links, and
-         local script must be one of JavaScript, CSS, sketch, JSON and CSV.")
+         local script must be one of JavaScript, CSS, sketch files.")
 }
 
 remove_attr <- function(x, attr) {
@@ -133,11 +148,6 @@ load_local_css <- function(x, ...) {
 
 load_sketch_script <- function(x, ...) {
     index_js <- compile_r(x, tempfile())
-    script(src = dataURI(file = index_js), ...)
-}
-
-load_local_data <- function(x, ...) {
-    index_js <- compile_data(x, tempfile())
     script(src = dataURI(file = index_js), ...)
 }
 

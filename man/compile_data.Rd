@@ -4,12 +4,14 @@
 \alias{compile_data}
 \title{Compile a data file into a JS file}
 \usage{
-compile_data(input, output)
+compile_data(input, output = tempfile(), ...)
 }
 \arguments{
 \item{input}{A character string; the path to the input file.}
 
 \item{output}{A character string; the path to the output file.}
+
+\item{...}{Extra arguments to be passed to `to_json`.}
 }
 \description{
 Compile a data file into a JS file

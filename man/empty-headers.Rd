@@ -3,11 +3,14 @@
 \name{load_library}
 \alias{load_library}
 \alias{load_script}
+\alias{load_data}
 \title{Header functions}
 \usage{
 load_library(package, ...)
 
 load_script(src, ...)
+
+load_data(x, cache, ...)
 }
 \arguments{
 \item{package}{A character string; name of a JavaScript library.}
@@ -15,6 +18,10 @@ load_script(src, ...)
 \item{...}{Additional arguments to pass to header processor.}
 
 \item{src}{A character string; the full web/local path to a JavaScript library.}
+
+\item{x}{A character string; the full path to the file containing the data.}
+
+\item{cache}{A character string; the full path to the cache file.}
 }
 \description{
 Header functions

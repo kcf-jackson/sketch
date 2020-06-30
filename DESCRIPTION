@@ -1,7 +1,7 @@
 Package: sketch
 Type: Package
 Title: Interactive sketches in R
-Version: 0.8.4
+Version: 0.9.4
 Author: Chun Fung (Jackson) Kwok
 Maintainer: Chun Fung (Jackson) Kwok <kwokcf@unimelb.edu.au>
 Description: Creates static / animated / interactive sketches and illustrations 
@@ -16,8 +16,8 @@ Imports:
     purrr,
     rstudioapi,
     stringr,
-    htmltools,
     glue,
+    htmltools,
     base64enc,
     jsonlite
 Suggests: 

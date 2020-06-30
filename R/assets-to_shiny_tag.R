@@ -87,7 +87,7 @@ load_script <- function(src, ...) to_shiny_tag(src = src, ...)
 #' @rdname empty-headers
 load_data <- function(x, cache, ...) {
     index_js <- compile_data(x, cache, ...)
-    script(src = dataURI(file = index_js))
+    script(src = dataURI(file = index_js, mime = "text/javascript"))
 }
 
 
@@ -115,14 +115,13 @@ to_shiny_tag <- function(src, ...) {
         if (is_r_script(src))   return(load_sketch_script(src, ...))
     }
 
-    stop("Web support only works for JavaScript, CSS and Web-fonts links, and
-         local script must be one of JavaScript, CSS, sketch files.")
+    stop("Web support only works for JavaScript, CSS and Web-fonts links, and local script must be one of JavaScript, CSS, sketch files.")
 }
 
-remove_attr <- function(x, attr) {
-    x[attr] <- NULL
-    return(x)
-}
+# remove_attr <- function(x, attr) {
+#     x[attr] <- NULL
+#     return(x)
+# }
 
 # load_* :: char -> shiny.tag
 load_web_js <- function(x, ...) {
@@ -138,7 +137,7 @@ load_web_font <- function(x, ...) {
 }
 
 load_local_js <- function(x, ...) {
-    script(src = dataURI(file = x), ...)
+    script(src = dataURI(file = x, mime = "text/javascript"), ...)
 }
 
 load_local_css <- function(x, ...) {
@@ -148,7 +147,7 @@ load_local_css <- function(x, ...) {
 
 load_sketch_script <- function(x, ...) {
     index_js <- compile_r(x, tempfile())
-    script(src = dataURI(file = index_js), ...)
+    script(src = dataURI(file = index_js, mime = "text/javascript"), ...)
 }
 
 

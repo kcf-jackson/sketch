@@ -13,7 +13,7 @@ source_r(file, debug = F, launch_browser = "viewer")
 
 \item{launch_browser}{A character string; "viewer" or "browser", which
 calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-`NULL` to suppress display.}
+"NULL" (character string) to suppress display.}
 }
 \description{
 This function compiles a sketch R file, resolves the

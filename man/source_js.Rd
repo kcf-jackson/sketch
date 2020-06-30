@@ -17,7 +17,7 @@ list of \code{shiny.tag} object.}
 
 \item{launch_browser}{A character string; "viewer" or "browser", which
 calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-"NULL" to suppress display.}
+"NULL" (character string) to suppress display.}
 }
 \description{
 Source a sketch R file

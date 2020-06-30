@@ -98,6 +98,7 @@ subst <- function(ast, pattern, replacement) {
     }
 
     if (rlang::is_syntactic_literal(ast)) {
+      # rewriting NULL and NA is not allowed
       if (is.null(ast))   return(ast)   # this line is needed as NULL cannot be compared using `==`.
       if (is.na(ast))     return(ast)   # this line is needed as NA cannot be compared using `==`.
       if (ast == pattern) return(as.symbol(replacement))
@@ -111,13 +112,14 @@ subst <- function(ast, pattern, replacement) {
     }
 
     # Handle reference to source code, as "srcref" is not a language object,
-    # but it appears in function definitions.
-    if (class(ast) == "srcref") {
+    # but it appears in function definitions. For more information, see
+    # https://stat.ethz.ch/R-manual/R-devel/library/base/html/srcfile.html
+    if (class(ast) == "srcref") {  # nocov start
       return(ast)
-    }
+    }                              # nocov end
 
     # Other cases should return error for now.
-    stop("The line should not be reached, please submit an issue with the input on github. Thanks!")
+    stop("The line should not be reached, please submit an issue with the input on github. Thanks!")  # nocov
 }
 
 

@@ -20,7 +20,7 @@ extract_headers <- function(file) {
     is_header <- Vectorize(function(x) substr(x, 1, 2) == "#!")
     readLines(file) %>%
         filter(is_header) %>%
-        purrr::map_dbl(~substring(.x, 3))  # Remove #!
+        purrr::map_chr(~substring(.x, 3))  # Remove #!
 }
 
 # process_headers :: [char] -> asset_list
@@ -36,6 +36,7 @@ process_headers <- function(headers, ...) {
     # Recursively build the assets dependencies in other sketch R files
     children_assets <- headers %>%
         filter(is_sketch) %>%
+        purrr::map(first_arg) %>%
         purrr::map(assets, ...)
     if (purrr::is_empty(children_assets)) {
         return(parent_assets)

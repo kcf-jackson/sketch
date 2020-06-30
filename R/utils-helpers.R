@@ -3,11 +3,10 @@
 #' @export
 src <- function(x) {
     switch(x,
-           "dataframe" = "https://gmousse.github.io/dataframe-js/dist/dataframe.min.js",
-           "math" = "https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.2.2/math.min.js",
-           "p5" = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js",
+           # "math" = "https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.0.2/math.min.js",
+           "p5" = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js",
+           "chart" = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js",
            "plotly" = "https://cdn.plot.ly/plotly-latest.min.js",
-           "chart" = "https://cdn.jsdelivr.net/npm/chart.js@2.8.0",
            "d3" = "https://d3js.org/d3.v5.min.js",
            stop(glue::glue("Library '{x}' does not exist."))
     )

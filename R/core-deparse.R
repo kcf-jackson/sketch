@@ -24,10 +24,7 @@ deparse_js <- function(ast, deparsers) {
       return(deparser$deparse(ast, deparsers))
     }
   }
-  stop("The program reaches the end of the list of deparsers
-  you provided; it means you have provided an input that no
-  deparser in the list can handle. You should check your input
-  or add the relevant deparser to the list of deparsers.")
+  stop("The program reaches the end of the list of deparsers you provided; it means you have provided an input that no deparser in the list can handle. You should check your input or add the relevant deparser to the list of deparsers.")
 }
 
 

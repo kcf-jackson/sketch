@@ -15,8 +15,6 @@ has_prefix <- function(x, y) substr(x, 1, nchar(y)) == y
 always_true <- function(x) TRUE
 
 # Extension-related predicates
-is_data <- function(x) is_csv(x) || is_json(x)
-
 is_javascript <- function(x) extname(x) == "js"
 is_r_script   <- function(x) extname(x) == "r"
 is_css        <- function(x) extname(x) == "css"
@@ -25,7 +23,4 @@ is_csv        <- function(x) extname(x) == "csv"
 is_font       <- function(x) extname(x) %in% c("woff", "ttf", "eot", "otf")
 
 # Get file extension
-extname <- function(x) {
-    filename <- basename(x)
-    tolower(tail(unlist(strsplit(filename, "[.]")), 1))
-}
+extname <- purrr::compose(tolower, tools::file_ext)  # handle cases without extension

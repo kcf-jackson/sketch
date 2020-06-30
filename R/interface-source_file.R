@@ -6,14 +6,14 @@
 #'
 #' @export
 source_active <- function(launch_browser = "viewer") {
-  source_r(copy_active_to_tempfile(), launch_browser = launch_browser)
+  source_r(copy_active_to_tempfile(), launch_browser = launch_browser)  # nocov
 }
 
 copy_active_to_tempfile <- function() {
-  x <- rstudioapi::getSourceEditorContext()$contents
+  x <- rstudioapi::getSourceEditorContext()$contents  # nocov start
   temp_file <- tempfile()
   write(x, file = temp_file)
-  temp_file
+  temp_file                                           # nocov end
 }
 
 
@@ -26,7 +26,7 @@ copy_active_to_tempfile <- function() {
 #' @param debug T or F; if T, print compiled code on screen.
 #' @param launch_browser A character string; "viewer" or "browser", which
 #' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-#' `NULL` to suppress display.
+#' "NULL" (character string) to suppress display.
 #'
 #' @export
 source_r <- function(file, debug = F, launch_browser = "viewer") {
@@ -51,7 +51,7 @@ source_r <- function(file, debug = F, launch_browser = "viewer") {
 #' list of \code{shiny.tag} object.
 #' @param launch_browser A character string; "viewer" or "browser", which
 #' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-#' "NULL" to suppress display.
+#' "NULL" (character string) to suppress display.
 #'
 #' @export
 source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewer") {
@@ -65,10 +65,7 @@ source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewe
 default_tags <- function() {
   rjs <- system.file("assets/R-browser.js", package = "sketch")
   asset_list(
-    head = list(
-      htmltools::tags$script(src = src("dataframe")),
-      js_to_shiny_tag(rjs)
-    ),
+    head = list(js_to_shiny_tag(rjs)),
     body = list(htmltools::tags$div(id = "sketch_1"))
   )
 }

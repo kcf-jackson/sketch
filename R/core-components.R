@@ -108,7 +108,7 @@ deparse_wrap <- function(ast, ...) {
          "[[" = deparse_wrap_sb(ast, ...),
          "("  = deparse_wrap_rb(ast, ...),
          "{"  = deparse_wrap_cb(ast, ...),
-         stop(glue::glue("Haven't implemented deparse for symbol '{sym}'"))
+         stop(glue::glue("Haven't implemented deparse for symbol '{sym}'"))   # nocov
   )
 }
 
@@ -384,13 +384,13 @@ is_call_dataURI <- function(ast) is_call(ast, "dataURI")
 #' Deparser for the "dataURI" operator
 #' @rdname deparsers_component
 deparse_dataURI <- function(ast, ...) {
-  if (!is.character(ast[[2]])) {
-    stop("The argument inside the \"dataURI\" call is not a character string.
-         Note that our \"compiler\" only does static code analysis, and it
-         cannot handle variable path.")
-  }
+  # dataURI(asset_path, mime_type)
   fname <- ast[[2]]
-  mime_type <- detect_mime(fname)
+  if (!is.character(fname)) {
+    stop("The first argument of 'dataURI' must be a character string.
+         Note that variable path is not supported.")
+  }
+  mime_type <- ifelse(length(ast) == 3, ast[[3]], detect_mime(fname))
   paste0('"', base64enc::dataURI(file = fname, mime = mime_type), '"')
 }
 
@@ -409,7 +409,7 @@ detect_mime <- function(fname) {
          "tiff" = "image/tiff",
          "gif" = "image/gif",
          "png" = "image/png",
-         "" # default case
+         stop(glue::glue("Please provide the mime-type for extension \"{extname(fname)}\"")) # default case
   )
 }
 

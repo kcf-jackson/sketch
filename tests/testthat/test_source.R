@@ -9,6 +9,7 @@ testthat::test_that("Source sketch R script", {
         "x = R.sin(10)"
     )
 
+    testthat::skip_if_offline()
     output_file <- source_r(file, launch_browser = "NULL")
     testthat::expect_equal(
         md5hash(output_file),

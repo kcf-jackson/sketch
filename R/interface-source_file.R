@@ -59,13 +59,16 @@ source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewe
   html_doc <- html_builder(append_to_body(asset_tags, file_tag))
 
   viewer = list("viewer" = rstudioapi::viewer, "browser" = utils::browseURL, "NULL" = NULL)
-  htmltools::html_print(html_doc, viewer = viewer[[launch_browser]])
+  html_print(html_doc, viewer = viewer[[launch_browser]])
 }
 
 default_tags <- function() {
   rjs <- system.file("assets/R-browser.js", package = "sketch")
   asset_list(
-    head = list(js_to_shiny_tag(rjs)),
+    head = list(
+      htmltools::tags$meta(charset = "utf-8"),
+      js_to_shiny_tag(rjs)
+    ),
     body = list(htmltools::tags$div(id = "sketch_1"))
   )
 }

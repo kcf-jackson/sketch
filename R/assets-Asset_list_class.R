@@ -70,10 +70,28 @@ map.asset_list <- function(x, f, ...) {
 
 # html_builder :: asset_list -> [shiny.tag]
 html_builder <- function(x) {
-    htmltools::tagList(
-        htmltools::tags$html(
-            htmltools::tags$head(ahead(x)),
-            htmltools::tags$body(abody(x))
-        )
+    htmltools::tags$html(
+        htmltools::tags$head(ahead(x)),
+        htmltools::tags$body(abody(x))
     )
+}
+
+# Taken from htmltools::html_print. It is modified so that
+# `save_html` is bounded to a new function and the other
+# parameters are removed.
+html_print <- function (html, viewer = getOption("viewer", utils::browseURL)) {
+    www_dir <- tempfile("viewhtml")
+    dir.create(www_dir)
+    index_html <- file.path(www_dir, "index.html")
+    save_html(html, file = index_html)
+    if (!is.null(viewer))
+        viewer(index_html)
+    invisible(index_html)
+}
+
+# The function solves the issue of duplicate tags appeared
+# in `htmltools::save_html`.
+save_html <- function(html, file) {
+    out <- paste0("<!DOCTYPE html>\n", htmltools::doRenderTags(html))
+    write(out, file = file)
 }

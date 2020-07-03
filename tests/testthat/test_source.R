@@ -9,11 +9,10 @@ testthat::test_that("Source sketch R script", {
         "x = R.sin(10)"
     )
 
-    testthat::skip_if_offline()
     output_file <- source_r(file, launch_browser = "NULL")
     testthat::expect_equal(
         md5hash(output_file),
-        "d71f3efd2b8c3a2aba38e34c32f13790"
+        "936f7729da1dcee343f3cf3b368a5f4f"
     )
 
     # Need to set path so that referencing to another file would work
@@ -24,7 +23,7 @@ testthat::test_that("Source sketch R script", {
     output_file <- source_r(file, launch_browser = "NULL")
     testthat::expect_equal(
         md5hash(output_file),
-        "699bef32ed7cf9e2b12b21e72e43ac3e"
+        "7cd25ac544d727b25bf6396b2528efe2"
     )
     setwd(current_wd)
 })

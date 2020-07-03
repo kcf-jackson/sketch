@@ -85,7 +85,7 @@ html_print <- function (html, viewer = getOption("viewer", utils::browseURL)) {
     index_html <- file.path(www_dir, "index.html")
     save_html(html, file = index_html)
     if (!is.null(viewer))
-        viewer(index_html)
+        viewer(index_html)  # nocov
     invisible(index_html)
 }
 

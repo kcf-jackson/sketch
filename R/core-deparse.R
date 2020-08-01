@@ -66,6 +66,7 @@ default_deparsers <- function() {
     "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
     "R.extract" = make_deparser(is_call_extract, deparse_extract),
     # Special forms
+    "pipe" = make_deparser(is_call_pipe, deparse_pipe),
     "lambda" = make_deparser(is_call_lambda, deparse_lambda),
     "ifelse" = make_deparser(is_call_ifelse, deparse_ifelse),
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),

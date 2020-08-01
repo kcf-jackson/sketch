@@ -445,13 +445,35 @@ deparse_lambda <- function(ast, ...) {
     if (!is.null(names(args))) {
       args <- purrr::map2_chr(
         .x = names(args), .y = args,
-        function(x, y) {
+        .f = function(x, y) {
           if (x == '') y else glue::glue('{x} = {y}')
         }
       )
     }
     args <- paste(args, collapse = ", ")
     glue::glue("function({args}) {{ return {body}; }}")
+  }
+}
+
+
+# Deparser for "pipe" ---------------------------------------------------
+#' Predicate for the "pipe" operator
+#' @rdname predicate_component
+is_call_pipe <- function(ast) is_call(ast, "pipe")
+
+#' Deparser for the "pipe" operator
+#' @rdname deparsers_component
+deparse_pipe <- function(ast, ...) {
+  if (rlang::is_symbol(ast[[3]])) {
+    arg <- deparse_js(ast[[2]], ...)
+    fname <- deparse_js(ast[[3]], ...)
+    glue::glue("{fname}({arg})")
+  } else {
+    new_ast <- ast[[3]] %>%
+      as.list() %>%
+      append(ast[[2]], 1) %>%
+      as.call()
+    deparse_js(new_ast, ...)
   }
 }
 
@@ -483,7 +505,11 @@ is_call_subtract <- function(ast) is_call(ast, "R.subtract")
 deparse_subtract <- function(ast, ...) {
   if (length(ast) == 2) {
     num <- deparse_js(ast[[2]], ...)
-    glue::glue("R.unaryMinus({num})")
+    if (is.numeric(ast[[2]])) {
+      glue::glue("-{num}")
+    } else {
+      glue::glue("R.unaryMinus({num})")
+    }
   } else {
     lhs <- deparse_js(ast[[2]], ...)
     rhs <- deparse_js(ast[[3]], ...)

@@ -16,13 +16,18 @@ basic_rules <- function() {
         make_rule("%%", "%"),
         make_rule("$", "."),
         make_rule("%instanceof%", "instanceof"),
+        make_rule("%+%", "+"),
         make_rule("%=>%", "=>"),
         make_rule("T", "true"),
         make_rule("F", "false"),
         make_rule("TRUE", "true"),
         make_rule("FALSE", "false"),
         make_rule("declare", "let"),
-        make_rule("self", "this")
+        make_rule("self", "this"),
+        make_rule("JS_NULL", "null"),
+        make_rule("JS_UNDEFINED", "undefined"),
+        make_rule("JS_NAN", "NaN"),
+        make_rule("JS_ARRAY", "Array")
     )
 }
 
@@ -49,6 +54,8 @@ default_rules <- function() {
         make_rule("%=>%", "=>"),
         make_rule("%+%", "+"),
         make_rule("%-%", "-"),
+        make_rule("%o%", "R.compose"),
+        make_rule("%>%", "pipe"),
 
         # Base Javascript
         make_rule("TRUE", "true"),
@@ -100,8 +107,12 @@ default_rules <- function() {
 
         make_rule("lgamma", "R.lgamma"),
         make_rule("gamma", "R.gamma"),
-        # Missing digamma, trigamma
-        # Missing cumsum, cumprod, cummax, cummin
+        make_rule("digamma", "R.digamma"),
+        make_rule("trigamma", "R.trigamma"),
+        make_rule("cumsum", "R.cumsum"),
+        make_rule("cumprod", "R.cumprod"),
+        make_rule("cummax", "R.cummax"),
+        make_rule("cummin", "R.cummin"),
 
         # Group "Summary" ----
         make_rule(  "all", "R.all"),
@@ -110,23 +121,23 @@ default_rules <- function() {
         make_rule( "prod", "R.prod"),
         make_rule(  "min", "R.min"),
         make_rule(  "max", "R.max"),
-        make_rule("range", "R.range"),
+        make_rule("range", "R.range2"),
 
         # Extra ----
         make_rule( "log10", "R.log10"),
         make_rule( "log2", "R.log2"),
         # Missing beta, lbeta, psigamma
-        make_rule("choose", "R.combinations"),
+        make_rule("choose", "R.choose"),
         make_rule("lchoose", "R.lchoose"),
         make_rule("factorial", "R.factorial"),
-        make_rule("lfactorial", "R.lfactorial"),
+        # make_rule("lfactorial", "R.lfactorial"),
 
         # JavaScript ----
         # make_rule("NULL", "null"),   # doesn't work since R doesn't distinguish input NULL and empty NULL.
         make_rule("JS_NULL", "null"),
         make_rule("JS_UNDEFINED", "undefined"),
         make_rule("JS_NAN", "NaN"),
-        make_rule("JS_Array", "["),
+        make_rule("JS_ARRAY", "Array"),
 
         # jQuery ----
         make_rule("jQuery", "$")

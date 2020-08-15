@@ -4,12 +4,15 @@
 \alias{insert_sketch}
 \title{Insert a sketch into an RMD document}
 \usage{
-insert_sketch(file, id, ...)
+insert_sketch(file, id, output_dir = NULL, ...)
 }
 \arguments{
 \item{file}{A character string; the path to the sketch file.}
 
 \item{id}{A character string; an unique identifier for the sketch file.}
+
+\item{output_dir}{A character string; a separate directory to save the
+sketch app. Default to be NULL, which embeds the app in the Rmd file.}
 
 \item{...}{(Optional) Other attributes to pass to iframes.}
 }

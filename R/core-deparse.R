@@ -75,6 +75,8 @@ default_deparsers <- function() {
     # Data structure
     "list" = make_deparser(is_call_list, deparse_list),
     "data.frame" = make_deparser(is_call_df, deparse_df),
+    "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
+    "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate),
     # Keywords
     "for"    = make_deparser(is_call_for, deparse_for),
     "if"     = make_deparser(is_call_if, deparse_if),

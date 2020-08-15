@@ -26,18 +26,22 @@ copy_active_to_tempfile <- function() {
 #' @param debug T or F; if T, print compiled code on screen.
 #' @param launch_browser A character string; "viewer" or "browser", which
 #' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-#' "NULL" (character string) to suppress display.
+#' NULL to suppress display.
+#' @param ... Additional arguments to pass to `compile_r`.
 #'
 #' @export
-source_r <- function(file, debug = F, launch_browser = "viewer") {
+source_r <- function(file, debug = F, launch_browser = "viewer", ...) {
+  index_js <- compile_r(file, tempfile(), ...)
+  file_asset <- assets(file)   # this line is needed to keep the working directory unchanged
+  asset_tags <- c(default_tags(), file_asset)
   if (debug) {
-    index_js <- compile_r(file, output = "")  # print to console
-    invisible(index_js)
-  } else {
-    index_js <- compile_r(file, tempfile())
-    asset_tags <- assets(file)   # this line is needed to keep the working directory unchanged
-    source_js(index_js, c(default_tags(), asset_tags), launch_browser = launch_browser)
+    debugger_js <- system.file("assets/console-log-div.js", package = "sketch")
+    asset_tags <- append_to_body(
+      x = asset_tags,
+      shiny_tag = js_to_shiny_tag(debugger_js)
+    )
   }
+  source_js(index_js, asset_tags, launch_browser = launch_browser)
 }
 
 
@@ -51,19 +55,27 @@ source_r <- function(file, debug = F, launch_browser = "viewer") {
 #' list of \code{shiny.tag} object.
 #' @param launch_browser A character string; "viewer" or "browser", which
 #' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-#' "NULL" (character string) to suppress display.
+#' NULL to suppress display.
 #'
 #' @export
 source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewer") {
   file_tag <- js_to_shiny_tag(file)
   html_doc <- html_builder(append_to_body(asset_tags, file_tag))
-
-  viewer = list("viewer" = rstudioapi::viewer, "browser" = utils::browseURL, "NULL" = NULL)
-  html_print(html_doc, viewer = viewer[[launch_browser]])
+  if (is.null(launch_browser)) {
+    viewer <- NULL
+  } else {
+    viewer <- switch(
+      launch_browser,
+      "viewer" = rstudioapi::viewer,
+      "browser" = utils::browseURL,
+      NULL
+    )
+  }
+  html_print(html_doc, viewer = viewer)
 }
 
 default_tags <- function() {
-  rjs <- system.file("assets/R-browser.js", package = "sketch")
+  rjs <- system.file("assets/browser-R_core.js", package = "sketch")
   asset_list(
     head = list(
       htmltools::tags$meta(charset = "utf-8"),

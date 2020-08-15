@@ -10,11 +10,14 @@
 \alias{is_call_function}
 \alias{is_call_list}
 \alias{is_call_df}
+\alias{is_call_df_summarise}
+\alias{is_call_df_mutate}
 \alias{is_call_new}
 \alias{is_call_let}
 \alias{is_call_dataURI}
 \alias{is_call_ifelse}
 \alias{is_call_lambda}
+\alias{is_call_pipe}
 \alias{is_call_add}
 \alias{is_call_subtract}
 \alias{is_call_extract}
@@ -41,6 +44,10 @@ is_call_list(ast)
 
 is_call_df(ast)
 
+is_call_df_summarise(ast)
+
+is_call_df_mutate(ast)
+
 is_call_new(ast)
 
 is_call_let(ast)
@@ -50,6 +57,8 @@ is_call_dataURI(ast)
 is_call_ifelse(ast)
 
 is_call_lambda(ast)
+
+is_call_pipe(ast)
 
 is_call_add(ast)
 
@@ -85,6 +94,10 @@ Predicate for the "list" operators
 
 Predicate for the "data.frame" operators
 
+Predicate for the "summarise" operators
+
+Predicate for the "mutate" operators
+
 Predicate for the "new" operator
 
 Predicate for the "let" operator
@@ -94,6 +107,8 @@ Predicate for the "dataURI" operator
 Predicate for the "ifelse" operator
 
 Predicate for the "lambda" operator
+
+Predicate for the "pipe" operator
 
 Predicate for the "add" operator
 

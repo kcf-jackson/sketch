@@ -98,10 +98,10 @@ subst <- function(ast, pattern, replacement) {
     }
 
     if (rlang::is_syntactic_literal(ast)) {
-      # rewriting NULL and NA is not allowed
-      if (is.null(ast))   return(ast)   # this line is needed as NULL cannot be compared using `==`.
-      if (is.na(ast))     return(ast)   # this line is needed as NA cannot be compared using `==`.
-      if (ast == pattern) return(as.symbol(replacement))
+      if (is.null(ast))   return(ast)  # this line is needed as NULL cannot be compared using `==`.
+      if (is.na(ast))     return(ast)  # this line is needed as NA cannot be compared using `==`.
+      if (is.character(ast))  return(ast)  # Quoted string should be kept as is
+      if (ast == pattern) return(as.symbol(replacement))  # applies to syntactic literal TRUE and FALSE
       return(ast)
     }
 

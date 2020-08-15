@@ -309,9 +309,10 @@ deparse_list_arg <- function(list0, err_msg, ...) {
 }
 
 
+# Dataframe related deparsers ----
 #' Predicate for the "data.frame" operators
 #' @rdname predicate_component
-is_call_df <- function(ast) is_call(ast, "data.frame")
+is_call_df <- function(ast) is_call(ast, "R.data_frame")
 
 #' Deparser for the "data.frame" operators
 #' @rdname deparsers_component
@@ -326,6 +327,41 @@ deparse_df <- function(ast, ...) {
 # the package. The rule here is that each deparser must have its own
 # argument deparser (if it needs one).
 deparse_df_arg <- deparse_list_arg
+
+
+#' Predicate for the "summarise" operators
+#' @rdname predicate_component
+is_call_df_summarise <- function(ast) is_call(ast, "R.summarise")
+
+#' Deparser for the "summarise" operators
+#' @rdname deparsers_component
+deparse_df_summarise <- function(ast, ...) {
+  args <- purrr::map_chr(ast, deparse_js, ...)
+  fname <- args[[1]]
+  df_arg <- args[[2]]
+  fun_args <- args[-c(1:2)]
+  label_args <- names(fun_args)
+  if (is.null(label_args) || any(label_args == "")) {
+    stop("Names must be provided for the new summary column.")
+  }
+
+  if (length(label_args) == 1) {
+    glue::glue("{fname}({df_arg}, '{label_args}', {fun_args})")
+  } else { # length > 1
+    fun_args <- paste(fun_args, collapse = ", ")
+    label_args <- paste(sQuote(label_args, "'"), collapse = ", ")
+    glue::glue("{fname}({df_arg}, [{label_args}], [{fun_args}])")
+  }
+}
+
+
+#' Predicate for the "mutate" operators
+#' @rdname predicate_component
+is_call_df_mutate <- function(ast) is_call(ast, "R.mutate")
+
+#' Deparser for the "mutate" operators
+#' @rdname deparsers_component
+deparse_df_mutate <- deparse_df_summarise
 
 
 # Special forms ==========================================================
@@ -459,7 +495,7 @@ deparse_lambda <- function(ast, ...) {
 # Deparser for "pipe" ---------------------------------------------------
 #' Predicate for the "pipe" operator
 #' @rdname predicate_component
-is_call_pipe <- function(ast) is_call(ast, "pipe")
+is_call_pipe <- function(ast) is_call(ast, "R.pipe")
 
 #' Deparser for the "pipe" operator
 #' @rdname deparsers_component
@@ -530,7 +566,7 @@ deparse_extract <- function(ast, ...) {
   if (length(ind) > 1) {
     ind <- paste(ind, collapse = ", ")
   }
-  glue::glue("R.extract({obj}, [{ind}])")
+  glue::glue("R.extract({obj}, {ind})")
 }
 
 replace_empty_index <- function(x, obj) {
@@ -561,7 +597,7 @@ deparse_extractAssign <- function(ast, ...) {
   if (length(ind) > 1) {
     ind <- paste(ind, collapse = ", ")
   }
-  glue::glue("R.extractAssign({obj}, {val}, [{ind}])")
+  glue::glue("{obj} = R.extractAssign({obj}, {val}, {ind})")
 }
 
 
@@ -595,12 +631,12 @@ is_call_extract2Assign <- function(ast) {
 deparse_extract2Assign <- function(ast, ...) {
   if (length(ast[[2]]) > 3) {
     # extract2 only takes one index argument (can be scalar or vector)
-    stop("Incorrect number of subscripts")
+    stop("Currently, `[[<-` only supports one argument.")
   }
   ind <- deparse_js(ast[[2]][[3]], ...)
   if (ind == "") stop("[[ ]] with missing subscript")
 
   obj <- deparse_js(ast[[2]][[2]], ...)
   val <- deparse_js(ast[[3]], ...)
-  glue::glue("R.extract2Assign({obj}, {val}, {ind})")
+  glue::glue("{obj} = R.extract2Assign({obj}, {val}, {ind})")
 }

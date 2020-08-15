@@ -11,11 +11,14 @@
 \alias{deparse_function}
 \alias{deparse_list}
 \alias{deparse_df}
+\alias{deparse_df_summarise}
+\alias{deparse_df_mutate}
 \alias{deparse_new}
 \alias{deparse_let}
 \alias{deparse_dataURI}
 \alias{deparse_ifelse}
 \alias{deparse_lambda}
+\alias{deparse_pipe}
 \alias{deparse_add}
 \alias{deparse_subtract}
 \alias{deparse_extract}
@@ -44,6 +47,10 @@ deparse_list(ast, ...)
 
 deparse_df(ast, ...)
 
+deparse_df_summarise(ast, ...)
+
+deparse_df_mutate(ast, ...)
+
 deparse_new(ast, ...)
 
 deparse_let(ast, ...)
@@ -53,6 +60,8 @@ deparse_dataURI(ast, ...)
 deparse_ifelse(ast, ...)
 
 deparse_lambda(ast, ...)
+
+deparse_pipe(ast, ...)
 
 deparse_add(ast, ...)
 
@@ -96,6 +105,10 @@ Deparser for the "list" operators
 
 Deparser for the "data.frame" operators
 
+Deparser for the "summarise" operators
+
+Deparser for the "mutate" operators
+
 Deparser for the "new" operator
 
 Deparser for the "let" operator
@@ -105,6 +118,8 @@ Deparser for the "dataURI" operator
 Deparser for the "ifelse" operator
 
 Deparser for the "lambda" operator
+
+Deparser for the "pipe" operator
 
 Deparser for the "add" operator
 

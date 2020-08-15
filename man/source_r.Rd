@@ -4,7 +4,7 @@
 \alias{source_r}
 \title{Source a sketch R file}
 \usage{
-source_r(file, debug = F, launch_browser = "viewer")
+source_r(file, debug = F, launch_browser = "viewer", ...)
 }
 \arguments{
 \item{file}{A character string; path to the R file.}
@@ -13,7 +13,9 @@ source_r(file, debug = F, launch_browser = "viewer")
 
 \item{launch_browser}{A character string; "viewer" or "browser", which
 calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-"NULL" (character string) to suppress display.}
+NULL to suppress display.}
+
+\item{...}{Additional arguments to pass to `compile_r`.}
 }
 \description{
 This function compiles a sketch R file, resolves the

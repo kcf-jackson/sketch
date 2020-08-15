@@ -4,15 +4,16 @@ md5hash <- function(x) as.character(tools::md5sum(x))
 
 testthat::test_that("Source sketch R script", {
     file <- system.file("test_files/test_sketch_basic.R", package = "sketch")
+    output_file <- source_r(file, debug = T, launch_browser = "NULL")
     testthat::expect_equal(
-        capture.output(source_r(file, debug = T)),
-        "x = R.sin(10)"
+        md5hash(output_file),
+        "2bf63af28e42c10198dbb469d7108fc2"
     )
 
     output_file <- source_r(file, launch_browser = "NULL")
     testthat::expect_equal(
         md5hash(output_file),
-        "936f7729da1dcee343f3cf3b368a5f4f"
+        "1b30eb33d37f87a934e01f7e9af99f38"
     )
 
     # Need to set path so that referencing to another file would work
@@ -23,7 +24,7 @@ testthat::test_that("Source sketch R script", {
     output_file <- source_r(file, launch_browser = "NULL")
     testthat::expect_equal(
         md5hash(output_file),
-        "7cd25ac544d727b25bf6396b2528efe2"
+        "300bee07f61774af1b632a1d57aafcb5"
     )
     setwd(current_wd)
 })

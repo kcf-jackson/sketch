@@ -1,15 +1,17 @@
 Package: sketch
 Type: Package
-Title: Interactive sketches in R
-Version: 0.9.4
-Author: Chun Fung (Jackson) Kwok
-Maintainer: Chun Fung (Jackson) Kwok <kwokcf@unimelb.edu.au>
+Title: Interactive Sketches in R
+Version: 1.0.0
+Authors@R: c(
+    person("Chun Fung","Kwok", role = c("aut", "cre"), email = "kwokcf@unimelb.edu.au"),
+    person("Kate", "Saunders", role = "ctb")
+    )
 Description: Creates static / animated / interactive sketches and illustrations 
     embeddable in RMarkDown documents.
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Imports: 
     magrittr,
     rlang,
@@ -19,7 +21,12 @@ Imports:
     glue,
     htmltools,
     base64enc,
-    jsonlite
+    jsonlite,
+    shiny
 Suggests: 
     testthat,
-    covr
+    covr,
+    knitr,
+    rmarkdown
+BugReports: https://github.com/kcf-jackson/sketch
+VignetteBuilder: knitr

@@ -35,6 +35,7 @@ basic_deparsers <- function() {
     # JavaScript object literal
     "list"    = make_deparser(is_call_list, deparse_list),
     # Keywords
+    "new"  = make_deparser(is_call_new, deparse_new),
     "let"    = make_deparser(is_call_let, deparse_let),
     "for"    = make_deparser(is_call_for, deparse_for),
     "if"     = make_deparser(is_call_if, deparse_if),

@@ -1,9 +1,15 @@
-# @description Take a sketch R file as input and extract the resources links
-# as provided by the user with the '#!' header.
-#
+#' Process assets in headers
+#'
+#' @description Take a sketch R file as input, extract and process the
+#' resources links as provided by the user with the '#!' header.
+#'
+#' @param file Character string; the file path.
+#' @param ... (Optional) List of processors to pass to `convert_src`.
+#' @param trace T or F; if T, assets are extracted, but not processed.
+#'
+#' @export
 # Instead of implementing 'async' loading of script, we move the sketch
 # files to the bottom of the body.
-#
 # assets :: char -> asset_list
 assets <- function(file, ..., trace = F) {
     headers <- extract_headers(file)

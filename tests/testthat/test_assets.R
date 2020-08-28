@@ -7,6 +7,21 @@ testthat::test_that("Convert asset to shiny.tag", {
         htmltools::tags$script(src = src("p5"))
     )
 
+    # Load data
+    path <- system.file("test_files/test_json.json", package = "sketch")
+    x <- tempfile()
+    if (.Platform$OS.type == 'windows') {
+        x <- normalizePath(x, winslash = "/")
+    }
+    testthat::expect_identical(
+        convert_src(glue::glue("load_data('{path}', cache = '{x}')")),
+        htmltools::tags$script(src = dataURI(file = x, mime = "text/javascript"))
+    )
+
+    testthat::expect_error(
+        convert_src("load_UNDEFINED('p5')")
+    )
+
     # Load script
     # Web
     testthat::expect_identical(
@@ -43,27 +58,26 @@ testthat::test_that("Convert asset to shiny.tag", {
         htmltools::tags$style(content, rel = "stylesheet")
     )
 
-    path <- system.file("test_files/test_sketch.R", package = "sketch")
-    testthat::expect_identical(
-        convert_src(glue::glue("load_script('{path}')")),
-        htmltools::tags$script(src = "data:text/javascript;base64,c2V0dXAgPSBmdW5jdGlvbigpIHsKICAgIGNyZWF0ZUNhbnZhcygzMDAsIDMwMCkKfQpkcmF3ID0gZnVuY3Rpb24oKSB7CiAgICBjaXJjbGUoMTUwLCAxNTAsIDMwKQogICAgbm9Mb29wKCkKfQo=")
-    )
-
     path <- system.file("test_files/test_image.png", package = "sketch")
     testthat::expect_error(
         convert_src(glue::glue("load_script('{path}')"))
     )
 
-    # Load data
-    path <- system.file("test_files/test_json.json", package = "sketch")
-    x <- tempfile()
+    testthat::skip_on_os("windows")
+    # The following test is skipped on Windows because I think
+    # `dataURI` produces different results when '\r\n' is used in
+    # place of '\n'.
+    #
+    # Online dataURI decoder shows that the Windows result from
+    # CRAN win-builder (in plain-text) looks the same as the Unix
+    # result, but they differ by 7 bytes. I believe the difference
+    # corresponds to the number of newlines in the file.
+    #
+    # PR on this issue is welcomed.
+    path <- system.file("test_files/test_sketch_2.R", package = "sketch")
     testthat::expect_identical(
-        convert_src(glue::glue("load_data('{path}', cache = '{x}')")),
-        htmltools::tags$script(src = dataURI(file = x, mime = "text/javascript"))
-    )
-
-    testthat::expect_error(
-        convert_src("load_UNDEFINED('p5')")
+        convert_src(glue::glue("load_script('{path}')")),
+        htmltools::tags$script(src = "data:text/javascript;base64,ZmliID0gZnVuY3Rpb24obikgewogICAgaWYgKFIuTFQobiwgMikpIHsKICAgICAgICByZXR1cm4obikKICAgIH0gZWxzZSB7CiAgICAgICAgcmV0dXJuKFIuYWRkKGZpYihSLnN1YnRyYWN0KG4sIDEpKSwgZmliKFIuc3VidHJhY3QobiwgMikpKSkKICAgIH0KfQo=")
     )
 })
 

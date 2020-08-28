@@ -81,7 +81,7 @@ default_tags <- function() {
       htmltools::tags$meta(charset = "utf-8"),
       js_to_shiny_tag(rjs)
     ),
-    body = list(htmltools::tags$div(id = "sketch_1"))
+    body = list()
   )
 }
 

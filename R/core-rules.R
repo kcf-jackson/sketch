@@ -137,7 +137,7 @@ default_rules <- function() {
         make_rule(   "sign", "R.sign"),
         make_rule(   "sqrt", "R.sqrt"),
         make_rule(  "floor", "R.floor"),
-        make_rule("ceiling", "R.ceil"),
+        make_rule("ceiling", "R.ceiling"),
         make_rule(  "trunc", "R.fix"),
         make_rule(  "round", "R.round"),
         make_rule( "signif", "R.signif"),

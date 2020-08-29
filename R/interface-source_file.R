@@ -1,0 +1,93 @@
+#' Source active file in RStudio
+#'
+#' @param launch_browser A character string; "viewer" or "browser", which
+#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+#' `NULL` to suppress display.
+#'
+#' @export
+source_active <- function(launch_browser = "viewer") {
+  source_r(copy_active_to_tempfile(), launch_browser = launch_browser)  # nocov
+}
+
+copy_active_to_tempfile <- function() {
+  x <- rstudioapi::getSourceEditorContext()$contents  # nocov start
+  temp_file <- tempfile()
+  write(x, file = temp_file)
+  temp_file                                           # nocov end
+}
+
+
+#' Source a sketch R file
+#'
+#' @description This function compiles a sketch R file, resolves the
+#' dependencies and serves it in the viewer.
+#'
+#' @param file A character string; path to the R file.
+#' @param debug T or F; if T, print compiled code on screen.
+#' @param launch_browser A character string; "viewer" or "browser", which
+#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+#' NULL to suppress display.
+#' @param ... Additional arguments to pass to `compile_r`.
+#'
+#' @export
+source_r <- function(file, debug = F, launch_browser = "viewer", ...) {
+  index_js <- compile_r(file, tempfile(), ...)
+  file_asset <- assets(file)   # this line is needed to keep the working directory unchanged
+  asset_tags <- c(default_tags(), file_asset)
+  if (debug) {
+    debugger_js <- system.file("assets/console-log-div.js", package = "sketch")
+    asset_tags <- append_to_body(
+      x = asset_tags,
+      shiny_tag = js_to_shiny_tag(debugger_js)
+    )
+  }
+  source_js(index_js, asset_tags, launch_browser = launch_browser)
+}
+
+
+#' Source a sketch R file
+#'
+#' @param file A character string; path to the compiled JS file.
+#' @param asset_tags An optional list of shiny tags to be added to the html
+#' template. The list must have signature / structure of a named list:
+#'     \code{[head = [shiny.tag], body = [shiny.tag]]},
+#' containing the \code{head} and \code{body} elements, each of which is a
+#' list of \code{shiny.tag} object.
+#' @param launch_browser A character string; "viewer" or "browser", which
+#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+#' NULL to suppress display.
+#'
+#' @export
+source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewer") {
+  file_tag <- js_to_shiny_tag(file)
+  html_doc <- html_builder(append_to_body(asset_tags, file_tag))
+  if (is.null(launch_browser)) {
+    viewer <- NULL
+  } else {
+    viewer <- switch(
+      launch_browser,
+      "viewer" = rstudioapi::viewer,
+      "browser" = utils::browseURL,
+      NULL
+    )
+  }
+  html_print(html_doc, viewer = viewer)
+}
+
+default_tags <- function() {
+  rjs <- system.file("assets/browser-R_core.js", package = "sketch")
+  asset_list(
+    head = list(
+      htmltools::tags$meta(charset = "utf-8"),
+      js_to_shiny_tag(rjs)
+    ),
+    body = list()
+  )
+}
+
+# Convert a JS file into a shiny tag
+# script_to_shiny_tag :: file -> shiny.tag
+js_to_shiny_tag <- function(file) {
+  fileURI <- base64enc::dataURI(file = file, mime = "application/javascript")
+  htmltools::tags$script(src = fileURI)
+}

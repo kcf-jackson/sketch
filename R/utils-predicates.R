@@ -5,9 +5,14 @@ is_web_link <- function(x) {
     has_prefix(x, "http://") || has_prefix(x, "https://")
 }
 
+is_local <- function(x) !is_web_link(x)
+
 # Check if input 'x' has the prefix 'y'
 has_prefix <- function(x, y) substr(x, 1, nchar(y)) == y
 
+# A predicate function that always returns TRUE.
+# This corresponds to the default case.
+always_true <- function(x) TRUE
 
 # Extension-related predicates
 is_javascript <- function(x) extname(x) == "js"
@@ -18,7 +23,4 @@ is_csv        <- function(x) extname(x) == "csv"
 is_font       <- function(x) extname(x) %in% c("woff", "ttf", "eot", "otf")
 
 # Get file extension
-extname <- function(x) {
-    filename <- basename(x)
-    tolower(tail(unlist(strsplit(filename, "[.]")), 1))
-}
+extname <- purrr::compose(tolower, tools::file_ext)  # handle cases without extension

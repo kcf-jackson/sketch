@@ -23,17 +23,21 @@ copy_active_to_tempfile <- function() {
 #' dependencies and serves it in the viewer.
 #'
 #' @param file A character string; path to the R file.
-#' @param debug T or F; if T, print compiled code on screen.
+#' @param debug TRUE or FALSE; if TRUE, a console for debugging is attached to your app.
 #' @param launch_browser A character string; "viewer" or "browser", which
 #' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
 #' NULL to suppress display.
+#' @param asset_tags An optional list of shiny tags to be added to the html
+#' template. The list must have signature / structure of a named list:
+#'     \code{[head = [shiny.tag], body = [shiny.tag]]},
 #' @param ... Additional arguments to pass to `compile_r`.
 #'
 #' @export
-source_r <- function(file, debug = F, launch_browser = "viewer", ...) {
+source_r <- function(file, debug = FALSE, launch_browser = "viewer",
+                     asset_tags = default_tags(), ...) {
   index_js <- compile_r(file, tempfile(), ...)
   file_asset <- assets(file)   # this line is needed to keep the working directory unchanged
-  asset_tags <- c(default_tags(), file_asset)
+  asset_tags <- c(asset_tags, file_asset)
   if (debug) {
     debugger_js <- system.file("assets/console-log-div.js", package = "sketch")
     asset_tags <- append_to_body(
@@ -45,7 +49,7 @@ source_r <- function(file, debug = F, launch_browser = "viewer", ...) {
 }
 
 
-#' Source a sketch R file
+#' Serve a compiled sketch JavaScript file
 #'
 #' @param file A character string; path to the compiled JS file.
 #' @param asset_tags An optional list of shiny tags to be added to the html
@@ -74,6 +78,15 @@ source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewe
   html_print(html_doc, viewer = viewer)
 }
 
+
+#' HTML templates
+#'
+#' @description A list of shiny tags describing a HTML template. The
+#' list must have signature / structure of a named list:
+#'     \code{[head = [shiny.tag], body = [shiny.tag]]}
+#'
+#' @name html_tags
+#' @export
 default_tags <- function() {
   rjs <- system.file("assets/browser-R_core.js", package = "sketch")
   asset_list(
@@ -84,6 +97,16 @@ default_tags <- function() {
     body = list()
   )
 }
+
+#' @rdname html_tags
+#' @export
+basic_tags <- function() {
+  asset_list(
+    head = list(htmltools::tags$meta(charset = "utf-8")),
+    body = list()
+  )
+}
+
 
 # Convert a JS file into a shiny tag
 # script_to_shiny_tag :: file -> shiny.tag

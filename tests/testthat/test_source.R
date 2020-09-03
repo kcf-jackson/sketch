@@ -6,7 +6,7 @@ testthat::test_that("Source sketch R script", {
     testthat::skip_on_os("windows") # see notes at the bottom of "test_assets.R"
 
     file <- system.file("test_files/test_sketch_basic.R", package = "sketch")
-    output_file <- source_r(file, debug = T, launch_browser = NULL)
+    output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
     testthat::expect_equal(
         md5hash(output_file),
         "c6c895056833c15955ad62e94d5f7584"

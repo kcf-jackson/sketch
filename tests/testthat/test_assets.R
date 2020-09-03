@@ -98,5 +98,5 @@ testthat::test_that("Convert data to JSON", {
 
     tsv <- system.file("test_files/test_tsv.tsv", package = "sketch")
     testthat::expect_error(to_json(tsv))
-    testthat::expect_error(to_json(tsv, as_data_frame = T))
+    testthat::expect_error(to_json(tsv, as_data_frame = TRUE))
 })

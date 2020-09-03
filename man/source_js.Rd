@@ -2,7 +2,7 @@
 % Please edit documentation in R/interface-source_file.R
 \name{source_js}
 \alias{source_js}
-\title{Source a sketch R file}
+\title{Serve a compiled sketch JavaScript file}
 \usage{
 source_js(file, asset_tags = default_tags(), launch_browser = "viewer")
 }
@@ -20,5 +20,5 @@ calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
 NULL to suppress display.}
 }
 \description{
-Source a sketch R file
+Serve a compiled sketch JavaScript file
 }

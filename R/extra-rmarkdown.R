@@ -23,7 +23,7 @@ insert_sketch <- function(file, id, output_dir = NULL, ...) {
       }
 
       temp_file <- file.path(temp_dir, paste0(id, ".html"))
-      file.copy(html_file, temp_file, overwrite = F)
+      file.copy(html_file, temp_file, overwrite = FALSE)
 
       return(htmltools::doRenderTags(
           htmltools::tags$iframe(src = temp_file, style="border: none;", ...)

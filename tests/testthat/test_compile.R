@@ -4,7 +4,7 @@ testthat::context("Test the rewriting and deparsing modules")
 green <- function(x) paste0("\033[32m", x, "\033[39m")
 red <- function(x) paste0("\033[31m", x, "\033[39m")
 color <- function(pred) if (pred) green(pred) else red(pred)
-test_equal <- function(f, input, expected, silent = T) {
+test_equal <- function(f, input, expected, silent = TRUE) {
     if (!silent) {
         cat("==========Test==========", "\n")
         cat("Input    : ", input, "\n")

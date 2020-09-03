@@ -29,7 +29,7 @@ Creates interactive illustrations embeddable in RMarkDown documents. The package
 
 ### 1.1 Installation {#section-1-1}
 
-```{r, eval = F}
+```{r, eval = FALSE}
 install.packages("sketch")
 
 # Or for the latest development 
@@ -50,7 +50,7 @@ There are two ways to run a sketch R file.
 
 Simply use `sketch::insert_sketch` in a code chunk:
 
-```{r, eval = F}
+```{r, eval = FALSE}
 sketch::insert_sketch(
   file = "main.R", id = "sketch_1",
   width = 800, height = 600
@@ -67,7 +67,7 @@ where `file` is the path to the sketch file, `id`, `width` and `height` are the 
 
 The functions `setup`, `draw`, `createCanvas`, `background`, `frameCount`, `fill` and `circle` are from the `p5.js` library, and one can use them as they are in the R code. This also works for *all* the other functions in the library.
 
-```{r, eval = F}
+```{r, eval = FALSE}
 #! load_script(src = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js")
 setup <- function() {
     createCanvas(400, 300)
@@ -91,7 +91,7 @@ draw <- function() {
 The web browser variable `document` and all of its methods are available, and DOM attributes also work as expected. 
 
 #### helper.R
-```{r, eval = F}
+```{r, eval = FALSE}
 # Create a new DOM element with an innerText
 dom <- function(tag_name, inner_text) {
     declare (el)   # Declare variable before use
@@ -108,7 +108,7 @@ insert_into <- function(x, y) {
 
 
 #### main.R
-```{r, eval = F}
+```{r, eval = FALSE}
 #! load_script("helper.R")
 # Textbox
 textbox <- dom("div", "Hello World!")
@@ -145,7 +145,7 @@ Use `#!` together with `load_script` to load any JavaScript library, CSV / JSON 
 
 `declare()` / `let()` are empty R functions that act as a placeholder to facilitate the conversion to JavaScript. If you want to assign a value to a variable, you may proceed as:
 
-```{r, eval = F}
+```{r, eval = FALSE}
 declare (x)
 x <- 3
 # alternatively
@@ -162,7 +162,7 @@ If one uses variables without declaring them, JavaScript will declare it for you
 - `%=>%` maps to the arrow function `=>` in JavaScript.
     
 - `%+%` maps to `+` in JavaScript. The reason for having this operator is that R does not perform string addition, but JS does. One may think of `%+%` as the semantic equivalent of `paste0`. Indeed, 
-```{r, eval = F}
+```{r, eval = FALSE}
 `%+%` <- paste0
 "a" %+% "b" %+% "c"  # gives "abc"
 ```

@@ -14,7 +14,9 @@ default_rules()
 Mapping R operators into JavaScript operators
 }
 \references{
-R operators: https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Operators
-R infix and prefix operators: https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Infix-and-prefix-operators
-JavaScript operators: https://www.w3schools.com/js/js_operators.asp
+R operators: \url{https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Operators}
+
+R infix and prefix operators: \url{https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Infix-and-prefix-operators}
+
+JavaScript operators: \url{https://www.w3schools.com/js/js_operators.asp}
 }

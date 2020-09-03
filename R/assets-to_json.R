@@ -42,7 +42,7 @@ to_json <- function(input, as_data_frame, read_fun, ...) {
         as_data_frame <- as_data_frame %||% TRUE
         read_fun <- read_fun %||% read.csv
     } else {
-        as_data_frame <- as_data_frame %||% stop("'as_data_frame' (T or F) must be provided when the file is not a CSV file or a JSON file.")
+        as_data_frame <- as_data_frame %||% stop("'as_data_frame' (TRUE or FALSE) must be provided when the file is not a CSV file or a JSON file.")
         read_fun <- read_fun %||% stop("'read_fun' (function) must be provided when the file is not a CSV file or a JSON file.")
     }
     contents <- read_fun(input, ...)
@@ -53,7 +53,7 @@ to_json <- function(input, as_data_frame, read_fun, ...) {
 # Set default parameter
 `%||%` <- function(x, y) if (missing(x)) y else x
 
-embed_data <- function(sym, json, as_data_frame = F) {
+embed_data <- function(sym, json, as_data_frame = FALSE) {
     json <- glue::single_quote(json)
     ifelse(as_data_frame,
            glue::glue({"const {sym} = R.data_frame(JSON.parse({json}))"}),

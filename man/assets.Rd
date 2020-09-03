@@ -4,14 +4,14 @@
 \alias{assets}
 \title{Process assets in headers}
 \usage{
-assets(file, ..., trace = F)
+assets(file, ..., trace = FALSE)
 }
 \arguments{
 \item{file}{Character string; the file path.}
 
 \item{...}{(Optional) List of processors to pass to `convert_src`.}
 
-\item{trace}{T or F; if T, assets are extracted, but not processed.}
+\item{trace}{TRUE or FALSE; if TRUE, assets are extracted, but not processed.}
 }
 \description{
 Take a sketch R file as input, extract and process the

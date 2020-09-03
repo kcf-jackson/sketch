@@ -146,8 +146,15 @@ load_local_css <- function(x, ...) {
 }
 
 load_sketch_script <- function(x, ...) {
-    index_js <- compile_r(x, tempfile())
-    script(src = dataURI(file = index_js, mime = "text/javascript"), ...)
+    optional_args <- capture_args(list(...), c("rules", "deparsers"))
+    ...1 <- optional_args$keep
+    ...2 <- optional_args$left
+
+    args_1 <- list(input = x, output = tempfile())
+    index_js <- do.call(compile_r, append(args_1, ...1))
+
+    args_2 <- list(src = dataURI(file = index_js, mime = "text/javascript"))
+    do.call(script, append(args_2, ...2))
 }
 
 

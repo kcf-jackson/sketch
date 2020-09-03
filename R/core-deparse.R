@@ -17,6 +17,7 @@
 #' @param deparsers A list of "typed" deparsers.
 #' @return A character string.
 #'
+#' @export
 # deparse_js :: ast -> [typed-deparser] -> char
 deparse_js <- function(ast, deparsers) {
   for (deparser in deparsers) { # use for-loop to avoid nested recursion
@@ -35,6 +36,10 @@ basic_deparsers <- function() {
     # JavaScript object literal
     "list"    = make_deparser(is_call_list, deparse_list),
     # Keywords
+    "pipe" = make_deparser(is_call_pipe, deparse_pipe),
+    "lambda" = make_deparser(is_call_lambda, deparse_lambda),
+    "ifelse" = make_deparser(is_call_ifelse, deparse_ifelse),
+    "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
     "new"  = make_deparser(is_call_new, deparse_new),
     "let"    = make_deparser(is_call_let, deparse_let),
     "for"    = make_deparser(is_call_for, deparse_for),
@@ -66,6 +71,11 @@ default_deparsers <- function() {
     "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
     "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
     "R.extract" = make_deparser(is_call_extract, deparse_extract),
+    # Data structure
+    "data.frame" = make_deparser(is_call_df, deparse_df),
+    "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
+    "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate),
+    "list" = make_deparser(is_call_list, deparse_list),
     # Special forms
     "pipe" = make_deparser(is_call_pipe, deparse_pipe),
     "lambda" = make_deparser(is_call_lambda, deparse_lambda),
@@ -73,11 +83,6 @@ default_deparsers <- function() {
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
     "new"  = make_deparser(is_call_new, deparse_new),
     "let"  = make_deparser(is_call_let, deparse_let),
-    # Data structure
-    "list" = make_deparser(is_call_list, deparse_list),
-    "data.frame" = make_deparser(is_call_df, deparse_df),
-    "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
-    "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate),
     # Keywords
     "for"    = make_deparser(is_call_for, deparse_for),
     "if"     = make_deparser(is_call_if, deparse_if),

@@ -1,12 +1,10 @@
 #' Source active file in RStudio
 #'
-#' @param launch_browser A character string; "viewer" or "browser", which
-#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-#' `NULL` to suppress display.
+#' @param ... Optional arguments to pass to \code{source_r}.
 #'
 #' @export
-source_active <- function(launch_browser = "viewer") {
-  source_r(copy_active_to_tempfile(), launch_browser = launch_browser)  # nocov
+source_active <- function(...) {
+  source_r(copy_active_to_tempfile(), ...)  # nocov
 }
 
 copy_active_to_tempfile <- function() {

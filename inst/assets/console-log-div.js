@@ -46,6 +46,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         // style.minHeight = '200px';
         style.fontFamily = 'monospace';
         style.marginTop = '20px';
+        style.marginBottom = '20px';  // Modified (CFK)
         style.marginLeft = '10px';
         style.marginRight = '10px';
         style.whiteSpace = 'pre';

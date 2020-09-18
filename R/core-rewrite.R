@@ -67,6 +67,10 @@ rm_attributes <- function(x) {
 #'
 #' @method print rule
 #'
+#' @examples
+#' rule_1 <- make_rule("+", "Math.add")
+#' print(rule_1)
+#'
 #' @export
 print.rule <- function(x, ...) {
   from <- attr(x, 'from')

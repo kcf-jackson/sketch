@@ -2,14 +2,23 @@
 % Please edit documentation in R/utils-helpers.R
 \name{let}
 \alias{let}
+\alias{declare}
 \title{Empty functions}
 \usage{
 let(...)
+
+declare(...)
 }
 \arguments{
 \item{...}{Any arguments}
 }
 \description{
-This function does nothing. It is created to ensure
+These functions do nothing. It is created to ensure
 the keywords `let` and `declare` are defined.
+}
+\examples{
+let (x)
+let (x = 1, y = 2)
+declare (x1, x2, x3)
+
 }

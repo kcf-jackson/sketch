@@ -263,6 +263,14 @@ deparse_function <- function(ast, ...) {
 }
 
 
+
+# Deparser for the 'break' keyword --------------------------
+#' Predicate for the 'break' keyword
+#' @rdname predicate_component
+is_call_break <- function(ast) is_call(ast, "break")
+
+
+
 # R data structure ===========================================
 # Continuing from above, one could further distinguish special
 # cases of calls. Here we consider the R data structure.

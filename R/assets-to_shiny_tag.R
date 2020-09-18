@@ -17,13 +17,16 @@ convert_src <- function(x, processors = default_processors()) {
 #' @param pred A function, taking a string and returning a logical.
 #' @param fun A function, taking a string and returning a 'shiny.tag' object.
 #' @return A header processor / handler.
-#'
-#' @export
 make_processor <- function(pred, fun) {
     list(predicate = pred, process = fun)
 }
 
 #' List of handlers for processing the '#!' header
+#' @note This is used as input to \link{assets}.
+#' @examples
+#' \dontrun{
+#' default_processors()
+#' }
 #' @export
 default_processors <- function() {
     list(
@@ -85,7 +88,7 @@ load_library <- function(package, ...) load_script(src(package), ...)
 load_script <- function(src, ...) to_shiny_tag(src = src, ...)
 
 #' @rdname empty-headers
-load_data <- function(x, cache, ...) {
+load_data <- function(x, cache = tempfile(), ...) {
     index_js <- compile_data(x, cache, ...)
     script(src = dataURI(file = index_js, mime = "text/javascript"))
 }
@@ -156,18 +159,3 @@ load_sketch_script <- function(x, ...) {
     args_2 <- list(src = dataURI(file = index_js, mime = "text/javascript"))
     do.call(script, append(args_2, ...2))
 }
-
-
-# TODO Potential future development:
-# - Handle optional arguments
-#     - JS - async [DONE]
-#
-#     - JS : add script into body (use specific order?)
-#     [DONE] Order of script is handled by `asset`
-#
-#     - JS: library - version [Cancelled]
-#
-#     - Cache data
-#     [DONE] Specify path and disable overwrite
-#
-# - `convert_src` may need to be changed accordingly

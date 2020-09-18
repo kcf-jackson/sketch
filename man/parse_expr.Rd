@@ -18,3 +18,7 @@ Parse R code
 \note{
 This function is imported from `rlang`.
 }
+\examples{
+parse_expr("x <- 1 + 1")
+
+}

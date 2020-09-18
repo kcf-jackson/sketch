@@ -1,15 +1,18 @@
 #' Process assets in headers
 #'
-#' @description Take a sketch R file as input, extract and process the
+#' @description Take a 'sketch' R file as input, extract and process the
 #' resources links as provided by the user with the '#!' header.
 #'
 #' @param file Character string; the file path.
-#' @param ... (Optional) List of processors to pass to `convert_src`.
+#' @param ... (Optional) List of processors to pass to \link{convert_src}.
 #' @param trace TRUE or FALSE; if TRUE, assets are extracted, but not processed.
 #'
+#' @examples
+#' file <- system.file("test_files/test_RMD.R", package = "sketch")
+#' assets(file, trace = TRUE)
+#' assets(file, trace = FALSE)
+#'
 #' @export
-# Instead of implementing 'async' loading of script, we move the sketch
-# files to the bottom of the body.
 # assets :: char -> asset_list
 assets <- function(file, ..., trace = FALSE) {
     headers <- extract_headers(file)
@@ -39,7 +42,7 @@ process_headers <- function(headers, ...) {
         rev() %>%  # Assets are moved to the top, R scripts are moved to the bottom
         as_asset_list()
 
-    # Recursively build the assets dependencies in other sketch R files
+    # Recursively build the assets dependencies in other 'sketch' R files
     children_assets <- headers %>%
         filter(is_sketch) %>%
         purrr::map(first_arg) %>%

@@ -9,3 +9,12 @@ default_deparsers()
 \description{
 A list of default deparsers for deparsing JavaScript
 }
+\note{
+This is used as input to \link{compile_r} and \link{compile_exprs}.
+}
+\examples{
+\dontrun{
+default_deparsers()
+}
+
+}

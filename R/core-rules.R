@@ -6,6 +6,11 @@
 #' @references R infix and prefix operators: \url{https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Infix-and-prefix-operators}
 #' @references JavaScript operators: \url{https://www.w3schools.com/js/js_operators.asp}
 #'
+#' @note These functions are used as inputs to \link{compile_r} and \link{compile_exprs}.
+#'
+#' @examples
+#' basic_rules()
+#'
 #' @export
 basic_rules <- function() {
     list(
@@ -14,6 +19,7 @@ basic_rules <- function() {
         make_rule("^", "**"),
         make_rule("%%", "%"),
         make_rule("$", "."),
+        make_rule("::", "."),
         make_rule("%instanceof%", "instanceof"),
         make_rule("%+%", "+"),
         make_rule("%=>%", "=>"),
@@ -32,6 +38,10 @@ basic_rules <- function() {
 
 
 #' @rdname r-to-js-rules
+#'
+#' @examples
+#' default_rules()
+#'
 #' @export
 default_rules <- function() {
     list(

@@ -13,6 +13,15 @@ default_rules()
 \description{
 Mapping R operators into JavaScript operators
 }
+\note{
+These functions are used as inputs to \link{compile_r} and \link{compile_exprs}.
+}
+\examples{
+basic_rules()
+
+default_rules()
+
+}
 \references{
 R operators: \url{https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Operators}
 

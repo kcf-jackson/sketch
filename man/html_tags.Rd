@@ -15,3 +15,8 @@ A list of shiny tags describing a HTML template. The
 list must have signature / structure of a named list:
     \code{[head = [shiny.tag], body = [shiny.tag]]}
 }
+\examples{
+default_tags()
+
+basic_tags()
+}

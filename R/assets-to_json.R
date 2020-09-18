@@ -1,8 +1,14 @@
-#' Compile a data file into a JS file
+#' Compile a data file into a JavaScript file
 #'
 #' @param input A character string; the path to the input file.
 #' @param output A character string; the path to the output file.
 #' @param ... Extra arguments to be passed to `to_json`.
+#'
+#' @examples
+#' \dontrun{
+#' file <- system.file("test_files/test_csv.csv", package = "sketch")
+#' readLines(compile_data(file))
+#' }
 #'
 #' @export
 compile_data <- function(input, output = tempfile(), ...) {
@@ -15,7 +21,7 @@ compile_data <- function(input, output = tempfile(), ...) {
 }
 
 
-#' Convert a file into JS expression
+#' Convert a file into a JavaScript expression
 #'
 #' @param input A character string; the path to the input file.
 #' @param as_data_frame TRUE or FALSE; whether the data are loaded as a data-frame.

@@ -14,3 +14,13 @@ capture_args(args, capture)
 \description{
 Split a list of arguments into two sets
 }
+\examples{
+\dontrun{
+f <- function(...) {
+   capture_args(list(...), c("a", "b"))
+}
+f(a = 1, b = 2, c = 3, d = 4)
+}
+
+}
+\keyword{internal}

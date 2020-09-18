@@ -1,6 +1,12 @@
-#' Run Shiny Application
+#' Run 'Shiny' Application
+#'
+#' @examples
+#' \dontrun{
+#' runShinyApp()
+#' }
+#'
 #' @export
-runApp <- function() {
+runShinyApp <- function() {
     dir <- system.file("sketch_editor", package = "sketch")
     shiny::runApp(dir)
 }

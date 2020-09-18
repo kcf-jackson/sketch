@@ -1,6 +1,13 @@
-#' Source active file in RStudio
+#' Source active file in 'RStudio'
 #'
 #' @param ... Optional arguments to pass to \code{source_r}.
+#'
+#' @examples
+#' \dontrun{
+#' # At 'RStudio', opens a 'sketch' R file in the editor, then
+#' # run the following:
+#' source_active()  # This launches the default HTML viewer.
+#' }
 #'
 #' @export
 source_active <- function(...) {
@@ -15,9 +22,9 @@ copy_active_to_tempfile <- function() {
 }
 
 
-#' Source a sketch R file
+#' Source a 'sketch' R file
 #'
-#' @description This function compiles a sketch R file, resolves the
+#' @description This function compiles a 'sketch' R file, resolves the
 #' dependencies and serves it in the viewer.
 #'
 #' @param file A character string; path to the R file.
@@ -30,26 +37,27 @@ copy_active_to_tempfile <- function() {
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]},
 #' @param ... Additional arguments to pass to `compile_r`.
 #'
+#' @examples
+#' \dontrun{
+#' file <- system.file("test_files/test_source.R", package = "sketch")
+#' source_r(file, debug = TRUE)  # This launches the default HTML viewer.
+#' }
+#'
 #' @export
 source_r <- function(file, debug = FALSE, launch_browser = "viewer",
                      asset_tags = default_tags(), ...) {
   index_js <- compile_r(file, tempfile(), ...)
   file_asset <- assets(file)   # this line is needed to keep the working directory unchanged
   asset_tags <- c(asset_tags, file_asset)
-  if (debug) {
-    debugger_js <- system.file("assets/console-log-div.js", package = "sketch")
-    asset_tags <- append_to_body(
-      x = asset_tags,
-      shiny_tag = js_to_shiny_tag(debugger_js)
-    )
-  }
-  source_js(index_js, asset_tags, launch_browser = launch_browser)
+  source_js(index_js, debug = debug, asset_tags = asset_tags,
+            launch_browser = launch_browser)
 }
 
 
-#' Serve a compiled sketch JavaScript file
+#' Serve a compiled 'sketch' JavaScript file
 #'
 #' @param file A character string; path to the compiled JS file.
+#' @param debug TRUE or FALSE; if TRUE, a console for debugging is attached to your app.
 #' @param asset_tags An optional list of shiny tags to be added to the html
 #' template. The list must have signature / structure of a named list:
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]},
@@ -59,8 +67,20 @@ source_r <- function(file, debug = FALSE, launch_browser = "viewer",
 #' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
 #' NULL to suppress display.
 #'
+#' @examples
+#' \dontrun{
+#' file <- system.file("test_files/test_source.js", package = "sketch")
+#' source_js(file, debug = TRUE)  # This launches the default HTML viewer.
+#' }
+#'
 #' @export
-source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewer") {
+source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
+                      launch_browser = "viewer") {
+  if (debug) {
+    debugger_js <- system.file("assets/console-log-div.js", package = "sketch")
+    asset_tags <- append_to_body(asset_tags, js_to_shiny_tag(debugger_js))
+  }
+
   file_tag <- js_to_shiny_tag(file)
   html_doc <- html_builder(append_to_body(asset_tags, file_tag))
   if (is.null(launch_browser)) {
@@ -79,11 +99,14 @@ source_js <- function(file, asset_tags = default_tags(), launch_browser = "viewe
 
 #' HTML templates
 #'
+#' @name html_tags
 #' @description A list of shiny tags describing a HTML template. The
 #' list must have signature / structure of a named list:
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]}
 #'
-#' @name html_tags
+#' @examples
+#' default_tags()
+#'
 #' @export
 default_tags <- function() {
   rjs <- system.file("assets/browser-R_core.js", package = "sketch")
@@ -97,6 +120,8 @@ default_tags <- function() {
 }
 
 #' @rdname html_tags
+#' @examples
+#' basic_tags()
 #' @export
 basic_tags <- function() {
   asset_list(
@@ -106,7 +131,7 @@ basic_tags <- function() {
 }
 
 
-# Convert a JS file into a shiny tag
+# Convert a JavaScript file into a shiny tag
 # script_to_shiny_tag :: file -> shiny.tag
 js_to_shiny_tag <- function(file) {
   fileURI <- base64enc::dataURI(file = file, mime = "application/javascript")

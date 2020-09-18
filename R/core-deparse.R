@@ -11,11 +11,23 @@
 # 2. each member is a typed-deparser
 
 
-#' Expression Deparsing for JS
+#' Expression Deparsing for JavaScript
 #'
 #' @param ast language object.
 #' @param deparsers A list of "typed" deparsers.
 #' @return A character string.
+#'
+#' @examples
+#' expr_1 <- parse_expr("R.extract(x, 3, )")
+#' deparse_js(expr_1, basic_deparsers())
+#' deparse_js(expr_1, default_deparsers())
+#'
+#' expr_2 <- parse_expr("R.data_frame(x = 1, y = 2)")
+#' deparse_js(expr_2, basic_deparsers())
+#' deparse_js(expr_2, default_deparsers())
+#'
+#' expr_3 <- parse_expr("lambda(x, x + 1)")
+#' deparse_js(expr_3, basic_deparsers())
 #'
 #' @export
 # deparse_js :: ast -> [typed-deparser] -> char
@@ -30,6 +42,14 @@ deparse_js <- function(ast, deparsers) {
 
 
 #' A minimal list of deparsers for deparsing JavaScript
+#'
+#' @note This is used as input to \link{deparse_js}, \link{compile_r} and \link{compile_exprs}.
+#'
+#' @examples
+#' \dontrun{
+#' basic_deparsers()
+#' }
+#'
 #' @export
 basic_deparsers <- function() {
   list(
@@ -46,6 +66,7 @@ basic_deparsers <- function() {
     "if"     = make_deparser(is_call_if, deparse_if),
     "while"  = make_deparser(is_call_while, deparse_while),
     "function" = make_deparser(is_call_function, deparse_function),
+    "break" = make_deparser(is_call_break, deparse_sym),
     # Operators
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
     "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
@@ -57,6 +78,14 @@ basic_deparsers <- function() {
 
 
 #' A list of default deparsers for deparsing JavaScript
+#'
+#' @note This is used as input to \link{compile_r} and \link{compile_exprs}.
+#'
+#' @examples
+#' \dontrun{
+#' default_deparsers()
+#' }
+#'
 #' @export
 default_deparsers <- function() {
   # Order is strict and the deparsers must be arranged such that the
@@ -72,7 +101,7 @@ default_deparsers <- function() {
     "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
     "R.extract" = make_deparser(is_call_extract, deparse_extract),
     # Data structure
-    "data.frame" = make_deparser(is_call_df, deparse_df),
+    "R.data.frame" = make_deparser(is_call_df, deparse_df),
     "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
     "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate),
     "list" = make_deparser(is_call_list, deparse_list),
@@ -88,6 +117,7 @@ default_deparsers <- function() {
     "if"     = make_deparser(is_call_if, deparse_if),
     "while"  = make_deparser(is_call_while, deparse_while),
     "function" = make_deparser(is_call_function, deparse_function),
+    "break" = make_deparser(is_call_break, deparse_sym),
     # Operators
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
     "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
@@ -103,6 +133,9 @@ default_deparsers <- function() {
 #' @param predicate_fun A function that takes a "lang" object and return a logical.
 #' @param deparse_fun A function that takes a "lang" object and return a character string.
 #' @return A list; a deparser ready to be dispatched by "type".
+#'
+#' @examples
+#' make_deparser(predicate_fun = rlang::is_call, deparse_fun = deparse)
 #'
 #' @export
 make_deparser <- function(predicate_fun, deparse_fun) {

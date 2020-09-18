@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 Creates interactive illustrations embeddable in RMarkDown documents. The package compiles R code into JavaScript code by applying rewriting rules to the R AST. This allows users to develop JS-style visualisations using only the R syntax.
 
 <img src="../man/figures/ast_transform.png" style='width:100%'>
-**Figure 1. Illustratuion of the rewriting process.**
+**Figure 1. Illustration of the rewriting process.**
 <!-- ![](../man/figures/ast_transform.png) -->
 
 ---

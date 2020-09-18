@@ -9,11 +9,17 @@ assets(file, ..., trace = FALSE)
 \arguments{
 \item{file}{Character string; the file path.}
 
-\item{...}{(Optional) List of processors to pass to `convert_src`.}
+\item{...}{(Optional) List of processors to pass to \link{convert_src}.}
 
 \item{trace}{TRUE or FALSE; if TRUE, assets are extracted, but not processed.}
 }
 \description{
-Take a sketch R file as input, extract and process the
+Take a 'sketch' R file as input, extract and process the
 resources links as provided by the user with the '#!' header.
+}
+\examples{
+file <- system.file("test_files/test_RMD.R", package = "sketch")
+assets(file, trace = TRUE)
+assets(file, trace = FALSE)
+
 }

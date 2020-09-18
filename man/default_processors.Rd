@@ -9,3 +9,11 @@ default_processors()
 \description{
 List of handlers for processing the '#!' header
 }
+\note{
+This is used as input to \link{assets}.
+}
+\examples{
+\dontrun{
+default_processors()
+}
+}

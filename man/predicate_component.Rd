@@ -8,6 +8,7 @@
 \alias{is_call_if}
 \alias{is_call_while}
 \alias{is_call_function}
+\alias{is_call_break}
 \alias{is_call_list}
 \alias{is_call_df}
 \alias{is_call_df_summarise}
@@ -39,6 +40,8 @@ is_call_if(ast)
 is_call_while(ast)
 
 is_call_function(ast)
+
+is_call_break(ast)
 
 is_call_list(ast)
 
@@ -89,6 +92,8 @@ Predicate for the 'if' keyword
 Predicate for the 'while' keyword
 
 Predicate for the 'function' keyword
+
+Predicate for the 'break' keyword
 
 Predicate for the "list" operators
 

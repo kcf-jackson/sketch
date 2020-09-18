@@ -2,7 +2,7 @@
 % Please edit documentation in R/interface-source_file.R
 \name{source_r}
 \alias{source_r}
-\title{Source a sketch R file}
+\title{Source a 'sketch' R file}
 \usage{
 source_r(
   file,
@@ -28,6 +28,13 @@ template. The list must have signature / structure of a named list:
 \item{...}{Additional arguments to pass to `compile_r`.}
 }
 \description{
-This function compiles a sketch R file, resolves the
+This function compiles a 'sketch' R file, resolves the
 dependencies and serves it in the viewer.
+}
+\examples{
+\dontrun{
+file <- system.file("test_files/test_source.R", package = "sketch")
+source_r(file, debug = TRUE)  # This launches the default HTML viewer.
+}
+
 }

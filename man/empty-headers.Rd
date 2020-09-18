@@ -10,7 +10,7 @@ load_library(package, ...)
 
 load_script(src, ...)
 
-load_data(x, cache, ...)
+load_data(x, cache = tempfile(), ...)
 }
 \arguments{
 \item{package}{A character string; name of a JavaScript library.}

@@ -9,7 +9,7 @@ testthat::test_that("Source sketch R script", {
     output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
     testthat::expect_equal(
         md5hash(output_file),
-        "c6c895056833c15955ad62e94d5f7584"
+        "f0f211e785688075cd594285e43ac9be"
     )
 
     output_file <- source_r(file, launch_browser = "NULL") # NULL in string is intentional here

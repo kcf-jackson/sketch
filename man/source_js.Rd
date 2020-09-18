@@ -2,12 +2,19 @@
 % Please edit documentation in R/interface-source_file.R
 \name{source_js}
 \alias{source_js}
-\title{Serve a compiled sketch JavaScript file}
+\title{Serve a compiled 'sketch' JavaScript file}
 \usage{
-source_js(file, asset_tags = default_tags(), launch_browser = "viewer")
+source_js(
+  file,
+  debug = FALSE,
+  asset_tags = default_tags(),
+  launch_browser = "viewer"
+)
 }
 \arguments{
 \item{file}{A character string; path to the compiled JS file.}
+
+\item{debug}{TRUE or FALSE; if TRUE, a console for debugging is attached to your app.}
 
 \item{asset_tags}{An optional list of shiny tags to be added to the html
 template. The list must have signature / structure of a named list:
@@ -20,5 +27,12 @@ calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
 NULL to suppress display.}
 }
 \description{
-Serve a compiled sketch JavaScript file
+Serve a compiled 'sketch' JavaScript file
+}
+\examples{
+\dontrun{
+file <- system.file("test_files/test_source.js", package = "sketch")
+source_js(file, debug = TRUE)  # This launches the default HTML viewer.
+}
+
 }

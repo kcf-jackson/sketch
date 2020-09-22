@@ -48,6 +48,8 @@ default_rules <- function() {
         # Binary operators
         make_rule("<-", "="),
         make_rule("<<-", "="),
+        make_rule("::", "."),
+        make_rule("$",  "."),
         make_rule("+",  "R.add"),
         make_rule("-",  "R.subtract"),
         make_rule("*",  "R.multiply"),
@@ -67,14 +69,12 @@ default_rules <- function() {
         make_rule("xor", "R.xor"),
         make_rule("[[", "R.extract2"),
         make_rule("[",  "R.extract"),
-        make_rule("::", "."),
-        make_rule("$",  "."),
         make_rule(":",  "R.seq"),
         make_rule("%instanceof%", "instanceof"),
         make_rule("%=>%", "=>"),
         make_rule("%+%", "+"),
         make_rule("%-%", "-"),
-        make_rule("%-%", "intDivide"),
+        make_rule("%/%", "intDivide"),
         make_rule("%o%", "R.compose"),
         make_rule("%>%", "R.pipe"),
 
@@ -98,10 +98,13 @@ default_rules <- function() {
 
         # Data structure
         make_rule("c", "R.c"),
+        make_rule("rep", "R.rep"),
         make_rule("matrix", "R.matrix2"),
         make_rule("array", "R.array"),
         make_rule("dim", "R.dim"),
         make_rule("list", "list"),
+        make_rule("names", "R.names"),
+        make_rule("append", "R.append"),
         make_rule("data.frame", "R.data_frame"),
         make_rule("filter", "R.filter"),
         make_rule("mutate", "R.mutate"),

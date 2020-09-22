@@ -2,7 +2,7 @@
 % Please edit documentation in R/extra-rmarkdown.R
 \name{eng_sketch}
 \alias{eng_sketch}
-\title{Knitr engine for 'sketch'}
+\title{A language engine for 'sketch'}
 \usage{
 eng_sketch(options)
 }
@@ -10,7 +10,7 @@ eng_sketch(options)
 \item{options}{A list of chunk options.}
 }
 \description{
-Knitr engine for 'sketch'
+This supports the use of 'sketch' code chunk in an R Markdown document.
 }
 \examples{
 \dontrun{

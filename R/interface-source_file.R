@@ -32,7 +32,7 @@ copy_active_to_tempfile <- function() {
 #' @param launch_browser A character string; "viewer" or "browser", which
 #' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
 #' NULL to suppress display.
-#' @param asset_tags An optional list of shiny tags to be added to the html
+#' @param asset_tags An optional list of 'shiny.tag' objects to be added to the html
 #' template. The list must have signature / structure of a named list:
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]},
 #' @param ... Additional arguments to pass to `compile_r`.
@@ -58,7 +58,7 @@ source_r <- function(file, debug = FALSE, launch_browser = "viewer",
 #'
 #' @param file A character string; path to the compiled JS file.
 #' @param debug TRUE or FALSE; if TRUE, a console for debugging is attached to your app.
-#' @param asset_tags An optional list of shiny tags to be added to the html
+#' @param asset_tags An optional list of 'shiny.tag' objects to be added to the html
 #' template. The list must have signature / structure of a named list:
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]},
 #' containing the \code{head} and \code{body} elements, each of which is a
@@ -100,7 +100,7 @@ source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
 #' HTML templates
 #'
 #' @name html_tags
-#' @description A list of shiny tags describing a HTML template. The
+#' @description A list of 'shiny.tag' objects describing a HTML template. The
 #' list must have signature / structure of a named list:
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]}
 #'
@@ -131,7 +131,7 @@ basic_tags <- function() {
 }
 
 
-# Convert a JavaScript file into a shiny tag
+# Convert a JavaScript file into a 'shiny.tag' object
 # script_to_shiny_tag :: file -> shiny.tag
 js_to_shiny_tag <- function(file) {
   fileURI <- base64enc::dataURI(file = file, mime = "application/javascript")

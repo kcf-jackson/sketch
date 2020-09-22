@@ -11,7 +11,7 @@ default_tags()
 basic_tags()
 }
 \description{
-A list of shiny tags describing a HTML template. The
+A list of 'shiny.tag' objects describing a HTML template. The
 list must have signature / structure of a named list:
     \code{[head = [shiny.tag], body = [shiny.tag]]}
 }

@@ -16,7 +16,7 @@ source_js(
 
 \item{debug}{TRUE or FALSE; if TRUE, a console for debugging is attached to your app.}
 
-\item{asset_tags}{An optional list of shiny tags to be added to the html
+\item{asset_tags}{An optional list of 'shiny.tag' objects to be added to the html
 template. The list must have signature / structure of a named list:
     \code{[head = [shiny.tag], body = [shiny.tag]]},
 containing the \code{head} and \code{body} elements, each of which is a

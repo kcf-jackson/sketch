@@ -2,7 +2,7 @@
 #'
 #' @param input A character string; the path to the input file.
 #' @param output A character string; the path to the output file.
-#' @param ... Extra arguments to be passed to `to_json`.
+#' @param ... Extra arguments to be passed to \link{to_json}.
 #'
 #' @examples
 #' \dontrun{

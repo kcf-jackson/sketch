@@ -49,8 +49,9 @@ insert_sketch <- function(file, id, output_dir = NULL, ...) {
 }
 
 
-#' Knitr engine for 'sketch'
+#' A language engine for 'sketch'
 #'
+#' @description This supports the use of 'sketch' code chunk in an R Markdown document.
 #' @param options A list of chunk options.
 #'
 #' @examples

@@ -21,7 +21,7 @@ source_r(
 calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
 NULL to suppress display.}
 
-\item{asset_tags}{An optional list of shiny tags to be added to the html
+\item{asset_tags}{An optional list of 'shiny.tag' objects to be added to the html
 template. The list must have signature / structure of a named list:
     \code{[head = [shiny.tag], body = [shiny.tag]]},}
 

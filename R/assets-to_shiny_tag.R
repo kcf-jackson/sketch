@@ -1,7 +1,7 @@
 #' Convert an asset link into a 'shiny.tag' object
 #' @param x A character string; the header line (without the prefix #!).
 #' @param processors A list of handlers for processing the '#!' header.
-#' @return A shiny.tag object.
+#' @return A 'shiny.tag' object.
 # convert_src :: char -> [header_processor] -> char
 # where header_processor := (predicate, process)
 convert_src <- function(x, processors = default_processors()) {
@@ -95,10 +95,10 @@ load_data <- function(x, cache = tempfile(), ...) {
 
 
 #=====================================================================
-#' Load JavaScript / CSS / R Sketch Script / CSV file
+#' Load JavaScript / CSS / 'sketch' R / CSV file
 #'
 #' @param x A character string; the link / path to the JS / CSS / R script / CSV file.
-# #' @param renderer function; the function to render the shiny tag object.
+# #' @param renderer function; the function to render the 'shiny.tag' object.
 # #' Use `htmltools::doRenderTags` for RMD, and `identity` for `html_template`.
 #'
 #' @keywords internal

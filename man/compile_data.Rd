@@ -11,7 +11,7 @@ compile_data(input, output = tempfile(), ...)
 
 \item{output}{A character string; the path to the output file.}
 
-\item{...}{Extra arguments to be passed to `to_json`.}
+\item{...}{Extra arguments to be passed to \link{to_json}.}
 }
 \description{
 Compile a data file into a JavaScript file

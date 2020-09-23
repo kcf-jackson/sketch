@@ -5,6 +5,8 @@
 #' Needed only when \code{output_dir} is not \code{NULL}.
 #' @param output_dir A character string; a separate directory to save the
 #' 'sketch' app. Default to be NULL, which embeds the app in the Rmd file.
+#' @param render TRUE or FALSE; if TRUE, call \link{htmltools::doRenderTags};
+#' if FALSE, return the 'shiny.tag' object.
 #' @param ... (Optional) Other attributes to pass to iframes. Also supports
 #' the `rules`, `deparsers` and `debug` options to pass to `source_r`.
 #'
@@ -16,35 +18,34 @@
 #' }
 #'
 #' @export
-insert_sketch <- function(file, id, output_dir = NULL, ...) {
+insert_sketch <- function(file, id, output_dir = NULL, render = TRUE, ...) {
     opt_args <- capture_args(list(...), c("rules", "deparsers", "debug", "asset_tags"))
     html_file <- do_call(source_r, file = file, launch_browser = NULL,
                          extended_args = opt_args$keep)
     if (is.null(output_dir)) {
         file_str <- paste(readLines(html_file), collapse = "\n")
-        return(htmltools::doRenderTags(
-            do_call(
-              htmltools::tags$iframe,
-              srcdoc = file_str, style="border: none;",
-              extended_args = opt_args$left
-            )
-        ))
+        res <- do_call(
+          htmltools::tags$iframe,
+          srcdoc = file_str, style="border: none;",
+          extended_args = opt_args$left
+        )
+        if (render) return(htmltools::doRenderTags(res))
+        return(res)
     } else {
-      temp_dir <- output_dir
-      if (!dir.exists(temp_dir)) {
-          stop(glue::glue("The output directory '{output_dir}' does not exist."))
-      }
+        temp_dir <- output_dir
+        if (!dir.exists(temp_dir)) {
+            stop(glue::glue("The output directory '{output_dir}' does not exist."))
+        }
 
-      temp_file <- file.path(temp_dir, paste0(id, ".html"))
-      file.copy(html_file, temp_file, overwrite = FALSE)
-
-      return(htmltools::doRenderTags(
-          do_call(
-            htmltools::tags$iframe,
-            src = temp_file, style="border: none;",
-            extended_args = opt_args$left
-          )
-      ))
+        temp_file <- file.path(temp_dir, paste0(id, ".html"))
+        file.copy(html_file, temp_file, overwrite = FALSE)
+        res <- do_call(
+          htmltools::tags$iframe,
+          src = temp_file, style="border: none;",
+          extended_args = opt_args$left
+        )
+        if (render) return(htmltools::doRenderTags(res))
+        return(res)
     }
 }
 

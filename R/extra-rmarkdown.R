@@ -5,7 +5,7 @@
 #' Needed only when \code{output_dir} is not \code{NULL}.
 #' @param output_dir A character string; a separate directory to save the
 #' 'sketch' app. Default to be NULL, which embeds the app in the Rmd file.
-#' @param render TRUE or FALSE; if TRUE, call \link{htmltools::doRenderTags};
+#' @param render TRUE or FALSE; if TRUE, call \link[htmltools]{doRenderTags};
 #' if FALSE, return the 'shiny.tag' object.
 #' @param ... (Optional) Other attributes to pass to iframes. Also supports
 #' the `rules`, `deparsers` and `debug` options to pass to `source_r`.

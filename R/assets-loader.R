@@ -46,7 +46,7 @@ process_headers <- function(headers, ...) {
     children_assets <- headers %>%
         filter(is_sketch) %>%
         purrr::map(first_arg) %>%
-        purrr::map(assets, ...)
+        purrr::map(assets, ..., trace = TRUE)
     if (purrr::is_empty(children_assets)) {
         return(parent_assets)
     }

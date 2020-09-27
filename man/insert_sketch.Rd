@@ -4,7 +4,7 @@
 \alias{insert_sketch}
 \title{Insert a 'sketch' app into an R Markdown document}
 \usage{
-insert_sketch(file, id, output_dir = NULL, ...)
+insert_sketch(file, id, output_dir = NULL, render = TRUE, ...)
 }
 \arguments{
 \item{file}{A character string; the path to the 'sketch' file.}
@@ -14,6 +14,9 @@ Needed only when \code{output_dir} is not \code{NULL}.}
 
 \item{output_dir}{A character string; a separate directory to save the
 'sketch' app. Default to be NULL, which embeds the app in the Rmd file.}
+
+\item{render}{TRUE or FALSE; if TRUE, call \link{htmltools::doRenderTags};
+if FALSE, return the 'shiny.tag' object.}
 
 \item{...}{(Optional) Other attributes to pass to iframes. Also supports
 the `rules`, `deparsers` and `debug` options to pass to `source_r`.}

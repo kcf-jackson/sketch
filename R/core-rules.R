@@ -57,6 +57,7 @@ default_rules <- function() {
         make_rule("/",  "R.divide"),
         make_rule("^",  "R.pow"),
         make_rule("%%", "R.mod"),
+        make_rule("identical", "R.identical"),
         make_rule("==", "R.EQ"),
         make_rule("<=", "R.LEQ"),
         make_rule(">=", "R.GEQ"),

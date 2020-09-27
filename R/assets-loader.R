@@ -51,8 +51,22 @@ process_headers <- function(headers, ...) {
         return(parent_assets)
     }
 
-    c(parent_assets, purrr::reduce(children_assets, c))
+    c(parent_assets, purrr::reduce(children_assets, c.asset_list))  # See Note 1 below
 }
+# Note 1: The dispatch of the second `c` needs to be explicitly stated, because
+# at the moment,`c.asset_list` is not exported (and hence not registered with the
+# S3 system). The issue is that if we pass the generic `c` down and call it at
+# a lower level, it would looks up the S3 registry for dispatch (and fails to
+# dispatch `c.asset_list`).
+#
+# It is different to the first `c`, which will be able to find `c.asset_list`
+# since they are in the same frame of environment.
+#
+# In summary, local bindings (including package ones) are not persistent to the
+# generics unless they are explicitly registered. This causes weird behaviour like
+# the same symbol in the same line referring to different things, as in
+#    `c(parent_assets, purrr::reduce(children_assets, c))`
+# where the first dispatches `c.asset_list` properly while the second doesn't.
 
 # Filter a vector according to a predicate function
 filter <- function(x, predicate) x[predicate(x)]

@@ -46,9 +46,7 @@ deparse_js <- function(ast, deparsers) {
 #' @note This is used as input to \link{deparse_js}, \link{compile_r} and \link{compile_exprs}.
 #'
 #' @examples
-#' \dontrun{
 #' basic_deparsers()
-#' }
 #'
 #' @export
 basic_deparsers <- function() {
@@ -82,9 +80,7 @@ basic_deparsers <- function() {
 #' @note This is used as input to \link{compile_r} and \link{compile_exprs}.
 #'
 #' @examples
-#' \dontrun{
 #' default_deparsers()
-#' }
 #'
 #' @export
 default_deparsers <- function() {
@@ -135,7 +131,7 @@ default_deparsers <- function() {
 #' @return A list; a deparser ready to be dispatched by "type".
 #'
 #' @examples
-#' make_deparser(predicate_fun = rlang::is_call, deparse_fun = deparse)
+#' str(make_deparser(predicate_fun = rlang::is_call, deparse_fun = deparse))
 #'
 #' @export
 make_deparser <- function(predicate_fun, deparse_fun) {

@@ -18,6 +18,6 @@ A list; a deparser ready to be dispatched by "type".
 A constructor for a "typed" deparser
 }
 \examples{
-make_deparser(predicate_fun = rlang::is_call, deparse_fun = deparse)
+str(make_deparser(predicate_fun = rlang::is_call, deparse_fun = deparse))
 
 }

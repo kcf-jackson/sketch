@@ -13,8 +13,6 @@ A minimal list of deparsers for deparsing JavaScript
 This is used as input to \link{deparse_js}, \link{compile_r} and \link{compile_exprs}.
 }
 \examples{
-\dontrun{
 basic_deparsers()
-}
 
 }

@@ -13,7 +13,5 @@ List of handlers for processing the '#!' header
 This is used as input to \link{assets}.
 }
 \examples{
-\dontrun{
 default_processors()
-}
 }

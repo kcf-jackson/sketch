@@ -25,10 +25,8 @@ the `rules`, `deparsers` and `debug` options to pass to `source_r`.}
 Insert a 'sketch' app into an R Markdown document
 }
 \examples{
-\dontrun{
 # In an R code chunk of an R Markdown document
 file <- system.file("test_files/test_RMD.R", package = "sketch")
-insert_sketch(file, style = "width:500px; height:500px;")
-}
+insert_sketch(file, style = "width:500px; height:500px;", render = FALSE)
 
 }

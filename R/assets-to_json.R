@@ -5,10 +5,8 @@
 #' @param ... Extra arguments to be passed to \link{to_json}.
 #'
 #' @examples
-#' \dontrun{
 #' file <- system.file("test_files/test_csv.csv", package = "sketch")
 #' readLines(compile_data(file))
-#' }
 #'
 #' @export
 compile_data <- function(input, output = tempfile(), ...) {

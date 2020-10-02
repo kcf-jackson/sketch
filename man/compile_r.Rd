@@ -28,10 +28,8 @@ A character string; the output file path.
 Compile an R file into a JavaScript file
 }
 \examples{
-\dontrun{
 file <- system.file("test_files/test_source.R", package = "sketch")
 readLines(file)
 compile_r(input = file)
-}
 
 }

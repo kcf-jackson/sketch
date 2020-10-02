@@ -17,9 +17,7 @@ compile_data(input, output = tempfile(), ...)
 Compile a data file into a JavaScript file
 }
 \examples{
-\dontrun{
 file <- system.file("test_files/test_csv.csv", package = "sketch")
 readLines(compile_data(file))
-}
 
 }

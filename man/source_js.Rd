@@ -32,7 +32,7 @@ Serve a compiled 'sketch' JavaScript file
 \examples{
 \dontrun{
 file <- system.file("test_files/test_source.js", package = "sketch")
-source_js(file, debug = TRUE)  # This launches the default HTML viewer.
+# The next line launches the default HTML browser
+source_js(file, debug = TRUE, launch_browser = "browser")
 }
-
 }

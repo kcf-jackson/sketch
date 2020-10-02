@@ -4,14 +4,13 @@
 #' @param capture A character vector; the variables to keep.
 #'
 #' @examples
-#' \dontrun{
 #' f <- function(...) {
 #'    capture_args(list(...), c("a", "b"))
 #' }
 #' f(a = 1, b = 2, c = 3, d = 4)
-#' }
 #'
 #' @keywords internal
+#' @noRd
 capture_args <- function(args, capture) {
     nargs <- names(args)
     keep <- intersect(nargs, capture)
@@ -27,6 +26,7 @@ capture_args <- function(args, capture) {
 #' @param extended_args A list of arguments to the function call.
 #'
 #' @keywords internal
+#' @noRd
 do_call <- function(what, ..., extended_args) {
     do.call(what, c(list(...), extended_args))
 }

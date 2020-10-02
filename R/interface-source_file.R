@@ -40,7 +40,8 @@ copy_active_to_tempfile <- function() {
 #' @examples
 #' \dontrun{
 #' file <- system.file("test_files/test_source.R", package = "sketch")
-#' source_r(file, debug = TRUE)  # This launches the default HTML viewer.
+#' # The next line launches the default HTML browser
+#' source_r(file, debug = TRUE, launch_browser = "browser")
 #' }
 #'
 #' @export
@@ -70,9 +71,9 @@ source_r <- function(file, debug = FALSE, launch_browser = "viewer",
 #' @examples
 #' \dontrun{
 #' file <- system.file("test_files/test_source.js", package = "sketch")
-#' source_js(file, debug = TRUE)  # This launches the default HTML viewer.
+#' # The next line launches the default HTML browser
+#' source_js(file, debug = TRUE, launch_browser = "browser")
 #' }
-#'
 #' @export
 source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
                       launch_browser = "viewer") {
@@ -105,7 +106,7 @@ source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]}
 #'
 #' @examples
-#' default_tags()
+#' str(default_tags())
 #'
 #' @export
 default_tags <- function() {
@@ -120,8 +121,10 @@ default_tags <- function() {
 }
 
 #' @rdname html_tags
+#'
 #' @examples
-#' basic_tags()
+#' str(basic_tags())
+#'
 #' @export
 basic_tags <- function() {
   asset_list(

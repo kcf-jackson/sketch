@@ -24,9 +24,7 @@ make_processor <- function(pred, fun) {
 #' List of handlers for processing the '#!' header
 #' @note This is used as input to \link{assets}.
 #' @examples
-#' \dontrun{
 #' default_processors()
-#' }
 #' @export
 default_processors <- function() {
     list(

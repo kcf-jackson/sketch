@@ -11,11 +11,9 @@
 #' the `rules`, `deparsers` and `debug` options to pass to `source_r`.
 #'
 #' @examples
-#' \dontrun{
 #' # In an R code chunk of an R Markdown document
 #' file <- system.file("test_files/test_RMD.R", package = "sketch")
-#' insert_sketch(file, style = "width:500px; height:500px;")
-#' }
+#' insert_sketch(file, style = "width:500px; height:500px;", render = FALSE)
 #'
 #' @export
 insert_sketch <- function(file, id, output_dir = NULL, render = TRUE, ...) {
@@ -56,10 +54,9 @@ insert_sketch <- function(file, id, output_dir = NULL, render = TRUE, ...) {
 #' @param options A list of chunk options.
 #'
 #' @examples
-#' \dontrun{
-#' # In the 'setup' code chunk of an R Markdown document
+#' # This line makes `sketch::eng_sketch` available to `knitr::knit_engines`.
+#' # It is usually used in the 'setup' code chunk of an R Markdown document
 #' knitr::knit_engines$set(sketch = sketch::eng_sketch)
-#' }
 #'
 #' @export
 eng_sketch <- function(options) {

@@ -34,7 +34,8 @@ dependencies and serves it in the viewer.
 \examples{
 \dontrun{
 file <- system.file("test_files/test_source.R", package = "sketch")
-source_r(file, debug = TRUE)  # This launches the default HTML viewer.
+# The next line launches the default HTML browser
+source_r(file, debug = TRUE, launch_browser = "browser")
 }
 
 }

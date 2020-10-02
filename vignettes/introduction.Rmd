@@ -34,7 +34,7 @@ install.packages("sketch")
 
 # Or for the latest development 
 install.packages("devtools")
-devtools::install_github("kcf-jackson/sketch")
+remotes::install_github("kcf-jackson/sketch")
 ```
 
 ### 1.2 Running a sketch R file {#section-1-2}

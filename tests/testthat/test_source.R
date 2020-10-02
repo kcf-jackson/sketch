@@ -30,3 +30,31 @@ testthat::test_that("Source sketch R script", {
     )
     setwd(current_wd)
 })
+
+
+testthat::test_that("basic_tags()", {
+    # Simple file structure
+    file <- system.file("test_files/test_sketch_basic.R", package = "sketch")
+    output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
+    output_file_2 <- source_r(file, debug = TRUE, launch_browser = NULL,
+                              asset_tags = basic_tags())
+    testthat::expect_gt(
+        file.size(output_file),   # with R functions
+        file.size(output_file_2)  # without R functions
+    )
+
+    # With recursive dependencies
+    current_wd <- getwd()
+    dir <- system.file("test_files", package = "sketch")
+    file <- "test_sketch.R"
+    setwd(dir)
+    file <- system.file("test_files/test_sketch.R", package = "sketch")
+    output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
+    output_file_2 <- source_r(file, debug = TRUE, launch_browser = NULL,
+                              asset_tags = basic_tags())
+    testthat::expect_gt(
+        file.size(output_file),   # with R functions
+        file.size(output_file_2)  # without R functions
+    )
+    setwd(current_wd)
+})

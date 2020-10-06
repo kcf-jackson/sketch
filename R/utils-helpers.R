@@ -17,7 +17,7 @@ src <- function(x) {
            "d3" = "https://d3js.org/d3.v5.min.js",
            "vegalite" = "https://cdn.jsdelivr.net/npm/vega-lite@4.15.0/build/vega-lite.min.js",
            "tensorflow" = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js",
-           "dom" = system.file("modules/dom.R", package = "sketch"),
+           "dom" = system.file("modules/dom.js", package = "sketch"),
            stop(glue::glue("Library '{x}' does not exist."))
     )
 }

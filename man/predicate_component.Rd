@@ -19,6 +19,7 @@
 \alias{is_call_ifelse}
 \alias{is_call_lambda}
 \alias{is_call_pipe}
+\alias{is_call_raw_string}
 \alias{is_call_add}
 \alias{is_call_subtract}
 \alias{is_call_extract}
@@ -62,6 +63,8 @@ is_call_ifelse(ast)
 is_call_lambda(ast)
 
 is_call_pipe(ast)
+
+is_call_raw_string(ast)
 
 is_call_add(ast)
 
@@ -114,6 +117,8 @@ Predicate for the "ifelse" operator
 Predicate for the "lambda" operator
 
 Predicate for the "pipe" operator
+
+Predicate for the raw string operator "r"
 
 Predicate for the "add" operator
 

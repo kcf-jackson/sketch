@@ -522,6 +522,31 @@ deparse_pipe <- function(ast, ...) {
 }
 
 
+# Template literal in JavaScript
+# Deparser for the raw string operator "r" -----------------------------------------
+#' Predicate for the raw string operator "r"
+#' @rdname predicate_component
+is_call_raw_string <- function(ast) {
+  is_call(ast, "r")
+}
+
+#' Deparser for the raw string operator "r"
+#' @rdname deparsers_component
+deparse_raw_string <- function(ast, ...) {
+  arg <- ast[[2]]   # must be a character string
+  # Safeguard
+  if (!is.character(arg)) {
+    stop("The argument of the raw string function 'r' must be a character string.")
+  }
+  if (nchar(arg) < 2 ||
+      substring(arg, 1, 1) != "`" ||
+      substring(arg, nchar(arg), nchar(arg)) != "`") {
+    stop("The argument of the raw string function 'r' must begin and end with '`'.")
+  }
+  arg  # parsing naturally removes the outer quotation marks
+}
+
+
 # Library functions and Exceptions -------------------------------------------------
 #' Predicate for the "add" operator
 #' @rdname predicate_component

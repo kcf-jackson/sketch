@@ -51,6 +51,8 @@ deparse_js <- function(ast, deparsers) {
 #' @export
 basic_deparsers <- function() {
   list(
+    # JavaScript template literal
+    "raw_string" = make_deparser(is_call_raw_string, deparse_raw_string),
     # JavaScript object literal
     "list"    = make_deparser(is_call_list, deparse_list),
     # Keywords
@@ -102,6 +104,7 @@ default_deparsers <- function() {
     "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate),
     "list" = make_deparser(is_call_list, deparse_list),
     # Special forms
+    "raw_string" = make_deparser(is_call_raw_string, deparse_raw_string),
     "pipe" = make_deparser(is_call_pipe, deparse_pipe),
     "lambda" = make_deparser(is_call_lambda, deparse_lambda),
     "ifelse" = make_deparser(is_call_ifelse, deparse_ifelse),

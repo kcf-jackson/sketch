@@ -19,6 +19,7 @@
 \alias{deparse_ifelse}
 \alias{deparse_lambda}
 \alias{deparse_pipe}
+\alias{deparse_raw_string}
 \alias{deparse_add}
 \alias{deparse_subtract}
 \alias{deparse_extract}
@@ -62,6 +63,8 @@ deparse_ifelse(ast, ...)
 deparse_lambda(ast, ...)
 
 deparse_pipe(ast, ...)
+
+deparse_raw_string(ast, ...)
 
 deparse_add(ast, ...)
 
@@ -120,6 +123,8 @@ Deparser for the "ifelse" operator
 Deparser for the "lambda" operator
 
 Deparser for the "pipe" operator
+
+Deparser for the raw string operator "r"
 
 Deparser for the "add" operator
 

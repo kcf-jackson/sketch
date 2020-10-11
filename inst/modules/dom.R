@@ -39,3 +39,16 @@ print_dom <- function(el, x = "body") {
     res$appendChild(el)
     return(res)
 }
+
+#' Construct a new SVG element
+#' @param tag0 A character string; name of the element.
+#' @param attr0 A named list; attributes of the element.
+#' @return A SVG element.
+#' @export
+svg <- function(tag0, attr0) {
+    svgObj <- document$createElementNS('http://www.w3.org/2000/svg', tag0)
+    for (key in Object$keys(attr0)) {
+        svgObj$setAttribute(key, attr0[key])
+    }
+    return(svgObj)
+}

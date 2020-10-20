@@ -296,7 +296,9 @@ deparse_list_arg <- function(list0, err_msg, ...) {
   labels <- names(list1)
 
   if (is.null(labels)) {   # all labels are missing
-    warning(err_msg)
+    if (length(list1) != 0) {
+      warning(err_msg)
+    }
     paste(list1, collapse = ", ")
 
   } else {
@@ -503,7 +505,7 @@ deparse_lambda <- function(ast, ...) {
 # Deparser for "pipe" ---------------------------------------------------
 #' Predicate for the "pipe" operator
 #' @rdname predicate_component
-is_call_pipe <- function(ast) is_call(ast, "R.pipe")
+is_call_pipe <- function(ast) is_call(ast, "pipe")
 
 #' Deparser for the "pipe" operator
 #' @rdname deparsers_component

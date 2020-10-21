@@ -124,7 +124,7 @@ Deparser for the "lambda" operator
 
 Deparser for the "pipe" operator
 
-Deparser for the raw string operator "r"
+Deparser for the raw string operator
 
 Deparser for the "add" operator
 

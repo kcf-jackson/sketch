@@ -126,7 +126,8 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("function(x = 3, y) {x + y}", "function(x = 3, y) {\n    R.add(x, y)\n}")
     unit_test("while (TRUE) { do(x) }", "while (true) {\n    do(x)\n}")
     unit_test("abc %op% abc", "%op%(abc, abc)")
-    unit_test("r('`x = $(1 + 1)`')", "`x = $(1 + 1)`")
+    # Raw string
+    unit_test("raw_str(r'(`x = $(1 + 1)`)')", "`x = $(1 + 1)`")
 
     # Test that function arguments are rewritten
     unit_test("function(b = TRUE, c = FALSE) {}", "function(b = true, c = false) {\n    \n}")
@@ -178,11 +179,26 @@ testthat::test_that("Test transpilation with basic rules and deparsers (files)",
     unit_test("for (i in iterables) { x }", "for (let i of iterables) {\n    x\n}")
     unit_test("function(b, c) {}", "function(b, c) {\n    \n}")
     unit_test("while (TRUE) { do(x) }", "while (true) {\n    do(x)\n}")
-    unit_test("r('`x = $(1 + 1)`')", "`x = $(1 + 1)`")
+    # Raw string
+    unit_test("raw_str(r'(`x = $(1 + 1)`)')", "`x = $(1 + 1)`")
 
     # Test that function arguments are rewritten
     unit_test("function(b = TRUE, c = FALSE) {}", "function(b = true, c = false) {\n    \n}")
     unit_test("function(n = 2 ^ 4) {}", "function(n = 2 ** 4) {\n    \n}")
     unit_test("function(n = f(3 + g(2 ^ 4))) {}", "function(n = f(3 + g(2 ** 4))) {\n    \n}")
     unit_test("function(n = 3 ^ 2 ^ 2) {}", "function(n = 3 ** 2 ** 2) {\n    \n}")
+})
+
+
+testthat::test_that("Test raw_str", {
+    fpath <- system.file("test_files/test_raw_string.R", package = "sketch")
+    exprs <- rlang::parse_exprs(file(fpath))
+    testthat::expect_equal(
+        deparse_js(exprs[[1]], deparsers = basic_deparsers()),
+        "/[123]+/"
+    )
+    testthat::expect_equal(
+        deparse_js(exprs[[2]], deparsers = basic_deparsers()),
+        "`template: ${x}.`"
+    )
 })

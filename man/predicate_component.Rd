@@ -118,7 +118,7 @@ Predicate for the "lambda" operator
 
 Predicate for the "pipe" operator
 
-Predicate for the raw string operator "r"
+Predicate for the raw string operator
 
 Predicate for the "add" operator
 

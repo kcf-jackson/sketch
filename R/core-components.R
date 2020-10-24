@@ -310,7 +310,7 @@ deparse_list_arg <- function(list0, err_msg, ...) {
           warning(err_msg)
           glue::glue("{y}")
         } else {
-          glue::glue("{x}: {y}")
+          glue::glue("\"{x}\": {y}")
         }
       }
     ) %>%

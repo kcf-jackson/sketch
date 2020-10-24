@@ -7,26 +7,18 @@ status](https://travis-ci.org/kcf-jackson/sketch.svg?branch=master)](https://tra
 coverage](https://codecov.io/gh/kcf-jackson/sketch/branch/master/graph/badge.svg)](https://codecov.io/gh/kcf-jackson/sketch?branch=master)
 <!-- badges: end -->
 
-## Preview for developers
-
-Warning: the package has not reached stable version.
-
 -----
 
 ## R package `sketch`
 
-Creates interactive illustrations embeddable in RMarkDown documents. The
-package compiles R code into JavaScript code by applying rewriting rules
-to the R AST. This allows users to develop JS-style visualisations using
+Creates interactive illustrations embeddable in RMarkDown documents. The package compiles R code into JavaScript code by applying rewriting rules to the R AST. This allows users to develop JS-style visualisations using
 only the R syntax.
 
 ![](./man/figures/ast_transform.png)
 
 ### Basic conversion from R to JavaScript
 
-The package current has ~56 AST rewriting rules. Here are a list of the
-basic
-ones.
+The package current has 190+ AST rewriting rules. Here are a list of the basic ones.
 
 |       Description       |                                 R                                 |                            JavaScript                             |
 | :---------------------: | :---------------------------------------------------------------: | :---------------------------------------------------------------: |
@@ -38,7 +30,7 @@ ones.
 |        For-loop         |                    `for (x in iterable) {...}`                    |                  `for (let x of iterable) {...}`                  |
 |       While-loop        |                       `while (cond) {...}`                        |                       `while (cond) {...}`                        |
 
-Note that the conversion is not perfect, e.g.
+Note that the conversion is not perfect, e.g. 
 
   - R vector cannot be nested, while JS array can be nested.
     
@@ -49,16 +41,6 @@ Note that the conversion is not perfect, e.g.
     
       - But don’t worry, when you try to convert an R unnamed list to JS
         object, `sketch` will warn you about it :)
-
------
-
-## News
-
-  - 2019-12-09:
-      - Switched to `math.js` to support vectorised operations.
-      - Added R `groupGeneric` functions.
-      - Added Travis CI and code coverage.
-  - 2019-12-01: Added `readme.md`: “Preview for developers”
 
 -----
 
@@ -134,8 +116,7 @@ working directory.
 The functions `setup`, `draw`, `createCanvas`, `background`,
 `frameCount`, `fill` and `circle` are from the `p5.js` library, and one
 can use them as they are in the R code. This also works for *all* the
-other functions in the
-library.
+other functions in the library.
 
 ``` r
 #! load_script(src = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js")
@@ -341,8 +322,7 @@ insert_into(start_button, "#new_sketch")
 #### main.R
 
 Note that since the symbol `$` has special meaning in R, the JavaScript
-`$` is mapped to the symbol
-`jQuery`.
+`$` is mapped to the symbol `jQuery`.
 
 ``` r
 #! load_script("https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js")
@@ -421,7 +401,7 @@ x <- 3
 let (x = 3)
 ```
 
-Note that `declare` and `let` are 100% interchangable, e.g. `declare (x
+Note that `declare` and `let` are 100% interchangable, e.g. `declare (x
 = 3)` is also valid. I prefer using `declare` for top-level variable
 declaration and `let` for local use.
 
@@ -458,6 +438,12 @@ x = [1,2,3]
 x[0]  // 1
 ```
 
+<script type="text/javascript">
+// Web-browser console
+x = [1,2,3]
+x[0]  // 1
+</script>
+
 #### ii. JavaScript function reads argument by position / order
 
 ``` js
@@ -465,6 +451,12 @@ x[0]  // 1
 first = function(x, y) { console.log(x) }
 first(y = 3, x = 1)  // 3
 ```
+
+<script type="text/javascript">
+// Web-browser console
+first = function(x, y) { console.log(x) }
+first(y = 3, x = 1)  // 3
+</script>
 
 Possible workaround: Use *destructuring* to mimic named arguments.
 
@@ -478,6 +470,14 @@ add2 = function(x, y) { return(x + y) }
 add(3, 4) // 7
 ```
 
+<script type="text/javascript">
+add = function(x, y) { x + y }
+add(3, 4) // undefined
+
+add2 = function(x, y) { return(x + y) }
+add(3, 4) // 7
+</script>
+
 #### iv. JavaScript passes objects by reference (think `R6` in R)
 
 ``` js
@@ -488,6 +488,15 @@ y[0] = 999
 y              // Array(3) [ 999, 2, 3 ]
 x              // Array(3) [ 999, 2, 3 ]
 ```
+
+<script type="text/javascript">
+// Web-browser console
+x = [1,2,3]    // Array(3) [ 1, 2, 3 ]
+y = x          // Array(3) [ 1, 2, 3 ]
+y[0] = 999
+y              // Array(3) [ 999, 2, 3 ]
+x              // Array(3) [ 999, 2, 3 ]
+</script>
 
 Workaround: Use `y = x.slice()` to make a copy of array.
 

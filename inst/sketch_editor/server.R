@@ -55,10 +55,12 @@ shinyServer(function(input, output, session) {
                 msg <- paste(res, collapse = "\n")
                 # print(msg)
                 path <- html_print(tags$script(msg))
-                temp_dir <- tempdir()
-                dir.create(file.path(temp_dir, "www"))
-                file.copy(path, file.path(temp_dir, "www/index.html"), overwrite = TRUE)
-                addResourcePath("www", temp_dir)
+                temp_www <- file.path(tempdir(), "www")
+                if (!dir.exists(temp_www)) {
+                    dir.create(temp_www)
+                }
+                file.copy(path, file.path(temp_www, "index.html"), overwrite = TRUE)
+                addResourcePath("index.html", temp_www)
                 message_obj <- shiny_msg(input$engine, msg, msg, "./index.html")
             } else { # input$engine == "V8"
                 ct <- V8::v8()

@@ -33,7 +33,7 @@ Creates interactive illustrations embeddable in RMarkDown documents. The package
 install.packages("sketch")
 
 # Or for the latest development 
-install.packages("devtools")
+install.packages("remotes")
 remotes::install_github("kcf-jackson/sketch")
 ```
 

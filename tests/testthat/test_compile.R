@@ -128,6 +128,8 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("abc %op% abc", "%op%(abc, abc)")
     # Raw string
     unit_test("raw_str(r'(`x = $(1 + 1)`)')", "`x = $(1 + 1)`")
+    unit_test("raw_str('`x = $(1 + 1)`')", "`x = $(1 + 1)`")
+    unit_test("raw_str('/[0-9]+/')", "/[0-9]+/")
 
     # Test that function arguments are rewritten
     unit_test("function(b = TRUE, c = FALSE) {}", "function(b = true, c = false) {\n    \n}")
@@ -181,6 +183,8 @@ testthat::test_that("Test transpilation with basic rules and deparsers (files)",
     unit_test("while (TRUE) { do(x) }", "while (true) {\n    do(x)\n}")
     # Raw string
     unit_test("raw_str(r'(`x = $(1 + 1)`)')", "`x = $(1 + 1)`")
+    unit_test("raw_str('`x = $(1 + 1)`')", "`x = $(1 + 1)`")
+    unit_test("raw_str('/[0-9]+/')", "/[0-9]+/")
 
     # Test that function arguments are rewritten
     unit_test("function(b = TRUE, c = FALSE) {}", "function(b = true, c = false) {\n    \n}")

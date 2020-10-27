@@ -4,7 +4,7 @@
 ^.*\.md$
 ^.*\.Rmd$
 ^.*\.yml$
-^development$
 ^sketch.code-workspace$
 ^doc$
 ^Meta$
+^examples$

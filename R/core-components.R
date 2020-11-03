@@ -1,4 +1,4 @@
-# Deparsers for symbols and calls ===========================
+# === Deparsers for symbols and calls ========================
 # To construct a "master"-deparser, at the most basic level
 # one must provide a deparser for each of symbols and calls.
 
@@ -38,7 +38,7 @@ deparse_call <- function(ast, ...) {
 }
 
 
-# Deparsers for infix and wrap operators =====================
+# === Deparsers for infix and wrap operators ==================
 # Continuing from above, one could further distinguish special
 # cases of calls. Here we consider the infix operators and
 # wrap operators ("{", "[", "[[", "(").
@@ -172,7 +172,7 @@ sep_symbol <- function(chr) {
 }
 
 
-# Deparsers for control flow and function definition =========
+# === Deparsers for control flow and function definition ======
 # Continuing from above, one could further distinguish special
 # cases of calls. Here we consider the control flow and
 # function definition.
@@ -237,11 +237,11 @@ deparse_while <- function(ast, ...) {
 
 
 # Deparser for function definition --------------------------
-#' Predicate for the 'function' keyword
+#' Predicate for the "function" keyword
 #' @rdname predicate_component
 is_call_function <- function(ast) is_call(ast, "function")
 
-#' Deparser for the 'function' keyword
+#' Deparser for the "function" keyword
 #' @rdname deparsers_component
 deparse_function <- function(ast, ...) {
   deparse_arg <- function(alist0, ...) {
@@ -264,23 +264,91 @@ deparse_function <- function(ast, ...) {
 
 
 
-# Deparser for the 'break' keyword --------------------------
-#' Predicate for the 'break' keyword
+# Deparser for the "break" keyword --------------------------
+#' Predicate for the "break" keyword
 #' @rdname predicate_component
 is_call_break <- function(ast) is_call(ast, "break")
 
 
 
-# R data structure ===========================================
+# === Deparser for Error handling =============================
+# Deparser for the "try" keyword --------------------------
+#' Predicate for the "try" keyword
+#' @rdname predicate_component
+is_call_try <- function(ast) is_call(ast, "try")
+
+#' Deparser for the "try" keyword
+#' @rdname deparsers_component
+deparse_try <- function(ast, ...) {
+  arg <- deparse_js(ast[[2]], ...)
+  if (!is_call(ast[[2]], "{")) {
+    arg <- add_curly_bracket(arg)
+  }
+  glue::glue("try <arg> catch(error) {\n    console.log(error)\n}",
+             .open = "<", .close = ">")
+}
+
+add_curly_bracket <- function(x) {
+  paste0("{\n    ", x, "\n}")
+}
+
+# Deparser for the "tryCatch" keyword --------------------------
+#' Predicate for the "tryCatch" keyword
+#' @rdname predicate_component
+is_call_tryCatch <- function(ast) is_call(ast, "tryCatch")
+
+#' Deparser for the "tryCatch" keyword
+#' @rdname deparsers_component
+deparse_tryCatch <- function(ast, ...) {
+  try_arg <- deparse_js(ast[[2]], ...)
+  catch_fun <- deparse_js(ast[[3]], ...)
+
+  if (!is_call(ast[[2]], "{")) {
+    try_arg <- add_curly_bracket(try_arg)
+  }
+  res <- glue::glue(
+    "try <try_arg> catch(error) {\n    (<catch_fun>)(error)\n}",
+    .open = "<", .close = ">"
+  )
+  if (length(ast) < 4) {
+    return(res)
+  }
+
+  fin_arg <- deparse_js(ast[[4]], ...)
+  if (!is_call(ast[[4]], "{")) {
+    fin_arg <- add_curly_bracket(fin_arg)
+  }
+  fin <- glue::glue("finally <fin_arg>",
+                    .open = "<", .close = ">")
+  paste(res, fin)
+}
+
+
+# Deparser for the "throw" keyword --------------------------
+#' Predicate for the "throw" keyword
+#' @rdname predicate_component
+is_call_throw <- function(ast) is_call(ast, "throw")
+
+#' Deparser for the "throw" keyword
+#' @rdname deparsers_component
+# Reference: https://stackoverflow.com/questions/9156176/what-is-the-difference-between-throw-new-error-and-throw-someobject
+deparse_throw <- function(ast, ...) {
+  err_msg <- deparse_js(ast[[2]], ...)
+  glue::glue("throw new Error({err_msg})")
+}
+
+
+
+# === R data structure =======================================
 # Continuing from above, one could further distinguish special
 # cases of calls. Here we consider the R data structure.
 
 
-#' Predicate for the "list" operators
+#' Predicate for the "list" operator
 #' @rdname predicate_component
 is_call_list <- function(ast) is_call(ast, "list")
 
-#' Deparser for the "list" operators
+#' Deparser for the "list" operator
 #' @rdname deparsers_component
 deparse_list <- function(ast, ...) {
   err_msg <- "All elements in a list must be named to convert into JavaScript properly."
@@ -374,9 +442,129 @@ is_call_df_mutate <- function(ast) is_call(ast, "R.mutate")
 deparse_df_mutate <- deparse_df_summarise
 
 
-# Special forms ==========================================================
-# Continuing from above, one could further distinguish special cases of
-# calls. Here we consider the special forms.
+
+# Deparser for the "R6Class" function --------------------------
+#' Predicate for the "R6Class" function
+#' @rdname predicate_component
+is_call_R6Class <- function(ast) is_call(ast, "R6Class")
+
+#' Deparser for the "R6Class" function
+#' @rdname deparsers_component
+deparse_R6Class <- function(ast, ...) {
+  public <- if (length(ast) < 3) NULL else ast[[3]]
+  private <- if (length(ast) < 4) NULL else ast[[4]]
+
+  if (!is.null(public) && !is_call(public, "list")) {
+    stop("The argument 'public' must be a list.")
+  }
+  if (!is.null(private) && !is_call(private, "list")) {
+    stop("The argument 'private' must be a list.")
+  }
+
+  const_arg <- get_constructor_arg(public, ...)
+  private_arg <- c(names(private[-1]), "that") %>%
+    paste(collapse = ", ")
+  public_list <- deparse_public_list(public, ...)
+  private_list <- deparse_private_list(private, ...)
+
+  return(glue::glue("function(<const_arg>) {
+        // public variables and methods
+        <public_list>
+        // private variables and methods
+        let <private_arg>
+        that = this
+        <private_list>
+        if (this.initialize) {
+            this.initialize(<const_arg>)
+        }
+    }", .open = "<", .close = ">"))
+}
+
+get_constructor_arg <- function(ast, ...) {
+  deparse_arg <- function(alist0, ...) {
+    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist2 <- purrr::map2_chr(
+      .x = names(alist1), .y = alist1,
+      function(x, y) {
+        glue::glue(if (y == "") "{x}" else "{x} = {y}")
+      }
+    )
+    paste(alist2, collapse = ", ")
+  }
+
+  if (!"initialize" %in% names(ast)) {
+    return("")
+  }
+
+  if (!is_call(ast$initialize, "function")) {
+    stop("The constructor must be a function.")
+  }
+
+  deparse_arg(ast$initialize[[2]], ...)
+}
+
+deparse_public_list <- function(ast, ...) {
+  if (is.null(ast) || length(ast) == 1) {
+    return("")
+  }
+
+  args <- ast[-1]
+  public_vars <- names(args)
+  if (any(public_vars == "")) {
+    stop("All (public) variables / methods of an R6 object must be named.")
+  }
+
+  rhs <- purrr::map_chr(args, deparse_js, ...)
+  purrr::map2_chr(
+    public_vars, rhs, function(x, y) {
+      glue::glue("this.<x> = <y>", .open = "<", .close = ">")
+    }) %>%
+    paste(collapse = "\n") %>%
+    gsub(pattern = "\n", replacement = "\n    ")  # increase indent
+}
+
+deparse_private_list <- function(ast, ...) {
+  if (is.null(ast) || length(ast) == 1) {
+    return("")
+  }
+
+  args <- ast[-1]
+  private_vars <- names(args)
+  if (any(private_vars == "")) {
+    stop("All (private) variables / methods of an R6 object must be named.")
+  }
+
+  # Reference: http://crockford.com/javascript/private.html
+  rhs <- args %>%
+    purrr::map(rewrite, rules = list(make_rule("this", "that"))) %>%
+    purrr::map_chr(deparse_js, ...)
+
+  purrr::map2_chr(
+    private_vars, rhs, function(x, y) {
+      glue::glue("<x> = <y>", .open = "<", .close = ">")
+    }) %>%
+    paste(collapse = "\n") %>%
+    gsub(pattern = "\n", replacement = "\n    ")  # increase indent
+}
+
+
+#' Predicate for the "private.object" pattern
+#' @rdname predicate_component
+is_call_private_dot <- function(ast) {
+  is_call(ast, c(".")) && (deparse(ast[[2]]) == "private")
+}
+
+#' Deparser for the "private.object" pattern
+#' @rdname deparsers_component
+deparse_private_dot <- function(ast, ...) {
+  deparse_js(ast[[3]], ...)
+}
+
+
+
+# === Special forms ===========================================
+# Continuing from above, one could further distinguish special
+# cases of calls. Here we consider the special forms.
 
 
 # Deparser for "new" ------------------------------------------------------
@@ -544,7 +732,7 @@ deparse_raw_string <- function(ast, ...) {
 }
 
 
-# Library functions and Exceptions -------------------------------------------------
+# === Library functions and Exceptions ======================
 #' Predicate for the "add" operator
 #' @rdname predicate_component
 is_call_add <- function(ast) is_call(ast, "R.add")

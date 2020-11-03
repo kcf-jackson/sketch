@@ -30,6 +30,7 @@ basic_rules <- function() {
         make_rule("FALSE", "false"),
         make_rule("declare", "let"),
         make_rule("self", "this"),
+        make_rule("stop", "throw"),
         make_rule("JS_NULL", "null"),
         make_rule("JS_UNDEFINED", "undefined"),
         make_rule("JS_NAN", "NaN"),
@@ -76,7 +77,7 @@ default_rules <- function() {
         make_rule("%=>%", "=>"),
         make_rule("%+%", "+"),
         make_rule("%-%", "-"),
-        make_rule("%/%", "intDivide"),
+        make_rule("%/%", "R.intDivide"),
         make_rule("%o%", "R.compose"),
         make_rule("%>%", "pipe"),
 
@@ -87,6 +88,7 @@ default_rules <- function() {
         make_rule("F", "false"),
         make_rule("declare", "let"),
         make_rule("self", "this"),
+        make_rule("stop", "throw"),
 
         # Basic R functions
         make_rule(    "pi", "R.pi"),

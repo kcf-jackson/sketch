@@ -67,6 +67,11 @@ basic_deparsers <- function() {
     "while"  = make_deparser(is_call_while, deparse_while),
     "function" = make_deparser(is_call_function, deparse_function),
     "break" = make_deparser(is_call_break, deparse_sym),
+    "try" = make_deparser(is_call_try, deparse_try),
+    "tryCatch" = make_deparser(is_call_tryCatch, deparse_tryCatch),
+    "throw" = make_deparser(is_call_throw, deparse_throw),
+    "private_dot" = make_deparser(is_call_private_dot, deparse_private_dot),
+    "R6Class" = make_deparser(is_call_R6Class, deparse_R6Class),
     # Operators
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
     "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
@@ -117,6 +122,11 @@ default_deparsers <- function() {
     "while"  = make_deparser(is_call_while, deparse_while),
     "function" = make_deparser(is_call_function, deparse_function),
     "break" = make_deparser(is_call_break, deparse_sym),
+    "try" = make_deparser(is_call_try, deparse_try),
+    "tryCatch" = make_deparser(is_call_tryCatch, deparse_tryCatch),
+    "throw" = make_deparser(is_call_throw, deparse_throw),
+    "private_dot" = make_deparser(is_call_private_dot, deparse_private_dot),
+    "R6Class" = make_deparser(is_call_R6Class, deparse_R6Class),
     # Operators
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
     "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),

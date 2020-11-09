@@ -62,6 +62,7 @@ basic_deparsers <- function() {
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
     "new"  = make_deparser(is_call_new, deparse_new),
     "let"    = make_deparser(is_call_let, deparse_let),
+    "const"  = make_deparser(is_call_const, deparse_const),
     "for"    = make_deparser(is_call_for, deparse_for),
     "if"     = make_deparser(is_call_if, deparse_if),
     "while"  = make_deparser(is_call_while, deparse_while),
@@ -70,7 +71,6 @@ basic_deparsers <- function() {
     "try" = make_deparser(is_call_try, deparse_try),
     "tryCatch" = make_deparser(is_call_tryCatch, deparse_tryCatch),
     "throw" = make_deparser(is_call_throw, deparse_throw),
-    "private_dot" = make_deparser(is_call_private_dot, deparse_private_dot),
     "R6Class" = make_deparser(is_call_R6Class, deparse_R6Class),
     # Operators
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
@@ -116,6 +116,7 @@ default_deparsers <- function() {
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
     "new"  = make_deparser(is_call_new, deparse_new),
     "let"  = make_deparser(is_call_let, deparse_let),
+    "const"  = make_deparser(is_call_const, deparse_const),
     # Keywords
     "for"    = make_deparser(is_call_for, deparse_for),
     "if"     = make_deparser(is_call_if, deparse_if),
@@ -125,7 +126,6 @@ default_deparsers <- function() {
     "try" = make_deparser(is_call_try, deparse_try),
     "tryCatch" = make_deparser(is_call_tryCatch, deparse_tryCatch),
     "throw" = make_deparser(is_call_throw, deparse_throw),
-    "private_dot" = make_deparser(is_call_private_dot, deparse_private_dot),
     "R6Class" = make_deparser(is_call_R6Class, deparse_R6Class),
     # Operators
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),

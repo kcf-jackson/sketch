@@ -301,7 +301,8 @@ is_call_tryCatch <- function(ast) is_call(ast, "tryCatch")
 #' @rdname deparsers_component
 deparse_tryCatch <- function(ast, ...) {
   try_arg <- deparse_js(ast[[2]], ...)
-  catch_fun <- deparse_js(ast[[3]], ...)
+  catch_fun <- deparse_js(ast[[3]], ...) %>%
+    gsub(pattern = "\n", replacement = "\n    ")  # increase indent
 
   if (!is_call(ast[[2]], "{")) {
     try_arg <- add_curly_bracket(try_arg)
@@ -462,8 +463,6 @@ deparse_R6Class <- function(ast, ...) {
   }
 
   const_arg <- get_constructor_arg(public, ...)
-  private_arg <- c(names(private[-1]), "that") %>%
-    paste(collapse = ", ")
   public_list <- deparse_public_list(public, ...)
   private_list <- deparse_private_list(private, ...)
 
@@ -471,8 +470,7 @@ deparse_R6Class <- function(ast, ...) {
         // public variables and methods
         <public_list>
         // private variables and methods
-        let <private_arg>
-        that = this
+        let that = this, private = {}
         <private_list>
         if (this.initialize) {
             this.initialize(<const_arg>)
@@ -510,7 +508,7 @@ deparse_public_list <- function(ast, ...) {
 
   args <- ast[-1]
   public_vars <- names(args)
-  if (any(public_vars == "")) {
+  if (is.null(public_vars) || any(public_vars == "")) {
     stop("All (public) variables / methods of an R6 object must be named.")
   }
 
@@ -530,7 +528,7 @@ deparse_private_list <- function(ast, ...) {
 
   args <- ast[-1]
   private_vars <- names(args)
-  if (any(private_vars == "")) {
+  if (is.null(private_vars) || any(private_vars == "")) {
     stop("All (private) variables / methods of an R6 object must be named.")
   }
 
@@ -541,25 +539,11 @@ deparse_private_list <- function(ast, ...) {
 
   purrr::map2_chr(
     private_vars, rhs, function(x, y) {
-      glue::glue("<x> = <y>", .open = "<", .close = ">")
+      glue::glue("private.<x> = <y>", .open = "<", .close = ">")
     }) %>%
     paste(collapse = "\n") %>%
     gsub(pattern = "\n", replacement = "\n    ")  # increase indent
 }
-
-
-#' Predicate for the "private.object" pattern
-#' @rdname predicate_component
-is_call_private_dot <- function(ast) {
-  is_call(ast, c(".")) && (deparse(ast[[2]]) == "private")
-}
-
-#' Deparser for the "private.object" pattern
-#' @rdname deparsers_component
-deparse_private_dot <- function(ast, ...) {
-  deparse_js(ast[[3]], ...)
-}
-
 
 
 # === Special forms ===========================================
@@ -582,7 +566,7 @@ deparse_new <- function(ast, ...) {
 }
 
 
-# Deparser for "let" ------------------------------------------------------
+# Deparser for "let" and "const" -----------------------------------------------
 #' Predicate for the "let" operator
 #' @rdname predicate_component
 is_call_let <- function(ast) is_call(ast, "let")
@@ -606,8 +590,18 @@ deparse_let <- function(ast, ...) {
     }
   }
 
-  paste("let", deparse_arg(ast[-1]))
+  paste(deparse(ast[[1]]), deparse_arg(ast[-1]))
 }
+
+
+#' Predicate for the "const" operator
+#' @rdname predicate_component
+is_call_const <- function(ast) is_call(ast, "const")
+
+#' Deparser for the "const" operator
+#' @rdname deparsers_component
+deparse_const <- deparse_let
+
 
 
 # Deparser for "dataURI" --------------------------------------------------

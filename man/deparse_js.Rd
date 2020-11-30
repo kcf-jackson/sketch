@@ -2,7 +2,7 @@
 % Please edit documentation in R/core-deparse.R
 \name{deparse_js}
 \alias{deparse_js}
-\title{Expression Deparsing for JavaScript}
+\title{Expression deparsing for JavaScript}
 \usage{
 deparse_js(ast, deparsers)
 }
@@ -15,7 +15,8 @@ deparse_js(ast, deparsers)
 A character string.
 }
 \description{
-Expression Deparsing for JavaScript
+This is the "master" deparser that dispatches
+the "worker" deparsers based on the type of the input.
 }
 \examples{
 expr_1 <- parse_expr("R.extract(x, 3, )")

@@ -13,7 +13,7 @@ eng_sketch(options)
 This supports the use of 'sketch' code chunk in an R Markdown document.
 }
 \examples{
-# This line makes `sketch::eng_sketch` available to `knitr::knit_engines`.
+# The following line makes `sketch::eng_sketch` available to `knitr::knit_engines`.
 # It is usually used in the 'setup' code chunk of an R Markdown document
 knitr::knit_engines$set(sketch = sketch::eng_sketch)
 

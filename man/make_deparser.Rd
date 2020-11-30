@@ -2,7 +2,19 @@
 % Please edit documentation in R/core-deparse.R
 \name{make_deparser}
 \alias{make_deparser}
-\title{A constructor for a "typed" deparser}
+\title{#' Concatenate two lists
+#'
+#' @param list0 A named list
+#' @param list1 A named list
+clist <- function(list0, list1) {
+  ns0 <- names(list0)
+  ns1 <- names(list1)
+  # Update the ones with the same name
+  list0[intersect(ns0, ns1)] <- list1[intersect(ns0, ns1)]
+  # Keep the old ones and Add the new ones
+  append(list0, list1[setdiff(ns1, ns0)])
+}
+A constructor for a "typed" deparser}
 \usage{
 make_deparser(predicate_fun, deparse_fun)
 }
@@ -15,6 +27,18 @@ make_deparser(predicate_fun, deparse_fun)
 A list; a deparser ready to be dispatched by "type".
 }
 \description{
+#' Concatenate two lists
+#'
+#' @param list0 A named list
+#' @param list1 A named list
+clist <- function(list0, list1) {
+  ns0 <- names(list0)
+  ns1 <- names(list1)
+  # Update the ones with the same name
+  list0[intersect(ns0, ns1)] <- list1[intersect(ns0, ns1)]
+  # Keep the old ones and Add the new ones
+  append(list0, list1[setdiff(ns1, ns0)])
+}
 A constructor for a "typed" deparser
 }
 \examples{

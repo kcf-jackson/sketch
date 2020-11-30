@@ -21,6 +21,10 @@ if FALSE, return the 'shiny.tag' object.}
 \item{...}{(Optional) Other attributes to pass to iframes. Also supports
 the `rules`, `deparsers` and `debug` options to pass to `source_r`.}
 }
+\value{
+An HTML string if \code{render} is TRUE, or a 'shiny.tag' object
+if \code{render} is FALSE.
+}
 \description{
 Insert a 'sketch' app into an R Markdown document
 }

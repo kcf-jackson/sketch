@@ -11,7 +11,10 @@
 # 2. each member is a typed-deparser
 
 
-#' Expression Deparsing for JavaScript
+#' Expression deparsing for JavaScript
+#'
+#' @description This is the "master" deparser that dispatches
+#' the "worker" deparsers based on the type of the input.
 #'
 #' @param ast language object.
 #' @param deparsers A list of "typed" deparsers.
@@ -135,6 +138,41 @@ default_deparsers <- function() {
     "symbol" = make_deparser(is_sym, deparse_sym)
   )
 }
+
+
+#' A list of deparsers to support implicit variable declaration and explicit 'return'
+#'
+#' \lifecycle{experimental}
+#'
+#' @note This is used as input to \link{compile_r} and \link{compile_exprs}.
+#'
+#' @examples
+#' default_2_deparsers()
+#'
+#' @export
+default_2_deparsers <- function() {
+  append(
+    list(
+      "assignment" = make_deparser(is_call_assignment, deparse_assignment),
+      "function" = make_deparser(is_call_function, deparse_function_with_return)
+    ),
+    default_deparsers()
+  )
+}
+
+
+#' #' Concatenate two lists
+#' #'
+#' #' @param list0 A named list
+#' #' @param list1 A named list
+#' clist <- function(list0, list1) {
+#'   ns0 <- names(list0)
+#'   ns1 <- names(list1)
+#'   # Update the ones with the same name
+#'   list0[intersect(ns0, ns1)] <- list1[intersect(ns0, ns1)]
+#'   # Keep the old ones and Add the new ones
+#'   append(list0, list1[setdiff(ns1, ns0)])
+#' }
 
 
 #' A constructor for a "typed" deparser

@@ -8,11 +8,13 @@
 # For completeness, we use the negation of `is_call` to include
 # also the pairlist case.
 # Reference: https://adv-r.hadley.nz/expressions.html#summary
+#' @name is_Family
 #' @rdname predicate_component
 #' @param ast A language object.
 is_sym <- function(ast) !is_call(ast)
 
 #' Deparsers (specialised)
+#' @name deparse_Family
 #' @rdname deparsers_component
 #' @param ast A language object.
 #' @param ... The contextual information to be passed on to
@@ -262,13 +264,91 @@ deparse_function <- function(ast, ...) {
   )
 }
 
+#' Deparser for the "function" keyword with explicit return
+#' @rdname deparsers_component
+deparse_function_with_return <- function(ast, ...) {
+  deparse_arg <- function(alist0, ...) {
+    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist2 <- purrr::map2_chr(
+      .x = names(alist1), .y = alist1,
+      function(x, y) {
+        glue::glue(if (y == "") "{x}" else "{x} = {y}")
+      }
+    )
+    paste(alist2, collapse = ", ")
+  }
+
+  last <- function(x) x[[length(x)]]
+
+  add_return <- function(ast) {
+    template_ast <- parse_expr("return(x)")
+    template_ast[[2]] <- ast  # insert tree at x
+    ast <- template_ast
+    return(ast)
+  }
+
+  is_return <- function(ast) is_call(ast, "return")
+  is_assignment <- function(ast) is_call(ast, c("=", "<-", "<<-"))
+
+  # TODO: Consider adding support to return of assignment.
+  # Note that it may not play well with the subset assignment implementation
+  # because that always returns the full object. While I think this is a
+  # sensible default, it differs from the R behaviour.
+  warning_of_assignment <- function(ast) {
+    if (is_assignment(ast)) {
+      fun_line <- deparse(ast)
+      warning(glue::glue("You have used an variable assignment as the final expression of the function: \n\t{fun_line}\nThis is currently not supported. Please end the function by putting the variable or a value `JS_NULL` on a standalone line."))
+    }
+  }
+
+  fun_body <- ast[[3]]
+  if (is_call(fun_body, "{")) {
+    last_expr <- last(fun_body)
+    # Add explicit return if it is not there
+    if (!is_return(last_expr)) {
+      # Warn user if the expression is an assignment
+      warning_of_assignment(last_expr)
+      ast[[3]][[length(fun_body)]] <- add_return(last(fun_body))
+    }
+  } else {
+    # function body is an atom
+    if (!is_return(fun_body)) {
+      warning_of_assignment(last_expr)
+      ast[[3]] <- add_return(fun_body)
+    }
+  }
+
+  paste0(
+    deparse_js(ast[[1]], ...), # function
+    "(", deparse_arg(ast[[2]], ...), ") ", # function-args
+    deparse_js(ast[[3]], ...) # function-body
+  )
+}
+
+
+# Deparser for assignments ----------------------------------
+#' Predicate for assignments
+#' @rdname predicate_component
+is_call_assignment <- function(ast) is_call(ast, "<-")
+
+#' Deparser for assignments
+#' @rdname deparsers_component
+deparse_assignment <- function(ast, ...) {
+  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  # 'var' is added only when LHS is a symbol
+  if (rlang::is_symbol(ast[[2]])) {
+    glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}")
+  } else {
+    glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
+  }
+}
+
 
 
 # Deparser for the "break" keyword --------------------------
 #' Predicate for the "break" keyword
 #' @rdname predicate_component
 is_call_break <- function(ast) is_call(ast, "break")
-
 
 
 # === Deparser for Error handling =============================

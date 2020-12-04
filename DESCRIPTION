@@ -1,7 +1,7 @@
 Package: sketch
 Type: Package
 Title: Interactive Sketches 
-Version: 1.0.4
+Version: 1.0.5
 Authors@R: c(
     person("Chun Fung","Kwok", role = c("aut", "cre"), email = "kwokcf@unimelb.edu.au"),
     person("Kate", "Saunders", role = "ctb")
@@ -22,7 +22,8 @@ Imports:
     htmltools,
     base64enc,
     jsonlite,
-    shiny
+    shiny,
+    lifecycle
 Suggests: 
     testthat,
     covr,
@@ -30,3 +31,4 @@ Suggests:
     rmarkdown,
 BugReports: https://github.com/kcf-jackson/sketch
 VignetteBuilder: knitr
+RdMacros: lifecycle

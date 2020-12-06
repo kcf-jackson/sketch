@@ -289,31 +289,35 @@ deparse_function_with_return <- function(ast, ...) {
 
   is_return <- function(ast) is_call(ast, "return")
   is_assignment <- function(ast) is_call(ast, c("=", "<-", "<<-"))
+  # Handle special forms, e.g. if, for, while, as JavaScript only
+  # allows returning values.
+  is_keyword <- function(ast) is_call(ast, c("if", "for", "while"))
+  is_valid_add <- function(ast) {
+    !is_return(ast) && !is_assignment(ast) && !is_keyword(ast)
+  }
 
   # TODO: Consider adding support to return of assignment.
   # Note that it may not play well with the subset assignment implementation
   # because that always returns the full object. While I think this is a
   # sensible default, it differs from the R behaviour.
-  warning_of_assignment <- function(ast) {
-    if (is_assignment(ast)) {
-      fun_line <- deparse(ast)
-      warning(glue::glue("You have used an variable assignment as the final expression of the function: \n\t{fun_line}\nThis is currently not supported. Please end the function by putting the variable or a value `JS_NULL` on a standalone line."))
-    }
-  }
+  # warning_of_assignment <- function(ast) {
+  #   fun_line <- deparse(ast)
+  #   if (is_assignment(ast)) {
+  #     warning(glue::glue("You have used an variable assignment as the final expression of the function: \n\t{fun_line}\nThis is currently not supported. Please end the function by putting the variable or a value `JS_NULL` on a standalone line."))
+  #   }
+  # }
 
   fun_body <- ast[[3]]
+  message("Note: automatic explicit return only applies to standalone values, not statements.")
   if (is_call(fun_body, "{")) {
     last_expr <- last(fun_body)
     # Add explicit return if it is not there
-    if (!is_return(last_expr)) {
-      # Warn user if the expression is an assignment
-      warning_of_assignment(last_expr)
+    if (is_valid_add(last_expr)) {
       ast[[3]][[length(fun_body)]] <- add_return(last(fun_body))
     }
   } else {
     # function body is an atom
-    if (!is_return(fun_body)) {
-      warning_of_assignment(last_expr)
+    if (is_valid_add(fun_body)) {
       ast[[3]] <- add_return(fun_body)
     }
   }
@@ -326,10 +330,24 @@ deparse_function_with_return <- function(ast, ...) {
 }
 
 
+# Deparser for return ----------------------------------
+#' Predicate for return
+#' @rdname predicate_component
+is_call_return <- function(ast) is_call(ast, "return")
+
+#' Deparser for return
+#' @rdname deparsers_component
+deparse_return <- function(ast, ...) {
+  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  glue::glue("return {sym_ls[[2]]}")
+}
+
+
+
 # Deparser for assignments ----------------------------------
 #' Predicate for assignments
 #' @rdname predicate_component
-is_call_assignment <- function(ast) is_call(ast, "<-")
+is_call_assignment <- function(ast) is_call(ast, c("<-", "="))
 
 #' Deparser for assignments
 #' @rdname deparsers_component

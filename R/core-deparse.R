@@ -154,7 +154,8 @@ default_2_deparsers <- function() {
   append(
     list(
       "assignment" = make_deparser(is_call_assignment, deparse_assignment),
-      "function" = make_deparser(is_call_function, deparse_function_with_return)
+      "function" = make_deparser(is_call_function, deparse_function_with_return),
+      "return" = make_deparser(is_call_return, deparse_return)
     ),
     default_deparsers()
   )

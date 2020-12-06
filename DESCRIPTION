@@ -23,7 +23,6 @@ Imports:
     base64enc,
     jsonlite,
     shiny,
-    lifecycle
 Suggests: 
     testthat,
     covr,
@@ -31,4 +30,3 @@ Suggests:
     rmarkdown,
 BugReports: https://github.com/kcf-jackson/sketch
 VignetteBuilder: knitr
-RdMacros: lifecycle

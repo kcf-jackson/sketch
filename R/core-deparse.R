@@ -142,8 +142,7 @@ default_deparsers <- function() {
 
 #' A list of deparsers to support implicit variable declaration and explicit 'return'
 #'
-#' \lifecycle{experimental}
-#'
+#' @note lifecycle: experimental
 #' @note This is used as input to \link{compile_r} and \link{compile_exprs}.
 #'
 #' @examples
@@ -160,20 +159,6 @@ default_2_deparsers <- function() {
     default_deparsers()
   )
 }
-
-
-#' #' Concatenate two lists
-#' #'
-#' #' @param list0 A named list
-#' #' @param list1 A named list
-#' clist <- function(list0, list1) {
-#'   ns0 <- names(list0)
-#'   ns1 <- names(list1)
-#'   # Update the ones with the same name
-#'   list0[intersect(ns0, ns1)] <- list1[intersect(ns0, ns1)]
-#'   # Keep the old ones and Add the new ones
-#'   append(list0, list1[setdiff(ns1, ns0)])
-#' }
 
 
 #' A constructor for a "typed" deparser

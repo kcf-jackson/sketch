@@ -9,6 +9,7 @@
 \alias{is_call_if}
 \alias{is_call_while}
 \alias{is_call_function}
+\alias{is_call_return}
 \alias{is_call_assignment}
 \alias{is_call_break}
 \alias{is_call_try}
@@ -48,6 +49,8 @@ is_call_if(ast)
 is_call_while(ast)
 
 is_call_function(ast)
+
+is_call_return(ast)
 
 is_call_assignment(ast)
 
@@ -114,6 +117,8 @@ Predicate for the 'if' keyword
 Predicate for the 'while' keyword
 
 Predicate for the "function" keyword
+
+Predicate for return
 
 Predicate for assignments
 

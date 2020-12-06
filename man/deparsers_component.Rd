@@ -11,6 +11,7 @@
 \alias{deparse_while}
 \alias{deparse_function}
 \alias{deparse_function_with_return}
+\alias{deparse_return}
 \alias{deparse_assignment}
 \alias{deparse_try}
 \alias{deparse_tryCatch}
@@ -53,6 +54,8 @@ deparse_while(ast, ...)
 deparse_function(ast, ...)
 
 deparse_function_with_return(ast, ...)
+
+deparse_return(ast, ...)
 
 deparse_assignment(ast, ...)
 
@@ -127,6 +130,8 @@ Deparser for the 'while' keyword
 Deparser for the "function" keyword
 
 Deparser for the "function" keyword with explicit return
+
+Deparser for return
 
 Deparser for assignments
 

@@ -257,10 +257,15 @@ deparse_function <- function(ast, ...) {
     paste(alist2, collapse = ", ")
   }
 
+  fun_body_str <- deparse_js(ast[[3]], ...)
+  if (!is_call(ast[[3]], "{")) {
+    fun_body_str <- paste0("{ ", fun_body_str, " }")
+  }
+
   paste0(
     deparse_js(ast[[1]], ...), # function
     "(", deparse_arg(ast[[2]], ...), ") ", # function-args
-    deparse_js(ast[[3]], ...) # function-body
+    fun_body_str # function-body
   )
 }
 
@@ -308,7 +313,7 @@ deparse_function_with_return <- function(ast, ...) {
   # }
 
   fun_body <- ast[[3]]
-  message("Note: automatic explicit return only applies to standalone values, not statements.")
+  message("Note: automatic explicit return only applies to standalone values, but not statements.")
   if (is_call(fun_body, "{")) {
     last_expr <- last(fun_body)
     # Add explicit return if it is not there
@@ -322,10 +327,15 @@ deparse_function_with_return <- function(ast, ...) {
     }
   }
 
+  fun_body_str <- deparse_js(ast[[3]], ...)
+  if (!is_call(ast[[3]], "{")) {
+    fun_body_str <- paste0("{ ", fun_body_str, " }")
+  }
+
   paste0(
     deparse_js(ast[[1]], ...), # function
     "(", deparse_arg(ast[[2]], ...), ") ", # function-args
-    deparse_js(ast[[3]], ...) # function-body
+    fun_body_str # function-body
   )
 }
 
@@ -347,18 +357,17 @@ deparse_return <- function(ast, ...) {
 # Deparser for assignments ----------------------------------
 #' Predicate for assignments
 #' @rdname predicate_component
-is_call_assignment <- function(ast) is_call(ast, c("<-", "="))
+is_call_assignment <- function(ast) is_call(ast, c("<-", "=", "<<-"))
 
 #' Deparser for assignments
 #' @rdname deparsers_component
 deparse_assignment <- function(ast, ...) {
   sym_ls <- purrr::map_chr(ast, deparse_js, ...)
   # 'var' is added only when LHS is a symbol
-  if (rlang::is_symbol(ast[[2]])) {
-    glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}")
-  } else {
-    glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
+  if (rlang::is_symbol(ast[[2]]) && !is_call(ast, "<<-")) {
+    return(glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}"))
   }
+  glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
 }
 
 

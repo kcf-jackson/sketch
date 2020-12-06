@@ -281,3 +281,29 @@ default_rules <- function() {
         make_rule("runif", "R.runif")
     )
 }
+
+
+#' @rdname r-to-js-rules
+#'
+#' @examples
+#' basic_rules()
+#'
+#' @note lifecycle: experimental
+#'
+#' @export
+basic_2_rules <- function() {
+    basic_rules()[-c(1,2)]
+}
+
+
+#' @rdname r-to-js-rules
+#'
+#' @examples
+#' default_2_rules()
+#'
+#' @note lifecycle: experimental
+#'
+#' @export
+default_2_rules <- function() {
+    default_rules()[-c(1,2)]
+}

@@ -8,12 +8,15 @@ testthat::test_that("`src` returns correct type: character.", {
     testthat::expect_true(is.character(src("mathjs")))
     testthat::expect_true(is.character(src("vegalite")))
     testthat::expect_true(is.character(src("tensorflow")))
+    testthat::expect_true(is.character(src("websocket")))
     testthat::expect_true(is.character(src("dom")))
+    testthat::expect_true(is.character(src("testthat")))
     testthat::expect_error(src("d4"))
 })
 
-testthat::test_that("let / declare", {
+testthat::test_that("let / declare / var / const", {
     testthat::expect_null(let(x))
+    testthat::expect_null(const(x))
     testthat::expect_null(declare(x))
     testthat::expect_null(let(x, y))
     testthat::expect_null(declare(x, y))

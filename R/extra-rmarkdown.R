@@ -10,6 +10,9 @@
 #' @param ... (Optional) Other attributes to pass to iframes. Also supports
 #' the `rules`, `deparsers` and `debug` options to pass to `source_r`.
 #'
+#' @return An HTML string if \code{render} is TRUE, or a 'shiny.tag' object
+#' if \code{render} is FALSE.
+#'
 #' @examples
 #' # In an R code chunk of an R Markdown document
 #' file <- system.file("test_files/test_RMD.R", package = "sketch")
@@ -54,18 +57,18 @@ insert_sketch <- function(file, id, output_dir = NULL, render = TRUE, ...) {
 #' @param options A list of chunk options.
 #'
 #' @examples
-#' # This line makes `sketch::eng_sketch` available to `knitr::knit_engines`.
+#' # The following line makes `sketch::eng_sketch` available to `knitr::knit_engines`.
 #' # It is usually used in the 'setup' code chunk of an R Markdown document
 #' knitr::knit_engines$set(sketch = sketch::eng_sketch)
 #'
 #' @export
 eng_sketch <- function(options) {
     out <- if (options$eval && knitr::is_html_output(excludes = 'markdown')) {
-        src_file <- tempfile()
+        src_file <- tempfile()   # nocov start
         write(options$code, file = src_file)
 
         opt_args <- capture_args(options, c("rules", "deparsers", "debug", "asset_tags", "style"))
-        do_call(insert_sketch, file = src_file, extended_args = opt_args$keep)
+        do_call(insert_sketch, file = src_file, extended_args = opt_args$keep)   # nocov end
     }
     options$results <- 'asis'
     knitr::engine_output(options, options$code, out)

@@ -18,6 +18,7 @@ Creates interactive illustrations embeddable in R Markdown documents. The packag
 ### Installation
 
 ```{r, eval = FALSE}
+# Stable version on CRAN
 install.packages("sketch")
 
 # For the development version
@@ -26,4 +27,4 @@ remotes::install_github("kcf-jackson/sketch")
 ```
 
 
-Visit the [website](https://kcf-jackson.github.io/sketch-doc) for [getting-started guide](https://kcf-jackson.github.io/sketch-doc/getting_started/), [examples](https://kcf-jackson.github.io/sketch-doc/docs/) and [documentation](https://kcf-jackson.github.io/sketch-doc/tutorials/)!
+Visit the [website](https://kcf-jackson.github.io/sketch-doc) for [getting-started guide](https://kcf-jackson.github.io/sketch-doc/getting_started/), [tutorials](https://kcf-jackson.github.io/sketch-doc/tutorials/) and other documentation!

@@ -31,6 +31,17 @@ src <- function(x) {
 }
 
 
+#' License information
+#'
+#' @param x A character string; name of the library / assets.
+#' @return A named list containing the license information and
+#' the link from which the information is extracted.
+#'
+#' @examples
+#' license_info("mathjs")
+#' license_info("p5")
+#'
+#' @export
 license_info <- function(x) {
     switch(x,
            "mathjs" = list(license = "Apache-2.0", url = "https://github.com/josdejong/mathjs/blob/develop/LICENSE"),

@@ -202,7 +202,7 @@ default_rules <- function() {
         make_rule("lgamma",   "R.lgamma"),
         make_rule("digamma",  "R.digamma"),
         make_rule("trigamma", "R.trigamma"),
-        # Todo: beta, lbeta, psigamma
+        # TODO: beta, lbeta, psigamma
         make_rule("choose", "R.choose"),
         make_rule("lchoose", "R.lchoose"),
         make_rule("factorial", "R.factorial"),

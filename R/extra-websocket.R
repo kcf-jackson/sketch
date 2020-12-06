@@ -11,10 +11,6 @@ websocket <- R6::R6Class("websocket", public = list(
     #' @field server A server handle to be used by 'stopServer'.
     server = NULL,
 
-    #' @field namespace A 'sandbox' environment to handle instructions sent
-    #' by the browser session.
-    namespace = new.env(),
-
     #' @field log A character vector that keep tracks of all the commands
     #' sent to the browser session.
     log = c(),
@@ -190,7 +186,7 @@ websocket <- R6::R6Class("websocket", public = list(
                 self$connected <- TRUE
                 ws$send("console.log(\"Connection established.\")")
                 ws$onMessage(function(binary, input) {
-                    eval(in_handler(input), envir = self$namespace)
+                    in_handler(input)
                 })
             }
         )

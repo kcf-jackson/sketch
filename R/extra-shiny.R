@@ -7,6 +7,6 @@
 #'
 #' @export
 runShinyApp <- function() {
-    dir <- system.file("sketch_editor", package = "sketch")
-    shiny::runApp(dir)
+    dir <- system.file("sketch_editor", package = "sketch")  # nocov
+    shiny::runApp(dir)  # nocov
 }

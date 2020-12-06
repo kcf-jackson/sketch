@@ -11,6 +11,8 @@ testthat::test_that("`src` returns correct type: character.", {
     testthat::expect_true(is.character(src("websocket")))
     testthat::expect_true(is.character(src("dom")))
     testthat::expect_true(is.character(src("testthat")))
+    testthat::expect_true(is.character(src("fontawesome")))
+    testthat::expect_true(is.character(src("ionicons")))
     testthat::expect_error(src("d4"))
 })
 
@@ -34,4 +36,16 @@ testthat::test_that("do_call", {
         do_call(f, x = 1, y = 2,
                 extended_args = capture_args(args, "z")$keep)
     )
+})
+
+testthat::test_that("Test `license_info`", {
+    testthat::expect_true(is.list(license_info("p5")))
+    testthat::expect_true(is.list(license_info("d3")))
+    testthat::expect_true(is.list(license_info("chart")))
+    testthat::expect_true(is.list(license_info("plotly")))
+    testthat::expect_true(is.list(license_info("mathjs")))
+    testthat::expect_true(is.list(license_info("vegalite")))
+    testthat::expect_true(is.list(license_info("tensorflow")))
+    testthat::expect_true(is.list(license_info("fontawesome")))
+    testthat::expect_true(is.list(license_info("ionicons")))
 })

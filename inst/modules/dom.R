@@ -3,6 +3,7 @@
 #' Construct a new DOM element
 #' @param tag0 A character string; name of the element.
 #' @param attr0 A named list; attributes of the element.
+#' @param ... (Optional) DOM elements to be added to the new DOM element.
 #' @return A DOM element.
 #' @export
 dom <- function(tag0, attr0 = list()) {
@@ -10,6 +11,13 @@ dom <- function(tag0, attr0 = list()) {
     domObj <- document$createElement(tag0)
     for (key in Object$keys(attr0)) {
         domObj[key] <- attr0[key]
+    }
+
+    let (args = Array(...arguments), args_len = args$length)
+    if (args_len >= 3) {
+        for (el in args$slice(2)) {
+            domObj$appendChild(el)
+        }
     }
     return(domObj)
 }

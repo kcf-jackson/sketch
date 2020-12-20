@@ -4,6 +4,12 @@ dom = function(tag0, attr0 = {  }) {
     for (let key of Object.keys(attr0)) {
         domObj[key] = attr0[key]
     }
+    let args = Array(...arguments), args_len = args.length
+    if (args_len >= 3) {
+        for (let el of args.slice(2)) {
+            domObj.appendChild(el)
+        }
+    }
     return(domObj)
 }
 select_dom = function(x) {

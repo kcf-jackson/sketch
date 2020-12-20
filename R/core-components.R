@@ -297,7 +297,25 @@ deparse_function_with_return <- function(ast, ...) {
   # Handle special forms, e.g. if, for, while, as JavaScript only
   # allows returning values.
   is_keyword <- function(ast) is_call(ast, c("if", "for", "while"))
-  is_valid_add <- function(ast) {
+  is_valid_add <- function(ast, ...) {
+    # Provide more informative message
+    ast_string <- deparse_js(ast, ...)
+    if (is_assignment(ast)) {
+      warning("You have used an assignment statement as the final expression in:", immediate. = TRUE)
+      message(line_separator("-"))
+      message(ast_string)
+      message(line_separator("-"))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
+    if (is_keyword(ast)) {
+      warning("You have used a control-flow statement as the final expression in:", immediate. = TRUE)
+      message(line_separator("-"))
+      message(ast_string)
+      message(line_separator("-"))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
+
+    # The actual check
     !is_return(ast) && !is_assignment(ast) && !is_keyword(ast)
   }
 
@@ -313,25 +331,26 @@ deparse_function_with_return <- function(ast, ...) {
   # }
 
   fun_body <- ast[[3]]
-  message("Note: automatic explicit return only applies to standalone values, but not statements.")
   if (is_call(fun_body, "{")) {
     last_expr <- last(fun_body)
-    # Add explicit return if it is not there
-    if (is_valid_add(last_expr)) {
+    # Add explicit return if it is not there and the expression
+    # is non-empty
+    if (is_valid_add(last_expr, ...) && length(fun_body) > 1) {
       ast[[3]][[length(fun_body)]] <- add_return(last(fun_body))
     }
   } else {
     # function body is an atom
-    if (is_valid_add(fun_body)) {
+    if (is_valid_add(fun_body, ...)) {
       ast[[3]] <- add_return(fun_body)
     }
   }
 
+  # Return the resulting string
   fun_body_str <- deparse_js(ast[[3]], ...)
+  # Wrap with { . } if function uses shorthand notation
   if (!is_call(ast[[3]], "{")) {
     fun_body_str <- paste0("{ ", fun_body_str, " }")
   }
-
   paste0(
     deparse_js(ast[[1]], ...), # function
     "(", deparse_arg(ast[[2]], ...), ") ", # function-args

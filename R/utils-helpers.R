@@ -103,3 +103,9 @@ script  <- htmltools::tags$script
 link    <- htmltools::tags$link
 style   <- htmltools::tags$style
 dataURI <- base64enc::dataURI
+
+
+
+line_separator <- function(x = "-") {
+    paste0(rep(x, getOption("width")), collapse = "")
+}

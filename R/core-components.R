@@ -692,6 +692,21 @@ deparse_new <- function(ast, ...) {
 }
 
 
+# Deparser for "typeof" ------------------------------------------------------
+#' Predicate for the "typeof" operator
+#' @rdname predicate_component
+is_call_typeof <- function(ast) {
+  is_call(ast, "typeof")
+}
+
+#' Deparser for the "typeof" operator
+#' @rdname deparsers_component
+deparse_typeof <- function(ast, ...) {
+  args <- deparse_js(ast[[2]], ...)
+  glue::glue("typeof {args}")
+}
+
+
 # Deparser for "let" and "const" -----------------------------------------------
 #' Predicate for the "let" operator
 #' @rdname predicate_component

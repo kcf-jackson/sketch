@@ -21,6 +21,7 @@
 \alias{is_call_df_mutate}
 \alias{is_call_R6Class}
 \alias{is_call_new}
+\alias{is_call_typeof}
 \alias{is_call_let}
 \alias{is_call_const}
 \alias{is_call_dataURI}
@@ -73,6 +74,8 @@ is_call_df_mutate(ast)
 is_call_R6Class(ast)
 
 is_call_new(ast)
+
+is_call_typeof(ast)
 
 is_call_let(ast)
 
@@ -141,6 +144,8 @@ Predicate for the "mutate" operators
 Predicate for the "R6Class" function
 
 Predicate for the "new" operator
+
+Predicate for the "typeof" operator
 
 Predicate for the "let" operator
 

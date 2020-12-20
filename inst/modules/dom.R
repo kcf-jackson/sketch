@@ -40,14 +40,19 @@ select_doms <- function(x) {
 
 #' Attach a DOM element to another DOM element by selector
 #' @param el A DOM element
-#' @param x A character string; a CSS selector string.
+#' @param x A character string (a CSS selector string) or a DOM element.
 #' @return A DOM element; the parent element.
 #' @export
 print_dom <- function(el, x = "body") {
-    declare (res)
-    res <- document$querySelector(x)
-    res$appendChild(el)
-    return(res)
+    if (typeof(x) == 'string') {
+        declare (res)
+        res <- document$querySelector(x)
+        res$appendChild(el)
+        return(res)
+    } else {
+        x$appendChild(el)
+        return(x)
+    }
 }
 
 #' Attach DOM elements to a DOM element

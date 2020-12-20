@@ -19,10 +19,15 @@ select_doms = function(x) {
     return(document.querySelectorAll(x))
 }
 print_dom = function(el, x = "body") {
-    let res
-    res = document.querySelector(x)
-    res.appendChild(el)
-    return(res)
+    if (typeof x == "string") {
+        let res
+        res = document.querySelector(x)
+        res.appendChild(el)
+        return(res)
+    } else {
+        x.appendChild(el)
+        return(x)
+    }
 }
 append_doms = function(parent) {
     let args = Array(...arguments), args_len = args.length

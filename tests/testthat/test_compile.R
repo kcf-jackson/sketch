@@ -219,28 +219,42 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
 })
 
 testthat::test_that("Test transpilation with default 2 deparsers", {
+    # Basic 2 setup
     basic_2 <- purrr::partial(compile_exprs, rules = basic_2_rules(), deparsers = default_2_deparsers())
     unit_test <- purrr::partial(test_equal, f = basic_2)
 
     unit_test("function(x) {x}", "function(x) {\n    return x\n}")
-    unit_test("function(x) {if(x) {x} else {x + 1}}",
-              "function(x) {\n    if (x) {\n        x\n    } else {\n        x + 1\n    }\n}")
+    testthat::expect_warning(
+        unit_test("function(x) {if(x) {x} else {x + 1}}",
+                  "function(x) {\n    if (x) {\n        x\n    } else {\n        x + 1\n    }\n}")
+    )
     unit_test("x <- 3", "var x = 3")
     unit_test("x <<- 3", "x = 3")
     unit_test("x$a <- 1", "x.a = 1")
     unit_test("x[1] <- 1", "x[1] = 1")
+    testthat::expect_warning(basic_2("function(x) { x <- 10 }"))
+    testthat::expect_warning(basic_2("function(x) {if(x) {x} else {x + 1}}"))
+    testthat::expect_warning(basic_2("function(x) { for (i in 1:10) { print(i) } }"))
 
+    # Default 2 setup
     default_2 <- purrr::partial(compile_exprs, rules = default_2_rules(), deparsers = default_2_deparsers())
     unit_test <- purrr::partial(test_equal, f = default_2)
 
+    unit_test("function(x) {}", "function(x) {\n    \n}")
     unit_test("function(x) {x}", "function(x) {\n    return x\n}")
     unit_test("function(x) x", "function(x) { return x }")
-    unit_test("function(x) {if(x) {x} else {x + 1}}",
-              "function(x) {\n    if (x) {\n        x\n    } else {\n        R.add(x, 1)\n    }\n}")
+    testthat::expect_warning(
+        unit_test("function(x) {if(x) {x} else {x + 1}}",
+                  "function(x) {\n    if (x) {\n        x\n    } else {\n        R.add(x, 1)\n    }\n}")
+    )
     unit_test("x <- 3", "var x = 3")
     unit_test("x <<- 3", "x = 3")
     unit_test("x$a <- 1", "x.a = 1")
     unit_test("x[1] <- 1", "R.extract(x, 1) = 1")
+
+    testthat::expect_warning(default_2("function(x) { x <- 10 }"))
+    testthat::expect_warning(default_2("function(x) {if(x) {x} else {x + 1}}"))
+    testthat::expect_warning(default_2("function(x) { for (i in 1:10) { print(i) } }"))
 })
 
 

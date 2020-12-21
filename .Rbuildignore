@@ -6,5 +6,6 @@
 ^.*\.yml$
 ^sketch.code-workspace$
 ^doc$
+^docs$
 ^Meta$
 ^examples$

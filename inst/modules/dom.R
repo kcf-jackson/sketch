@@ -75,6 +75,7 @@ append_doms <- function(parent) {
 #' Construct a new SVG element
 #' @param tag0 A character string; name of the element.
 #' @param attr0 A named list; attributes of the element.
+#' @param ... (Optional) SVG elements to be added to the new SVG element.
 #' @return A SVG element.
 #' @export
 svg <- function(tag0, attr0) {
@@ -82,6 +83,13 @@ svg <- function(tag0, attr0) {
     svgObj <- document$createElementNS('http://www.w3.org/2000/svg', tag0)
     for (key in Object$keys(attr0)) {
         svgObj$setAttribute(key, attr0[key])
+    }
+
+    let (args = Array(...arguments), args_len = args$length)
+    if (args_len >= 3) {
+        for (el in args$slice(2)) {
+            svgObj$appendChild(el)
+        }
     }
     return(svgObj)
 }

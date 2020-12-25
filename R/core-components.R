@@ -597,7 +597,7 @@ deparse_R6Class <- function(ast, ...) {
         let self = this
         <public_list>
         // private variables and methods
-        let that = this, private = {}
+        let private = {}
         <private_list>
         if (self.initialize) {
             self.initialize(<const_arg>)
@@ -661,7 +661,6 @@ deparse_private_list <- function(ast, ...) {
 
   # Reference: http://crockford.com/javascript/private.html
   rhs <- args %>%
-    purrr::map(rewrite, rules = list(make_rule("this", "that"))) %>%
     purrr::map_chr(deparse_js, ...)
 
   purrr::map2_chr(

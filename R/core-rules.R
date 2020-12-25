@@ -19,6 +19,7 @@ basic_rules <- function() {
         make_rule("^", "**"),
         make_rule("%%", "%"),
         make_rule("$", "."),
+        make_rule("@", "."),
         make_rule("::", "."),
         make_rule("%instanceof%", "instanceof"),
         make_rule("%+%", "+"),
@@ -29,7 +30,6 @@ basic_rules <- function() {
         make_rule("TRUE", "true"),
         make_rule("FALSE", "false"),
         make_rule("declare", "let"),
-        make_rule("self", "this"),
         make_rule("stop", "throw"),
         make_rule("JS_NULL", "null"),
         make_rule("JS_UNDEFINED", "undefined"),
@@ -52,6 +52,7 @@ default_rules <- function() {
         make_rule("<<-", "="),
         make_rule("::", "."),
         make_rule("$",  "."),
+        make_rule("@", "."),
         make_rule("+",  "R.add"),
         make_rule("-",  "R.subtract"),
         make_rule("*",  "R.multiply"),
@@ -87,7 +88,6 @@ default_rules <- function() {
         make_rule("FALSE", "false"),
         make_rule("F", "false"),
         make_rule("declare", "let"),
-        make_rule("self", "this"),
         make_rule("stop", "throw"),
 
         # Basic R functions

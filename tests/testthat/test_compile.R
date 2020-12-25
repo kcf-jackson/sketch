@@ -35,7 +35,7 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("123 %% 5 == 4", "123 % 5 == 4")
 
     # Test subsetting / extraction
-    unit_test("self$abc(123)", "this.abc(123)")
+    unit_test("self$abc(123)", "self.abc(123)")
     unit_test("obj_1$method_1(x)", "obj_1.method_1(x)")
     unit_test("obj_1$attr_1$x", "obj_1.attr_1.x")
     unit_test("obj_1$attr_1$f(1 + 2)", "obj_1.attr_1.f(1 + 2)")
@@ -89,7 +89,7 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("123 %% 5 == 4", "R.EQ(R.mod(123, 5), 4)")
 
     # Test extraction /  subsetting
-    unit_test("self$abc(123)", "this.abc(123)")
+    unit_test("self$abc(123)", "self.abc(123)")
     unit_test("obj_1$method_1(x)", "obj_1.method_1(x)")
     unit_test("obj_1$attr_1$x", "obj_1.attr_1.x")
     unit_test("obj_1$attr_1$f(1 + 2)", "obj_1.attr_1.f(R.add(1, 2))")
@@ -209,7 +209,7 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     # Test R6Class
     unit_test(
         "R6Class(\"Class_1\")",
-        "function() {\n    // public variables and methods\n    \n    // private variables and methods\n    let that = this, private = {}\n    \n    if (this.initialize) {\n        this.initialize()\n    }\n}"
+        "function() {\n    // public variables and methods\n    let self = this\n    \n    // private variables and methods\n    let that = this, private = {}\n    \n    if (self.initialize) {\n        self.initialize()\n    }\n}"
     )
     testthat::expect_error(default("R6Class(\"myClass\", x = \"NO LIST\")"))
     testthat::expect_error(default("R6Class(\"myClass\", list(\"NO NAME\"))"))
@@ -286,7 +286,7 @@ testthat::test_that("Test transpilation with basic rules and deparsers (files)",
     unit_test("123 %% 5 == 4", "123 % 5 == 4")
 
     # Test subsetting / extraction
-    unit_test("self$abc(123)", "this.abc(123)")
+    unit_test("self$abc(123)", "self.abc(123)")
     unit_test("obj_1$method_1(x)", "obj_1.method_1(x)")
     unit_test("obj_1$attr_1$x", "obj_1.attr_1.x")
     unit_test("obj_1$attr_1$f(1 + 2)", "obj_1.attr_1.f(1 + 2)")
@@ -350,7 +350,6 @@ testthat::test_that("Test R6Class", {
     file <- system.file("test_files/test_R6.R", package = "sketch")
     file_ref <- system.file("test_files/test_R6.js", package = "sketch")
     temp <- compile_r(file, tempfile())
-
     testthat::expect_equal(read_file(temp), read_file(file_ref))
 
     file <- system.file("test_files/test_R6_2.R", package = "sketch")

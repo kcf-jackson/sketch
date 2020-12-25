@@ -1,11 +1,12 @@
 Person2 = function(name, age) {
     // public variables and methods
-    this.x = 10
-    this.initialize = function(name, age) {
+    let self = this
+    self.x = 10
+    self.initialize = function(name, age) {
         private.name = name
         private.age = age
     }
-    this.get_age = function() {
+    self.get_age = function() {
         R.print(private.age)
         R.print(private.get_age_plus_x())
     }
@@ -14,10 +15,10 @@ Person2 = function(name, age) {
     private.age = null
     private.name = null
     private.get_age_plus_x = function() {
-        return(R.add(private.age, that.x))
+        return(R.add(private.age, self.x))
     }
-    if (this.initialize) {
-        this.initialize(name, age)
+    if (self.initialize) {
+        self.initialize(name, age)
     }
 }
 elena = new Person2("Elena", 4)

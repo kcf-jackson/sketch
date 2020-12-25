@@ -5,7 +5,7 @@ testthat::test_that("Test component functions", {
     expr <- parse_expr('list(x = 1, y = 2, z = function(x) {x})')
     expect_equal(
         deparse_public_list(expr, default_deparsers()),
-        "this.x = 1\n    this.y = 2\n    this.z = function(x) {\n        x\n    }"
+        "self.x = 1\n    self.y = 2\n    self.z = function(x) {\n        x\n    }"
     )
 
     # deparse_private_list

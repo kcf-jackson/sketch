@@ -594,12 +594,13 @@ deparse_R6Class <- function(ast, ...) {
 
   return(glue::glue("function(<const_arg>) {
         // public variables and methods
+        let self = this
         <public_list>
         // private variables and methods
         let that = this, private = {}
         <private_list>
-        if (this.initialize) {
-            this.initialize(<const_arg>)
+        if (self.initialize) {
+            self.initialize(<const_arg>)
         }
     }", .open = "<", .close = ">"))
 }
@@ -641,7 +642,7 @@ deparse_public_list <- function(ast, ...) {
   rhs <- purrr::map_chr(args, deparse_js, ...)
   purrr::map2_chr(
     public_vars, rhs, function(x, y) {
-      glue::glue("this.<x> = <y>", .open = "<", .close = ">")
+      glue::glue("self.<x> = <y>", .open = "<", .close = ">")
     }) %>%
     paste(collapse = "\n") %>%
     gsub(pattern = "\n", replacement = "\n    ")  # increase indent

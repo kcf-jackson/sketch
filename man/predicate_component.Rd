@@ -9,6 +9,7 @@
 \alias{is_call_if}
 \alias{is_call_while}
 \alias{is_call_function}
+\alias{is_call_return}
 \alias{is_call_assignment}
 \alias{is_call_break}
 \alias{is_call_try}
@@ -20,6 +21,7 @@
 \alias{is_call_df_mutate}
 \alias{is_call_R6Class}
 \alias{is_call_new}
+\alias{is_call_typeof}
 \alias{is_call_let}
 \alias{is_call_const}
 \alias{is_call_dataURI}
@@ -49,6 +51,8 @@ is_call_while(ast)
 
 is_call_function(ast)
 
+is_call_return(ast)
+
 is_call_assignment(ast)
 
 is_call_break(ast)
@@ -70,6 +74,8 @@ is_call_df_mutate(ast)
 is_call_R6Class(ast)
 
 is_call_new(ast)
+
+is_call_typeof(ast)
 
 is_call_let(ast)
 
@@ -115,6 +121,8 @@ Predicate for the 'while' keyword
 
 Predicate for the "function" keyword
 
+Predicate for return
+
 Predicate for assignments
 
 Predicate for the "break" keyword
@@ -136,6 +144,8 @@ Predicate for the "mutate" operators
 Predicate for the "R6Class" function
 
 Predicate for the "new" operator
+
+Predicate for the "typeof" operator
 
 Predicate for the "let" operator
 

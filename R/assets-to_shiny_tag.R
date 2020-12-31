@@ -21,7 +21,7 @@ make_processor <- function(pred, fun) {
     list(predicate = pred, process = fun)
 }
 
-#' List of handlers for processing the '#!' header
+#' A list of handlers for processing the '#!' header
 #' @note This is used as input to \link{assets}.
 #' @examples
 #' default_processors()
@@ -72,7 +72,8 @@ load_error_proc <- function(x) {
 
 
 #' Header functions
-#' @rdname empty-headers
+#' @name load_Family
+#' @rdname header-functions
 #' @param package A character string; name of a JavaScript library.
 #' @param src A character string; the full web/local path to a JavaScript library.
 #' @param x A character string; the full path to the file containing the data.
@@ -81,11 +82,11 @@ load_error_proc <- function(x) {
 # load_library :: char -> ... -> shiny.tag
 load_library <- function(package, ...) load_script(src(package), ...)
 
-#' @rdname empty-headers
+#' @rdname header-functions
 # load_script :: char -> ... -> shiny.tag
 load_script <- function(src, ...) to_shiny_tag(src = src, ...)
 
-#' @rdname empty-headers
+#' @rdname header-functions
 load_data <- function(x, cache = tempfile(), ...) {
     index_js <- compile_data(x, cache, ...)
     script(src = dataURI(file = index_js, mime = "text/javascript"))

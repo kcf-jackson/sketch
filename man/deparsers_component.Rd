@@ -11,6 +11,7 @@
 \alias{deparse_while}
 \alias{deparse_function}
 \alias{deparse_function_with_return}
+\alias{deparse_return}
 \alias{deparse_assignment}
 \alias{deparse_try}
 \alias{deparse_tryCatch}
@@ -21,6 +22,7 @@
 \alias{deparse_df_mutate}
 \alias{deparse_R6Class}
 \alias{deparse_new}
+\alias{deparse_typeof}
 \alias{deparse_let}
 \alias{deparse_const}
 \alias{deparse_dataURI}
@@ -54,6 +56,8 @@ deparse_function(ast, ...)
 
 deparse_function_with_return(ast, ...)
 
+deparse_return(ast, ...)
+
 deparse_assignment(ast, ...)
 
 deparse_try(ast, ...)
@@ -73,6 +77,8 @@ deparse_df_mutate(ast, ...)
 deparse_R6Class(ast, ...)
 
 deparse_new(ast, ...)
+
+deparse_typeof(ast, ...)
 
 deparse_let(ast, ...)
 
@@ -128,6 +134,8 @@ Deparser for the "function" keyword
 
 Deparser for the "function" keyword with explicit return
 
+Deparser for return
+
 Deparser for assignments
 
 Deparser for the "try" keyword
@@ -147,6 +155,8 @@ Deparser for the "mutate" operators
 Deparser for the "R6Class" function
 
 Deparser for the "new" operator
+
+Deparser for the "typeof" operator
 
 Deparser for the "let" operator
 

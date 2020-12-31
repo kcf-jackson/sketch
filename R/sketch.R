@@ -9,6 +9,6 @@
 #' @docType package
 #'
 #' @importFrom magrittr %>%
-#' @importFrom utils tail read.csv
+#' @importFrom utils head tail read.csv
 #' @importFrom stats setNames
 NULL

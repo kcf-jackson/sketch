@@ -1,0 +1,20 @@
+# Use the official R image
+# https://hub.docker.com/_/r-base
+FROM r-base
+
+# Create and change to the app directory.
+WORKDIR /usr/src/app
+
+# Copy local code to the container image.
+COPY . .
+
+# Install any R packages
+RUN apt-get update
+RUN apt-get install -y libcurl4-openssl-dev libsodium-dev
+RUN Rscript -e "install.packages(c('plumber', 'remotes'), repos = 'https://cran.ms.unimelb.edu.au/')"
+RUN Rscript -e "remotes::install_github('kcf-jackson/sketch')"
+
+EXPOSE 8080
+
+# Run the web service on container startup.
+CMD [ "Rscript", "server.R"]

@@ -31,5 +31,5 @@ remotes::install_github("kcf-jackson/sketch")
 Visit the [website](https://kcf-jackson.github.io/sketch-doc) for
 [getting-started
 guide](https://kcf-jackson.github.io/sketch-doc/getting_started/),
-[examples](https://kcf-jackson.github.io/sketch-doc/docs/) and
-[documentation](https://kcf-jackson.github.io/sketch-doc/tutorials/)\!
+[tutorials](https://kcf-jackson.github.io/sketch-doc/tutorials/) and
+other documentation\!

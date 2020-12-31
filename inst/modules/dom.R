@@ -3,6 +3,7 @@
 #' Construct a new DOM element
 #' @param tag0 A character string; name of the element.
 #' @param attr0 A named list; attributes of the element.
+#' @param ... (Optional) DOM elements to be added to the new DOM element.
 #' @return A DOM element.
 #' @export
 dom <- function(tag0, attr0 = list()) {
@@ -10,6 +11,13 @@ dom <- function(tag0, attr0 = list()) {
     domObj <- document$createElement(tag0)
     for (key in Object$keys(attr0)) {
         domObj[key] <- attr0[key]
+    }
+
+    let (args = Array(...arguments), args_len = args$length)
+    if (args_len >= 3) {
+        for (el in args$slice(2)) {
+            domObj$appendChild(el)
+        }
     }
     return(domObj)
 }
@@ -32,14 +40,19 @@ select_doms <- function(x) {
 
 #' Attach a DOM element to another DOM element by selector
 #' @param el A DOM element
-#' @param x A character string; a CSS selector string.
+#' @param x A character string (a CSS selector string) or a DOM element.
 #' @return A DOM element; the parent element.
 #' @export
 print_dom <- function(el, x = "body") {
-    declare (res)
-    res <- document$querySelector(x)
-    res$appendChild(el)
-    return(res)
+    if (typeof(x) == 'string') {
+        declare (res)
+        res <- document$querySelector(x)
+        res$appendChild(el)
+        return(res)
+    } else {
+        x$appendChild(el)
+        return(x)
+    }
 }
 
 #' Attach DOM elements to a DOM element
@@ -62,6 +75,7 @@ append_doms <- function(parent) {
 #' Construct a new SVG element
 #' @param tag0 A character string; name of the element.
 #' @param attr0 A named list; attributes of the element.
+#' @param ... (Optional) SVG elements to be added to the new SVG element.
 #' @return A SVG element.
 #' @export
 svg <- function(tag0, attr0) {
@@ -69,6 +83,13 @@ svg <- function(tag0, attr0) {
     svgObj <- document$createElementNS('http://www.w3.org/2000/svg', tag0)
     for (key in Object$keys(attr0)) {
         svgObj$setAttribute(key, attr0[key])
+    }
+
+    let (args = Array(...arguments), args_len = args$length)
+    if (args_len >= 3) {
+        for (el in args$slice(2)) {
+            svgObj$appendChild(el)
+        }
     }
     return(svgObj)
 }

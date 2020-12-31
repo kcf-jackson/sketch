@@ -257,10 +257,15 @@ deparse_function <- function(ast, ...) {
     paste(alist2, collapse = ", ")
   }
 
+  fun_body_str <- deparse_js(ast[[3]], ...)
+  if (!is_call(ast[[3]], "{")) {
+    fun_body_str <- paste0("{ ", fun_body_str, " }")
+  }
+
   paste0(
     deparse_js(ast[[1]], ...), # function
     "(", deparse_arg(ast[[2]], ...), ") ", # function-args
-    deparse_js(ast[[3]], ...) # function-body
+    fun_body_str # function-body
   )
 }
 
@@ -289,58 +294,99 @@ deparse_function_with_return <- function(ast, ...) {
 
   is_return <- function(ast) is_call(ast, "return")
   is_assignment <- function(ast) is_call(ast, c("=", "<-", "<<-"))
+  # Handle special forms, e.g. if, for, while, as JavaScript only
+  # allows returning values.
+  is_keyword <- function(ast) is_call(ast, c("if", "for", "while"))
+  is_valid_add <- function(ast, ...) {
+    # Provide more informative message
+    ast_string <- deparse_js(ast, ...)
+    if (is_assignment(ast)) {
+      warning("You have used an assignment statement as the final expression in:", immediate. = TRUE)
+      message(line_separator("-"))
+      message(ast_string)
+      message(line_separator("-"))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
+    if (is_keyword(ast)) {
+      warning("You have used a control-flow statement as the final expression in:", immediate. = TRUE)
+      message(line_separator("-"))
+      message(ast_string)
+      message(line_separator("-"))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
+
+    # The actual check
+    !is_return(ast) && !is_assignment(ast) && !is_keyword(ast)
+  }
 
   # TODO: Consider adding support to return of assignment.
   # Note that it may not play well with the subset assignment implementation
   # because that always returns the full object. While I think this is a
   # sensible default, it differs from the R behaviour.
-  warning_of_assignment <- function(ast) {
-    if (is_assignment(ast)) {
-      fun_line <- deparse(ast)
-      warning(glue::glue("You have used an variable assignment as the final expression of the function: \n\t{fun_line}\nThis is currently not supported. Please end the function by putting the variable or a value `JS_NULL` on a standalone line."))
-    }
-  }
+  # warning_of_assignment <- function(ast) {
+  #   fun_line <- deparse(ast)
+  #   if (is_assignment(ast)) {
+  #     warning(glue::glue("You have used an variable assignment as the final expression of the function: \n\t{fun_line}\nThis is currently not supported. Please end the function by putting the variable or a value `JS_NULL` on a standalone line."))
+  #   }
+  # }
 
   fun_body <- ast[[3]]
   if (is_call(fun_body, "{")) {
     last_expr <- last(fun_body)
-    # Add explicit return if it is not there
-    if (!is_return(last_expr)) {
-      # Warn user if the expression is an assignment
-      warning_of_assignment(last_expr)
+    # Add explicit return if it is not there and the expression
+    # is non-empty
+    if (is_valid_add(last_expr, ...) && length(fun_body) > 1) {
       ast[[3]][[length(fun_body)]] <- add_return(last(fun_body))
     }
   } else {
     # function body is an atom
-    if (!is_return(fun_body)) {
-      warning_of_assignment(last_expr)
+    if (is_valid_add(fun_body, ...)) {
       ast[[3]] <- add_return(fun_body)
     }
   }
 
+  # Return the resulting string
+  fun_body_str <- deparse_js(ast[[3]], ...)
+  # Wrap with { . } if function uses shorthand notation
+  if (!is_call(ast[[3]], "{")) {
+    fun_body_str <- paste0("{ ", fun_body_str, " }")
+  }
   paste0(
     deparse_js(ast[[1]], ...), # function
     "(", deparse_arg(ast[[2]], ...), ") ", # function-args
-    deparse_js(ast[[3]], ...) # function-body
+    fun_body_str # function-body
   )
 }
+
+
+# Deparser for return ----------------------------------
+#' Predicate for return
+#' @rdname predicate_component
+is_call_return <- function(ast) is_call(ast, "return")
+
+#' Deparser for return
+#' @rdname deparsers_component
+deparse_return <- function(ast, ...) {
+  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  glue::glue("return {sym_ls[[2]]}")
+}
+
 
 
 # Deparser for assignments ----------------------------------
 #' Predicate for assignments
 #' @rdname predicate_component
-is_call_assignment <- function(ast) is_call(ast, "<-")
+is_call_assignment <- function(ast) is_call(ast, c("<-", "=", "<<-"))
 
 #' Deparser for assignments
 #' @rdname deparsers_component
 deparse_assignment <- function(ast, ...) {
   sym_ls <- purrr::map_chr(ast, deparse_js, ...)
   # 'var' is added only when LHS is a symbol
-  if (rlang::is_symbol(ast[[2]])) {
-    glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}")
-  } else {
-    glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
+  if (rlang::is_symbol(ast[[2]]) && !is_call(ast, "<<-")) {
+    return(glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}"))
   }
+  glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
 }
 
 
@@ -548,12 +594,13 @@ deparse_R6Class <- function(ast, ...) {
 
   return(glue::glue("function(<const_arg>) {
         // public variables and methods
+        let self = this
         <public_list>
         // private variables and methods
-        let that = this, private = {}
+        let private = {}
         <private_list>
-        if (this.initialize) {
-            this.initialize(<const_arg>)
+        if (self.initialize) {
+            self.initialize(<const_arg>)
         }
     }", .open = "<", .close = ">"))
 }
@@ -595,7 +642,7 @@ deparse_public_list <- function(ast, ...) {
   rhs <- purrr::map_chr(args, deparse_js, ...)
   purrr::map2_chr(
     public_vars, rhs, function(x, y) {
-      glue::glue("this.<x> = <y>", .open = "<", .close = ">")
+      glue::glue("self.<x> = <y>", .open = "<", .close = ">")
     }) %>%
     paste(collapse = "\n") %>%
     gsub(pattern = "\n", replacement = "\n    ")  # increase indent
@@ -614,7 +661,6 @@ deparse_private_list <- function(ast, ...) {
 
   # Reference: http://crockford.com/javascript/private.html
   rhs <- args %>%
-    purrr::map(rewrite, rules = list(make_rule("this", "that"))) %>%
     purrr::map_chr(deparse_js, ...)
 
   purrr::map2_chr(
@@ -643,6 +689,21 @@ is_call_new <- function(ast) {
 deparse_new <- function(ast, ...) {
   args <- deparse_js(ast[[2]], ...)
   glue::glue("new {args}")
+}
+
+
+# Deparser for "typeof" ------------------------------------------------------
+#' Predicate for the "typeof" operator
+#' @rdname predicate_component
+is_call_typeof <- function(ast) {
+  is_call(ast, "typeof")
+}
+
+#' Deparser for the "typeof" operator
+#' @rdname deparsers_component
+deparse_typeof <- function(ast, ...) {
+  args <- deparse_js(ast[[2]], ...)
+  glue::glue("typeof {args}")
 }
 
 

@@ -19,6 +19,7 @@ basic_rules <- function() {
         make_rule("^", "**"),
         make_rule("%%", "%"),
         make_rule("$", "."),
+        make_rule("@", "."),
         make_rule("::", "."),
         make_rule("%instanceof%", "instanceof"),
         make_rule("%+%", "+"),
@@ -29,7 +30,6 @@ basic_rules <- function() {
         make_rule("TRUE", "true"),
         make_rule("FALSE", "false"),
         make_rule("declare", "let"),
-        make_rule("self", "this"),
         make_rule("stop", "throw"),
         make_rule("JS_NULL", "null"),
         make_rule("JS_UNDEFINED", "undefined"),
@@ -52,6 +52,7 @@ default_rules <- function() {
         make_rule("<<-", "="),
         make_rule("::", "."),
         make_rule("$",  "."),
+        make_rule("@", "."),
         make_rule("+",  "R.add"),
         make_rule("-",  "R.subtract"),
         make_rule("*",  "R.multiply"),
@@ -87,7 +88,6 @@ default_rules <- function() {
         make_rule("FALSE", "false"),
         make_rule("F", "false"),
         make_rule("declare", "let"),
-        make_rule("self", "this"),
         make_rule("stop", "throw"),
 
         # Basic R functions
@@ -202,7 +202,7 @@ default_rules <- function() {
         make_rule("lgamma",   "R.lgamma"),
         make_rule("digamma",  "R.digamma"),
         make_rule("trigamma", "R.trigamma"),
-        # Todo: beta, lbeta, psigamma
+        # TODO: beta, lbeta, psigamma
         make_rule("choose", "R.choose"),
         make_rule("lchoose", "R.lchoose"),
         make_rule("factorial", "R.factorial"),
@@ -280,4 +280,30 @@ default_rules <- function() {
         make_rule("qunif", "R.qunif"),
         make_rule("runif", "R.runif")
     )
+}
+
+
+#' @rdname r-to-js-rules
+#'
+#' @examples
+#' basic_rules()
+#'
+#' @note lifecycle: experimental
+#'
+#' @export
+basic_2_rules <- function() {
+    basic_rules()[-c(1,2)]
+}
+
+
+#' @rdname r-to-js-rules
+#'
+#' @examples
+#' default_2_rules()
+#'
+#' @note lifecycle: experimental
+#'
+#' @export
+default_2_rules <- function() {
+    default_rules()[-c(1,2)]
 }

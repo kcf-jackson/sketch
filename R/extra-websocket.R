@@ -11,10 +11,6 @@ websocket <- R6::R6Class("websocket", public = list(
     #' @field server A server handle to be used by 'stopServer'.
     server = NULL,
 
-    #' @field namespace A 'sandbox' environment to handle instructions sent
-    #' by the browser session.
-    namespace = new.env(),
-
     #' @field log A character vector that keep tracks of all the commands
     #' sent to the browser session.
     log = c(),
@@ -95,12 +91,12 @@ websocket <- R6::R6Class("websocket", public = list(
             return(invisible(NULL))
         }
 
-        if (!self$connected) {
+        if (!self$connected) {   # nocov start
             message("No connection has been established.")
             return(invisible(NULL))
         }
 
-        cat("(Type `q()` to exit sketch mode)")     # nocov start
+        cat("(Type `q()` to exit sketch mode)")
         while (TRUE) {
             input <- read_multilines("sketch > ")
             self$log <- c(self$log, input)
@@ -120,7 +116,7 @@ websocket <- R6::R6Class("websocket", public = list(
     #' @param ... Extra parameters to pass to \link{source_r}.
     #'
     #' @return The (invisible) temporary file path to the app.
-    new_app = function(preamble = list(library = c(), script = c(), data = c()), ...) {
+    new_app = function(preamble = list(library = c(), script = c(), data = c()), ...) {  # nocov start
           preamble_to_string <- function(preamble) {
               list(names(preamble), preamble) %>%
                   purrr::pmap(~glue::glue('#! load_{..1}("{..2}")')) %>%
@@ -133,7 +129,7 @@ websocket <- R6::R6Class("websocket", public = list(
               preamble_to_string() %>%
               writeLines(temp_file)
           source_r(temp_file, ...)
-    },
+    },  # nocov end
 
     #' @description Initialise a WebSocket connection
     #'
@@ -177,7 +173,7 @@ websocket <- R6::R6Class("websocket", public = list(
                           out_handler = sketch::compile_exprs,
                           message = TRUE, port = 9454) {
         self$app <- list(
-            call = function(req) {
+            call = function(req) {  # nocov start
                 if (message) message("Received http request.")
                 list(
                     status = 200L,
@@ -190,9 +186,9 @@ websocket <- R6::R6Class("websocket", public = list(
                 self$connected <- TRUE
                 ws$send("console.log(\"Connection established.\")")
                 ws$onMessage(function(binary, input) {
-                    eval(in_handler(input), envir = self$namespace)
+                    in_handler(input)
                 })
-            }
+            }  # nocov end
         )
         self$in_handler <- in_handler
         self$out_handler <- out_handler
@@ -216,7 +212,7 @@ websocket <- R6::R6Class("websocket", public = list(
 #' This can only be used in an interactive session.
 #'
 #' @export
-read_multilines <- function(prompt) {
+read_multilines <- function(prompt) {  # nocov start
     success_parse <- function(x) {
         is.null(purrr::safely(parse_expr)(x)$error)
     }
@@ -226,4 +222,4 @@ read_multilines <- function(prompt) {
         res <- paste(res, "\n", readline(prompt = ""))
     }
     return(res)
-}
+}  # nocov end

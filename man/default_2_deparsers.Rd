@@ -7,9 +7,11 @@
 default_2_deparsers()
 }
 \description{
-\lifecycle{experimental}
+A list of deparsers to support implicit variable declaration and explicit 'return'
 }
 \note{
+lifecycle: experimental
+
 This is used as input to \link{compile_r} and \link{compile_exprs}.
 }
 \examples{

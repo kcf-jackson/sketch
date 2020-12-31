@@ -8,7 +8,7 @@ Person = function(name, age) {
         self.age = age
     }
     // private variables and methods
-    let that = this, private = {}
+    let private = {}
     
     if (self.initialize) {
         self.initialize(name, age)

@@ -11,7 +11,7 @@ Person2 = function(name, age) {
         R.print(private.get_age_plus_x())
     }
     // private variables and methods
-    let that = this, private = {}
+    let private = {}
     private.age = null
     private.name = null
     private.get_age_plus_x = function() {

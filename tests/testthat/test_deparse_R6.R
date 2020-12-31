@@ -17,7 +17,7 @@ testthat::test_that("Test component functions", {
     expr <- parse_expr('list(x = 1, y = 2, z = function(x) {this$x})')
     expect_equal(
         deparse_private_list(expr, default_deparsers()),
-        "private.x = 1\n    private.y = 2\n    private.z = function(x) {\n        $(that, x)\n    }"
+        "private.x = 1\n    private.y = 2\n    private.z = function(x) {\n        $(this, x)\n    }"
     )
 
     # get_constructor_arg

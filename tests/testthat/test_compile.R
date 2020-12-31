@@ -209,7 +209,7 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     # Test R6Class
     unit_test(
         "R6Class(\"Class_1\")",
-        "function() {\n    // public variables and methods\n    let self = this\n    \n    // private variables and methods\n    let that = this, private = {}\n    \n    if (self.initialize) {\n        self.initialize()\n    }\n}"
+        "function() {\n    // public variables and methods\n    let self = this\n    \n    // private variables and methods\n    let private = {}\n    \n    if (self.initialize) {\n        self.initialize()\n    }\n}"
     )
     testthat::expect_error(default("R6Class(\"myClass\", x = \"NO LIST\")"))
     testthat::expect_error(default("R6Class(\"myClass\", list(\"NO NAME\"))"))

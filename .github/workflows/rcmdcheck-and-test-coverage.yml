@@ -1,0 +1,72 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+#
+# See https://github.com/r-lib/actions/tree/master/examples#readme for
+# additional example workflows available for the R community.
+
+name: R
+
+on:
+  push:
+    branches: [ master, develop, experiment ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config: 
+          - {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: 'devel'}
+          - {os: macOS-latest, r: 'release'}  
+          - {os: macOS-latest, r: 'devel'}
+          - {os: ubuntu-16.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
+          - {os: ubuntu-16.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
+    
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      RSPM: ${{ matrix.config.rspm }}
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up R ${{ matrix.config.r }}
+        uses: r-lib/actions/setup-r@master
+        with:
+          r-version: ${{ matrix.config.r }}
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+      
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
+        env:
+          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
+        run: |
+          Rscript -e "remotes::install_github('r-hub/sysreqs')"
+          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
+          sudo -s eval "$sysreqs" 
+      
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes", "rcmdcheck"))
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+      
+      - name: Check
+        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        shell: Rscript {0}
+      
+      - name: Test coverage
+        run: covr::codecov()
+        shell: Rscript {0}

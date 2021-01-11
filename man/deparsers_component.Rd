@@ -13,6 +13,7 @@
 \alias{deparse_function_with_return}
 \alias{deparse_return}
 \alias{deparse_assignment}
+\alias{deparse_assignment_auto}
 \alias{deparse_try}
 \alias{deparse_tryCatch}
 \alias{deparse_throw}
@@ -59,6 +60,8 @@ deparse_function_with_return(ast, ...)
 deparse_return(ast, ...)
 
 deparse_assignment(ast, ...)
+
+deparse_assignment_auto(ast, ...)
 
 deparse_try(ast, ...)
 
@@ -137,6 +140,8 @@ Deparser for the "function" keyword with explicit return
 Deparser for return
 
 Deparser for assignments
+
+Deparser for assignments (automatic variable declaration)
 
 Deparser for the "try" keyword
 

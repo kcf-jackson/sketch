@@ -4,36 +4,22 @@
 \alias{r-to-js-rules}
 \alias{basic_rules}
 \alias{default_rules}
-\alias{basic_2_rules}
-\alias{default_2_rules}
 \title{Mapping R operators into JavaScript operators}
 \usage{
 basic_rules()
 
 default_rules()
-
-basic_2_rules()
-
-default_2_rules()
 }
 \description{
 Mapping R operators into JavaScript operators
 }
 \note{
 These functions are used as inputs to \link{compile_r} and \link{compile_exprs}.
-
-lifecycle: experimental
-
-lifecycle: experimental
 }
 \examples{
 basic_rules()
 
 default_rules()
-
-basic_rules()
-
-default_2_rules()
 
 }
 \references{

@@ -220,7 +220,7 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
 
 testthat::test_that("Test transpilation with default 2 deparsers", {
     # Basic 2 setup
-    basic_2 <- purrr::partial(compile_exprs, rules = basic_2_rules(), deparsers = default_2_deparsers())
+    basic_2 <- purrr::partial(compile_exprs, rules = basic_rules(), deparsers = default_2_deparsers())
     unit_test <- purrr::partial(test_equal, f = basic_2)
 
     unit_test("function(x) {x}", "function(x) {\n    return x\n}")
@@ -237,7 +237,7 @@ testthat::test_that("Test transpilation with default 2 deparsers", {
     testthat::expect_warning(basic_2("function(x) { for (i in 1:10) { print(i) } }"))
 
     # Default 2 setup
-    default_2 <- purrr::partial(compile_exprs, rules = default_2_rules(), deparsers = default_2_deparsers())
+    default_2 <- purrr::partial(compile_exprs, rules = default_rules(), deparsers = default_2_deparsers())
     unit_test <- purrr::partial(test_equal, f = default_2)
 
     unit_test("function(x) {}", "function(x) {\n    \n}")

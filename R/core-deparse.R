@@ -54,6 +54,7 @@ deparse_js <- function(ast, deparsers) {
 #' @export
 basic_deparsers <- function() {
   list(
+    "assignment" = make_deparser(is_call_assignment, deparse_assignment),
     # JavaScript template literal
     "raw_string" = make_deparser(is_call_raw_string, deparse_raw_string),
     # JavaScript object literal
@@ -99,44 +100,21 @@ default_deparsers <- function() {
   # specialised ones are at the top and the general ones are at the
   # bottom. This list acts like a sieve, and only inputs that do not
   # get caught at the top will fall to the bottom.
-  list(
-    # Library functions
-    "R.add" = make_deparser(is_call_add, deparse_add),
-    "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
-    "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extract2Assign),
-    "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
-    "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
-    "R.extract" = make_deparser(is_call_extract, deparse_extract),
-    # Data structure
-    "R.data.frame" = make_deparser(is_call_df, deparse_df),
-    "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
-    "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate),
-    "list" = make_deparser(is_call_list, deparse_list),
-    # Special forms
-    "raw_string" = make_deparser(is_call_raw_string, deparse_raw_string),
-    "pipe" = make_deparser(is_call_pipe, deparse_pipe),
-    "lambda" = make_deparser(is_call_lambda, deparse_lambda),
-    "ifelse" = make_deparser(is_call_ifelse, deparse_ifelse),
-    "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
-    "new"  = make_deparser(is_call_new, deparse_new),
-    "let"  = make_deparser(is_call_let, deparse_let),
-    "const"  = make_deparser(is_call_const, deparse_const),
-    # Keywords
-    "for"    = make_deparser(is_call_for, deparse_for),
-    "if"     = make_deparser(is_call_if, deparse_if),
-    "while"  = make_deparser(is_call_while, deparse_while),
-    "function" = make_deparser(is_call_function, deparse_function),
-    "break" = make_deparser(is_call_break, deparse_sym),
-    "try" = make_deparser(is_call_try, deparse_try),
-    "tryCatch" = make_deparser(is_call_tryCatch, deparse_tryCatch),
-    "throw" = make_deparser(is_call_throw, deparse_throw),
-    "R6Class" = make_deparser(is_call_R6Class, deparse_R6Class),
-    # Operators
-    "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
-    "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
-    # Basic
-    "call"   = make_deparser(is_call, deparse_call),
-    "symbol" = make_deparser(is_sym, deparse_sym)
+  append(
+    list(
+      # Library functions
+      "R.add" = make_deparser(is_call_add, deparse_add),
+      "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
+      "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extract2Assign),
+      "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
+      "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
+      "R.extract" = make_deparser(is_call_extract, deparse_extract),
+      # Data structure
+      "R.data.frame" = make_deparser(is_call_df, deparse_df),
+      "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
+      "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate)
+    ),
+    basic_deparsers()
   )
 }
 
@@ -153,7 +131,7 @@ default_deparsers <- function() {
 default_2_deparsers <- function() {
   append(
     list(
-      "assignment" = make_deparser(is_call_assignment, deparse_assignment),
+      "assignment_auto" = make_deparser(is_call_assignment_auto, deparse_assignment_auto),
       "function" = make_deparser(is_call_function, deparse_function_with_return),
       "return" = make_deparser(is_call_return, deparse_return)
     ),

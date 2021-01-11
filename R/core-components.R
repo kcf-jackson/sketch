@@ -376,11 +376,25 @@ deparse_return <- function(ast, ...) {
 # Deparser for assignments ----------------------------------
 #' Predicate for assignments
 #' @rdname predicate_component
-is_call_assignment <- function(ast) is_call(ast, c("<-", "=", "<<-"))
+is_call_assignment <- function(ast) is_call(ast, c("<-", "<<-"))
+
 
 #' Deparser for assignments
 #' @rdname deparsers_component
+# Replace arrow sign by equal sign
 deparse_assignment <- function(ast, ...) {
+  ast[[1]] <- as.symbol("=")
+  deparse_js(ast, ...)
+}
+
+
+#' Predicate for assignments
+#' @rdname predicate_component
+is_call_assignment_auto <- function(ast) is_call(ast, c("<-", "=", "<<-"))
+
+#' Deparser for assignments (automatic variable declaration)
+#' @rdname deparsers_component
+deparse_assignment_auto <- function(ast, ...) {
   sym_ls <- purrr::map_chr(ast, deparse_js, ...)
   # 'var' is added only when LHS is a symbol
   if (rlang::is_symbol(ast[[2]]) && !is_call(ast, "<<-")) {

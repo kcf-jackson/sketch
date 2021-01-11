@@ -14,8 +14,6 @@
 #' @export
 basic_rules <- function() {
     list(
-        make_rule("<-", "="),
-        make_rule("<<-", "="),
         make_rule("^", "**"),
         make_rule("%%", "%"),
         make_rule("$", "."),
@@ -48,8 +46,6 @@ basic_rules <- function() {
 default_rules <- function() {
     list(
         # Binary operators
-        make_rule("<-", "="),
-        make_rule("<<-", "="),
         make_rule("::", "."),
         make_rule("$",  "."),
         make_rule("@", "."),
@@ -280,30 +276,4 @@ default_rules <- function() {
         make_rule("qunif", "R.qunif"),
         make_rule("runif", "R.runif")
     )
-}
-
-
-#' @rdname r-to-js-rules
-#'
-#' @examples
-#' basic_rules()
-#'
-#' @note lifecycle: experimental
-#'
-#' @export
-basic_2_rules <- function() {
-    basic_rules()[-c(1,2)]
-}
-
-
-#' @rdname r-to-js-rules
-#'
-#' @examples
-#' default_2_rules()
-#'
-#' @note lifecycle: experimental
-#'
-#' @export
-default_2_rules <- function() {
-    default_rules()[-c(1,2)]
 }

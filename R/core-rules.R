@@ -135,6 +135,7 @@ default_rules <- function() {
         make_rule("is.element", "R.is_element"),
         make_rule("is.subset", "R.is_subset"),   # not in R
         make_rule("setsymdiff", "R.setsymdiff"), # not in R
+        make_rule("table", "R.table"),
 
         # Statistics functions
         make_rule("mean", "R.mean"),

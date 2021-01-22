@@ -3,6 +3,9 @@
 \name{deparse_Family}
 \alias{deparse_Family}
 \alias{deparse_sym}
+\alias{deparse_NULL}
+\alias{deparse_NA}
+\alias{deparse_NaN}
 \alias{deparse_call}
 \alias{deparse_infix}
 \alias{deparse_wrap}
@@ -40,6 +43,12 @@
 \title{Deparsers (specialised)}
 \usage{
 deparse_sym(ast, ...)
+
+deparse_NULL(ast, ...)
+
+deparse_NA(ast, ...)
+
+deparse_NaN(ast, ...)
 
 deparse_call(ast, ...)
 
@@ -120,6 +129,12 @@ A character string.
 }
 \description{
 Deparsers (specialised)
+
+Deparser for NULL
+
+Deparser for NA
+
+Deparser for NaN
 
 Deparser for calls
 

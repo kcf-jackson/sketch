@@ -65,6 +65,11 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("try(1 + 1)", "try {\n    1 + 1\n} catch(error) {\n    console.log(error)\n}")
     unit_test("try({1 + 2; 3 + 4})", "try {\n    1 + 2\n    3 + 4\n} catch(error) {\n    console.log(error)\n}")
     unit_test("stop(\"ERROR_MSG\")", "throw new Error(\"ERROR_MSG\")")
+
+    # Test syntactic literal
+    unit_test("x <- NULL",  "x = null")
+    unit_test("x <- NA",  "x = undefined")
+    unit_test("x <- NaN",  "x = NaN")
 })
 
 testthat::test_that("Test transpilation with default rules and deparsers (exprs)", {
@@ -216,6 +221,11 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     testthat::expect_error(default("R6Class(\"myClass\", list(), x = \"NO LIST\")"))
     testthat::expect_error(default("R6Class(\"myClass\", list(), list(\"NO NAME\"))"))
     testthat::expect_error(default("R6Class(\"myClass\", list(initialize = \"ERROR: NOT A FUNCTION\"))"))
+
+    # Test syntactic literal
+    unit_test("x <- NULL",  "x = null")
+    unit_test("x <- NA",  "x = undefined")
+    unit_test("x <- NaN",  "x = NaN")
 })
 
 testthat::test_that("Test transpilation with default 2 deparsers", {

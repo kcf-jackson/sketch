@@ -102,8 +102,8 @@ subst <- function(ast, pattern, replacement) {
     }
 
     if (rlang::is_syntactic_literal(ast)) {
-      if (is.null(ast))   return(ast)  # this line is needed as NULL cannot be compared using `==`.
-      if (is.na(ast))     return(ast)  # this line is needed as NA cannot be compared using `==`.
+      if (is.null(ast))   return(ast)  # this line is needed as NULL cannot be compared using `==`. See Note 2 for further comment.
+      if (is.na(ast))     return(ast)  # this line is needed as NA cannot be compared using `==`. Note that `is.na(NaN)` returns TRUE.
       if (is.character(ast))  return(ast)  # Quoted string should be kept as is
       if (ast == pattern) return(as.symbol(replacement))  # applies to syntactic literal TRUE and FALSE
       return(ast)
@@ -139,3 +139,13 @@ subst <- function(ast, pattern, replacement) {
 #
 # Note that this does not rule out arguments in a function call, e.g.
 # in "obj_1.fun(args)", both "obj_1" and "args" will get rewritten.
+
+
+# Note 2:
+# The reason why `ast` is returned as-is rather than `as.symbol("null")` is
+# that R inserts a `NULL` when one defines a function without an argument.
+# This can be checked with `parse_expr("function(){}")[[2]]`. Hence, `NULL`
+# cannot be rewritten, as there is no way to distinguish whether such symbol
+# is provided by user or inserted by R. Clearly, it is undesirable to see
+# `function() {}` being transpiled to `function(null) {}`. This shall be
+# tackled with the deparser.

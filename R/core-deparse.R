@@ -80,6 +80,10 @@ basic_deparsers <- function() {
     # Operators
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
     "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
+    # Syntactic literal
+    "NULL" = make_deparser(is_syntactic_literal %&&% is.null, deparse_NULL),
+    "NaN" = make_deparser(is_syntactic_literal %&&% is.nan, deparse_NaN),
+    "NA" = make_deparser(is_syntactic_literal %&&% is.na, deparse_NA),
     # Basic
     "call"   = make_deparser(is_call, deparse_call),
     "symbol" = make_deparser(is_sym, deparse_sym)

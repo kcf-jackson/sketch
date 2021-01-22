@@ -24,6 +24,26 @@ deparse_sym <- function(ast, ...) {
   deparse(ast, width.cutoff = 500L)
 }
 
+
+# Deparser for syntactic literal ---------------------------------------
+#' Predicate for syntactic literal
+#' @inheritParams rlang::is_syntactic_literal
+#' @note This function is imported from `rlang`.
+is_syntactic_literal <- rlang::is_syntactic_literal
+
+#' Deparser for NULL
+#' @rdname deparsers_component
+deparse_NULL <- function(ast, ...) return("null")
+
+#' Deparser for NA
+#' @rdname deparsers_component
+deparse_NA <- function(ast, ...) return("undefined")
+
+#' Deparser for NaN
+#' @rdname deparsers_component
+deparse_NaN <- function(ast, ...) return("NaN")
+
+
 # Deparser for calls ---------------------------------------
 #' Predicate for calls
 #' @inheritParams rlang::is_call

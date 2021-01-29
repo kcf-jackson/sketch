@@ -45,15 +45,17 @@ copy_active_to_tempfile <- function() {
 #' }
 #'
 #' @export
-source_r <- function(file, debug = FALSE, launch_browser = "viewer",
-                     asset_tags = default_tags(), ...) {
-  index_js <- compile_r(file, tempfile(), ...)
-  file_asset <- assets(file)   # this line is needed to keep the working directory unchanged
-  asset_tags <- c(asset_tags, file_asset)
-  source_js(index_js, debug = debug, asset_tags = asset_tags,
-            launch_browser = launch_browser)
-}
-
+source_r <- with_config(
+  "file",
+  function(file, debug = FALSE, launch_browser = "viewer",
+           asset_tags = default_tags(), ...) {
+    index_js <- compile_r(file, tempfile(), ...)
+    file_asset <- assets(file)   # this line is needed to keep the working directory unchanged
+    asset_tags <- c(asset_tags, file_asset)
+    source_js(index_js, debug = debug, asset_tags = asset_tags,
+              launch_browser = launch_browser)
+  }
+)
 
 #' Serve a compiled 'sketch' JavaScript file
 #'
@@ -101,20 +103,32 @@ source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
 #' HTML templates
 #'
 #' @name html_tags
+#'
 #' @description A list of 'shiny.tag' objects describing a HTML template. The
 #' list must have signature / structure of a named list:
 #'     \code{[head = [shiny.tag], body = [shiny.tag]]}
+#'
+#' @param local TRUE / FALSE. If TRUE, the R base module is loaded from the
+#' local file stored in the package, otherwise, the module is served via a
+#' content delivery network (CDN).
 #'
 #' @examples
 #' str(default_tags())
 #'
 #' @export
-default_tags <- function() {
-  rjs <- system.file("assets/browser-R_core.js", package = "sketch")
+default_tags <- function(local = TRUE) {
+  if (local) {
+    rjs <- system.file("assets/browser-R_core.js", package = "sketch")
+    script_tag <- js_to_shiny_tag(rjs)
+  } else {
+    cdn <- "https://cdn.jsdelivr.net/gh/kcf-jackson/sketch-js/bin/dist/browser-R_core.js"
+    script_tag <- htmltools::tags$script(src = cdn)
+  }
+
   asset_list(
     head = list(
       htmltools::tags$meta(charset = "utf-8"),
-      js_to_shiny_tag(rjs)
+      script_tag
     ),
     body = list()
   )

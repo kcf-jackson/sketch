@@ -31,37 +31,43 @@ default_processors <- function() {
         make_processor(load_library_pred, load_library_proc),
         make_processor(load_script_pred, load_script_proc),
         make_processor(load_data_pred, load_data_proc),
+        make_processor(config_pred, ignore_proc),
         make_processor(always_true, load_error_proc)
     )
 }
 
 #=====================================================================
-# load_library_pred :: char -> logical
-load_library_pred <- function(x) {
-    ast <- rlang::parse_expr(x)
-    rlang::is_call(ast, "load_library")
+`%o%` <- purrr::compose
+
+# is_call_pred :: char -> (language -> logical)
+is_call_pred <- function(name) {
+    function(x) is_call(x, name = name)
 }
+
+
+# load_library_pred :: char -> logical
+load_library_pred <- is_call_pred("load_library") %o% rlang::parse_expr
 # load_library_proc :: char -> shiny.tag
-# Delegate to `load_library`
-load_library_proc <- purrr::compose(eval, rlang::parse_expr)
+load_library_proc <- eval %o% rlang::parse_expr  # Delegate to `load_library`
+
 
 # load_script_pred :: char -> logical
-load_script_pred <- function(x) {
-    ast <- rlang::parse_expr(x)
-    rlang::is_call(ast, "load_script")
-}
+load_script_pred <- is_call_pred("load_script") %o% rlang::parse_expr
 # load_script_proc :: char -> shiny.tag
-# Delegate to `load_script`
-load_script_proc <- purrr::compose(eval, rlang::parse_expr)
+load_script_proc <- eval %o% rlang::parse_expr  # Delegate to `load_script`
+
 
 # load_data_pred :: char -> logical
-load_data_pred <- function(x) {
-    ast <- rlang::parse_expr(x)
-    rlang::is_call(ast, "load_data")
-}
+load_data_pred <- is_call_pred("load_data") %o% rlang::parse_expr
 # load_data_proc :: char -> shiny.tag
-# Delegate to `load_data`
-load_data_proc <- purrr::compose(eval, rlang::parse_expr)
+load_data_proc <- eval %o% rlang::parse_expr  # Delegate to `load_data`
+
+
+# config_pred :: char -> logical
+config_pred <- is_call_pred("config") %o% rlang::parse_expr
+# config_proc :: char -> NULL
+ignore_proc <- function(x) NULL  # This is handled by extra-config.R
+
 
 # Load error messages
 # load_error_proc :: char -> IO()
@@ -80,11 +86,15 @@ load_error_proc <- function(x) {
 #' @param cache A character string; the full path to the cache file.
 #' @param ... Additional arguments to pass to header processor.
 # load_library :: char -> ... -> shiny.tag
-load_library <- function(package, ...) load_script(src(package), ...)
+load_library <- function(package, ...) {
+    load_script(src(package), ...)
+}
 
 #' @rdname header-functions
 # load_script :: char -> ... -> shiny.tag
-load_script <- function(src, ...) to_shiny_tag(src = src, ...)
+load_script <- function(src, ...) {
+    to_shiny_tag(src = src, ...)
+}
 
 #' @rdname header-functions
 load_data <- function(x, cache = tempfile(), ...) {
@@ -103,7 +113,7 @@ load_data <- function(x, cache = tempfile(), ...) {
 #' @keywords internal
 # to_shiny_tag :: char -> ... -> shiny.tag
 to_shiny_tag <- function(src, ...) {
-    # JS, CSS: local or web,  R, CSV: local only.
+    # JS, CSS: local or web;  R, CSV: local only.
     # web links are kept as-is; local are turned into URI (except CSS is kept in-line).
     if (is_web_link(src)) {
         if (is_javascript(src)) return(load_web_js(src, ...))

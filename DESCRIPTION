@@ -23,6 +23,7 @@ Imports:
     base64enc,
     jsonlite,
     shiny,
+    methods
 Suggests: 
     testthat,
     covr,

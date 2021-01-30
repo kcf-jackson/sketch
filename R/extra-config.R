@@ -1,6 +1,16 @@
 # Make a function configurable
+#
+# The `with_config` function takes a function that has a file input argument
+# and returns a function with the same interface and additional support of
+# configuration. The configuration (set within the file with comments) provides
+# a way to specify default for the function (in this case the transpiler) on a
+# per-file basis.
+#
+# The precedence of arguments is as follows: default << config << call, where
+# the "config" arguments override the "default" arguments, and then the "call"
+# arguments override the "config" arguments.
+#
 # with_config :: char -> function -> function
-# Precedence of arguments: default << config << call
 with_config <- function(file_arg, f) {
     res_f <- function() {
         default_args <- as.list(formals(f))  # list of "unevaluated" symbols
@@ -69,7 +79,7 @@ get_config <- function(file) {
 merge_alist <- function(fst, snd) {
     for (var in names(snd)) {
         if (var %in% names(fst)) {
-            fst[[var]] <- snd[[var]]
+            fst[var] <- snd[var]
         } else if ("..." %in% names(fst)) {
             if (deparse1(fst[["..."]]) == "") {
                 fst[["..."]] <- snd[var]
@@ -84,12 +94,14 @@ merge_alist <- function(fst, snd) {
 # expand_dots :: list -> list
 expand_dots <- function(x) {
     x <- as.list(x)
-    if ("..." %in% names(x)) {
-        dots_list <- x[["..."]]
-        x[["..."]] <- NULL
-        return(c(x, dots_list))
-    }
-    x
+    has_dots <- "..." %in% names(x)
+    if (!has_dots) return(x)  # no dots
+
+    dots_list <- x[["..."]]
+    x[["..."]] <- NULL
+    if (missing(dots_list)) return(x)  # empty dots
+
+    c(x, dots_list)
 }
 
 config <- list

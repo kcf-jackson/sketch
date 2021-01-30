@@ -7,8 +7,12 @@
 #'
 #' @export
 safeguard <- function(ast, rules) {
-    to <- purrr::map_chr(rules, ~attr(.x, "to"))
-    from <- purrr::map_chr(rules, ~attr(.x, "from"))
+    to <- rules %>%
+        purrr::map(~attr(.x, "to")) %>%
+        purrr::reduce(c)
+    from <- rules %>%
+        purrr::map(~attr(.x, "from")) %>%
+        purrr::reduce(c)
     reserved_words <- c(to, from)
 
     check <- function(ast) {
@@ -28,7 +32,8 @@ check_assignment <- function(ast, reserved_words) {
     if (rlang::is_call(ast, c("=", "<-"))) {
         lhs <- deparse(ast[[2]])
         if (lhs %in% reserved_words) {
-            warning(glue::glue("You assigned a value to the reserved word '{lhs}' in the following expression: {deparse_sym(ast)}"))
+            expr <- paste(deparse_sym(ast), collapse = "\n")
+            warning(glue::glue("You assigned a value to the reserved word '{yellow(lhs)}' in the following expression:\n{yellow(expr)}"))
         }
     }
 }
@@ -40,7 +45,8 @@ check_function_arg <- function(ast, reserved_words) {
             farg_name <- names(ast[[2]])
             purrr::walk(farg_name, function(farg) {
                 if (farg %in% reserved_words) {
-                    warning(glue::glue("You used the reserved word '{farg}' as the function argument name in the following expression:{deparse_sym(ast)}"))
+                    expr <- paste(deparse_sym(ast), collapse = "\n")
+                    warning(glue::glue("You used the reserved word '{yellow(farg)}' as the function argument name in the following expression:\n{yellow(expr)}"))
                 }
             })
         }

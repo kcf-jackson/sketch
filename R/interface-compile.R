@@ -42,7 +42,9 @@ compile_r <- with_config(
 #' @export
 compile_exprs <- function(x, rules = default_rules(),
                           deparsers = default_deparsers()) {
-    rlang::parse_exprs(x) %>%
+    exprs <- rlang::parse_exprs(x)
+    safeguard(exprs, rules = rules)
+    exprs %>%
         purrr::map(rewrite, rules = rules) %>%
         purrr::map_chr(deparse_js, deparsers = deparsers)
 }

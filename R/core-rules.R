@@ -13,12 +13,12 @@
 #'
 #' @export
 basic_rules <- function() {
-    list(
-        make_rule("^", "**"),
-        make_rule("%%", "%"),
+    res <- list(
         make_rule("$", "."),
         make_rule("@", "."),
         make_rule("::", "."),
+        make_rule("^", "**"),
+        make_rule("%%", "%"),
         make_rule("%instanceof%", "instanceof"),
         make_rule("%+%", "+"),
         make_rule("%=>%", "=>"),
@@ -34,6 +34,10 @@ basic_rules <- function() {
         make_rule("JS_NAN", "NaN"),
         make_rule("JS_ARRAY", "Array")
     )
+    # "." requires higher precedence in grouping because "." triggers
+    # conditional rewriting in `subst`.
+    dot_precedence <- 10 * purrr::map_lgl(res, ~attr(.x, "to") == ".")
+    combine_rules(res, dot_precedence)
 }
 
 
@@ -44,7 +48,9 @@ basic_rules <- function() {
 #'
 #' @export
 default_rules <- function() {
-    list(
+    # The list of rules is separated into two parts because the transpilation
+    # involving "." is conditional, hence it needs to be done first.
+    res <- list(
         # Binary operators
         make_rule("::", "."),
         make_rule("$",  "."),
@@ -78,7 +84,7 @@ default_rules <- function() {
         make_rule("%o%", "R.compose"),
         make_rule("%>%", "pipe"),
 
-        # Base Javascript
+        # Base Javascript ----
         make_rule("TRUE", "true"),
         make_rule("T", "true"),
         make_rule("FALSE", "false"),
@@ -86,7 +92,7 @@ default_rules <- function() {
         make_rule("declare", "let"),
         make_rule("stop", "throw"),
 
-        # Basic R functions
+        # Basic R functions ----
         make_rule(    "pi", "R.pi"),
         make_rule(   "seq", "R.seq"),
         make_rule( "print", "R.print"),
@@ -96,7 +102,7 @@ default_rules <- function() {
         make_rule("typeof", "R.typeof"),
         make_rule("which", "R.which"),
 
-        # Data structure
+        # Data structure ----
         make_rule("c", "R.c"),
         make_rule("rep", "R.rep"),
         make_rule("matrix", "R.matrix2"),
@@ -115,7 +121,7 @@ default_rules <- function() {
         make_rule("rbind", "R.rbind"),
         make_rule("colnames", "R.colnames"),
 
-        # High order functions
+        # High order functions ----
         make_rule(   "map",  "R.map"),
         make_rule(  "map2",  "R.map2"),
         make_rule(  "pmap",  "R.pmap"),
@@ -123,7 +129,7 @@ default_rules <- function() {
         make_rule("reduce_right", "R.reduce_right"),
         make_rule("compose", "R.compose"),
 
-        # Optimisation
+        # Optimisation ----
         make_rule("uniroot", "R.uniroot"),
 
         # Set functions
@@ -137,7 +143,7 @@ default_rules <- function() {
         make_rule("setsymdiff", "R.setsymdiff"), # not in R
         make_rule("table", "R.table"),
 
-        # Statistics functions
+        # Statistics functions ----
         make_rule("mean", "R.mean"),
         make_rule("median", "R.median"),
         make_rule("sd", "R.sd"),
@@ -162,7 +168,7 @@ default_rules <- function() {
         make_rule( "log10", "R.log10"),
         make_rule( "log2", "R.log2"),
 
-        # Trigonometric functions
+        # Trigonometric functions ----
         make_rule( "cos", "R.cos"),
         make_rule( "sin", "R.sin"),
         make_rule( "tan", "R.tan"),
@@ -193,7 +199,7 @@ default_rules <- function() {
         make_rule("acsch", "R.acsch"),
         make_rule("asech", "R.asech"),
 
-        # Special functions
+        # Special functions ----
         make_rule("erf", "R.erf"),
         make_rule("gamma",    "R.gamma"),
         make_rule("lgamma",   "R.lgamma"),
@@ -238,7 +244,7 @@ default_rules <- function() {
         # jQuery ----
         make_rule("jQuery", "$"),
 
-        # Distributions functions
+        # Distributions functions ----
         # make_rule("discrete_inverse", "R.discrete_inverse"),
         make_rule("dbinom", "R.dbinom"),
         make_rule("pbinom", "R.pbinom"),
@@ -277,4 +283,6 @@ default_rules <- function() {
         make_rule("qunif", "R.qunif"),
         make_rule("runif", "R.runif")
     )
+    dot_precedence <- 10 * purrr::map_lgl(res, ~attr(.x, "to") == ".")
+    combine_rules(res, dot_precedence)
 }

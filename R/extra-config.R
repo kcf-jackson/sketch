@@ -15,18 +15,20 @@ with_config <- function(file_arg, f) {
     res_f <- function() {
         default_args <- as.list(formals(f))  # list of "unevaluated" symbols
 
-        call_args <- match.call(expand.dots = FALSE)  # See Note 1 (below).
+        call_args <- match.call(expand.dots = FALSE)  # returns a named list
         call_args[[1]] <- as.symbol("list")
         call_args <- eval.parent(call_args)  # See Note 1.
 
         file <- call_args[[file_arg]]
         res_args <- default_args
         if (has_config(file)) {
-            config_args <- extract_config(file)  # eager evaluation returns a list
-            res_args <- merge_alist(res_args, config_args)
+            config_args <- extract_config(file)  # eager evaluation returns a named list
+
+            context <- as.environment(list(overridden = FALSE))
+            res_args <- merge_alist(res_args, config_args, context)
         }
 
-        res_args <- merge_alist(res_args, call_args)
+        res_args <- merge_alist(res_args, call_args, context)
         do.call(f, expand_dots(res_args))
     }
     formals(res_f) <- formals(f)
@@ -74,16 +76,28 @@ get_config <- function(file) {
         purrr::keep(~is_call(.x, "config"))
 }
 
-# merge_alist :: list -> list -> list
-# The second list overrides the first list
-merge_alist <- function(fst, snd) {
+# Merge the second list into the first list
+#
+# The first list may have optional arguments "..."; the second list does not.
+# The second list overrides the first list.
+#
+# The context variable is needed to handle the edge case where a default value
+# is provided to "...". As `merge_alist` is called twice, what we want to
+# achieve is to override "..." when it is the default value and to append to
+# it when it has been overridden. This behaviour should hold regardless of
+# whether `merge_alist` is called the first time or the second time, and it
+# requires an extra context variable to keep track.
+#
+# merge_alist :: Opt list -> Named list -> Env{overridden} -> Opt list
+merge_alist <- function(fst, snd, context = as.environment(list(overridden = FALSE))) {
     for (var in names(snd)) {
         if (var %in% names(fst)) {
             fst[var] <- snd[var]
         } else if ("..." %in% names(fst)) {
-            if (deparse1(fst[["..."]]) == "") {
+            if (!context$overridden) { # first time
                 fst[["..."]] <- snd[var]
-            } else {
+                context$overridden <- TRUE
+            } else{
                 fst[["..."]] <- append(fst[["..."]], snd[var])
             }
         } # else { ignore the extra argument }

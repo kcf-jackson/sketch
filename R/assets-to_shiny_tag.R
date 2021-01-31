@@ -37,34 +37,35 @@ default_processors <- function() {
 }
 
 #=====================================================================
-`%o%` <- purrr::compose
-
-# is_call_pred :: char -> (language -> logical)
+# is_call_pred :: char -> (char -> logical)
 is_call_pred <- function(name) {
-    function(x) is_call(x, name = name)
+    function(x) {
+        is_call(parse_expr(x), name = name)
+    }
 }
 
+eval_expr <- function(x) eval(parse_expr(x))
 
 # load_library_pred :: char -> logical
-load_library_pred <- is_call_pred("load_library") %o% rlang::parse_expr
+load_library_pred <- is_call_pred("load_library")
 # load_library_proc :: char -> shiny.tag
-load_library_proc <- eval %o% rlang::parse_expr  # Delegate to `load_library`
+load_library_proc <- eval_expr  # Delegate to `load_library`
 
 
 # load_script_pred :: char -> logical
-load_script_pred <- is_call_pred("load_script") %o% rlang::parse_expr
+load_script_pred <- is_call_pred("load_script")
 # load_script_proc :: char -> shiny.tag
-load_script_proc <- eval %o% rlang::parse_expr  # Delegate to `load_script`
+load_script_proc <- eval_expr  # Delegate to `load_script`
 
 
 # load_data_pred :: char -> logical
-load_data_pred <- is_call_pred("load_data") %o% rlang::parse_expr
+load_data_pred <- is_call_pred("load_data")
 # load_data_proc :: char -> shiny.tag
-load_data_proc <- eval %o% rlang::parse_expr  # Delegate to `load_data`
+load_data_proc <- eval_expr  # Delegate to `load_data`
 
 
 # config_pred :: char -> logical
-config_pred <- is_call_pred("config") %o% rlang::parse_expr
+config_pred <- is_call_pred("config")
 # config_proc :: char -> NULL
 ignore_proc <- function(x) NULL  # This is handled by extra-config.R
 

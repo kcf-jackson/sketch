@@ -355,7 +355,7 @@ testthat::test_that("Test transpilation with basic rules and deparsers (files)",
 })
 
 
-# Additional tests
+# Test specific features
 testthat::test_that("Test raw string", {
     fpath <- system.file("test_files/test_raw_string.R", package = "sketch")
     exprs <- rlang::parse_exprs(file(fpath))
@@ -378,6 +378,22 @@ testthat::test_that("Test R6Class", {
     file_ref <- system.file("test_files/test_R6_2.js", package = "sketch")
     temp <- compile_r(file, tempfile())
     testthat::expect_equal(read_file(temp), read_file(file_ref))
+})
+
+
+# Additional tests
+testthat:: test_that("Test CDN option in `default_tags`", {
+    script <- default_tags()$head[[2]]
+    testthat::expect_gt(
+        nchar(script)[["attribs"]],
+        10000
+    )
+
+    script <- default_tags(local = FALSE)$head[[2]]
+    testthat::expect_lt(
+        nchar(script)[["attribs"]],
+        100
+    )
 })
 
 

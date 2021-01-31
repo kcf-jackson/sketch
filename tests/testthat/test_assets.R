@@ -23,7 +23,7 @@ testthat::test_that("Convert asset to shiny.tag", {
     )
 
     # Load script
-    # Web
+    # - Web
     testthat::expect_identical(
         convert_src("load_script(src('p5'))"),
         htmltools::tags$script(src = src("p5"))
@@ -44,7 +44,7 @@ testthat::test_that("Convert asset to shiny.tag", {
         htmltools::tags$link(href = "https://fonts.eot", rel = "preload")
     )
 
-    # Local
+    # - Local
     path <- system.file("test_files/test_js.js", package = "sketch")
     testthat::expect_identical(
         convert_src(glue::glue("load_script('{path}')")),
@@ -79,6 +79,11 @@ testthat::test_that("Convert asset to shiny.tag", {
         convert_src(glue::glue("load_script('{path}')")),
         htmltools::tags$script(src = "data:text/javascript;base64,ZmliID0gZnVuY3Rpb24obikgewogICAgaWYgKFIuTFQobiwgMikpIHsKICAgICAgICByZXR1cm4obikKICAgIH0gZWxzZSB7CiAgICAgICAgcmV0dXJuKFIuYWRkKGZpYihSLnN1YnRyYWN0KG4sIDEpKSwgZmliKFIuc3VidHJhY3QobiwgMikpKSkKICAgIH0KfQo=")
     )
+
+    # Config
+    testthat::expect_null(
+        convert_src(glue::glue("config(rules = basic_rules())"))
+    )
 })
 
 testthat::test_that("Compile data with caching", {
@@ -99,4 +104,14 @@ testthat::test_that("Convert data to JSON", {
     tsv <- system.file("test_files/test_tsv.tsv", package = "sketch")
     testthat::expect_error(to_json(tsv))
     testthat::expect_error(to_json(tsv, as_data_frame = TRUE))
+})
+
+testthat::test_that("Test helper function `is_call_pred`", {
+    f <- is_call_pred("load_fun")
+    testthat::expect_true(
+        f("load_fun(x = 1, y = 2)")
+    )
+    testthat::expect_false(
+        f("other_fun(x = 1, y = 2)")
+    )
 })

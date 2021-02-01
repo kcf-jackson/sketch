@@ -1,28 +1,28 @@
-test <- function() {
-    self$total <- 0
-    self$pass <- 0
-    self$error_msg <- Array()
+test <- R6Class("testthat", list(
+    total = 0,
+    pass = 0,
+    error_msg = Array(),
 
-    self$reset <- function() {
+    reset = function() {
         self$total <- 0
         self$pass <- 0
-    }
-    self$conduct_test <- function() {
+    },
+    conduct_test = function() {
         self$total <- self$total + 1
-    }
-    self$pass_test <- function() {
+    },
+    pass_test = function() {
         self$pass <- self$pass + 1
-    }
-    self$report <- function() {
+    },
+    report = function() {
         return(list(
             total = self$total,
             pass = self$pass,
-            failed = self$total - self$pass,
+            fail = self$total - self$pass,
             error_msg = self$error_msg
         ))
-    }
+    },
     # Testing functions
-    self$expect_true <- function(object) {
+    expect_true = function(object) {
         declare (msg)
         self$conduct_test()
         if (object != TRUE) {
@@ -32,8 +32,8 @@ test <- function() {
         } else {
             self$pass_test()
         }
-    }
-    self$expect_false <- function(object) {
+    },
+    expect_false = function(object) {
         declare (msg)
         self$conduct_test()
         if (object != FALSE) {
@@ -43,8 +43,8 @@ test <- function() {
         } else {
             self$pass_test()
         }
-    }
-    self$expect_equal <- function(object, expected) {
+    },
+    expect_equal = function(object, expected) {
         declare (msg)
         self$conduct_test()
         if (object != expected) {
@@ -67,7 +67,7 @@ test <- function() {
     #         self$pass_test()
     #     }
     # }
-}
+))
 
 testthat <- test$new()
 # testthat::expect_true(123)

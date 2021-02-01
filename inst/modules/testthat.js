@@ -1,4 +1,6 @@
 test = function() {
+    // public variables and methods
+    let self = this
     self.total = 0
     self.pass = 0
     self.error_msg = Array()
@@ -13,7 +15,7 @@ test = function() {
         self.pass = self.pass + 1
     }
     self.report = function() {
-        return({ "total": self.total, "pass": self.pass, "failed": self.total - self.pass, "error_msg": self.error_msg })
+        return({ "total": self.total, "pass": self.pass, "fail": self.total - self.pass, "error_msg": self.error_msg })
     }
     self.expect_true = function(object) {
         let msg
@@ -59,6 +61,12 @@ test = function() {
         } else {
             self.pass_test()
         }
+    }
+    // private variables and methods
+    let private = {}
+    
+    if (self.initialize) {
+        self.initialize()
     }
 }
 testthat = new test()

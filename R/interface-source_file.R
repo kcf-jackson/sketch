@@ -30,7 +30,7 @@ copy_active_to_tempfile <- function() {
 #' @param file A character string; path to the R file.
 #' @param debug TRUE or FALSE; if TRUE, a console for debugging is attached to your app.
 #' @param launch_browser A character string; "viewer" or "browser", which
-#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+#' calls `rstudioapi::viewer` and `utils::browseURL` respectively; use
 #' NULL to suppress display.
 #' @param asset_tags An optional list of 'shiny.tag' objects to be added to the html
 #' template. The list must have signature / structure of a named list:
@@ -67,7 +67,7 @@ source_r <- with_config(
 #' containing the \code{head} and \code{body} elements, each of which is a
 #' list of \code{shiny.tag} object.
 #' @param launch_browser A character string; "viewer" or "browser", which
-#' calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+#' calls `rstudioapi::viewer` and `utils::browseURL` respectively; use
 #' NULL to suppress display.
 #'
 #' @examples

@@ -27,12 +27,15 @@ websocket <- R6::R6Class("websocket", public = list(
     #' browser session.
     out_handler = NULL,
 
+    #' @field env An environment to store variables temporarily.
+    env = new.env(),
+
     #' @field port An integer; the TCP port number.
     port = 9454,
 
     #' @field message TRUE or FALSE; whether to display a prompt when
     #' a server is started and when it is stopped.
-    message = NULL,
+    message = TRUE,
 
     #' @field connected TRUE or FALSE; whether a connection has been established.
     #' One should ways start the WebSocket server before visiting the web page
@@ -169,7 +172,7 @@ websocket <- R6::R6Class("websocket", public = list(
     #' ws$stopServer()
     #' ws$listServers()    # Confirm no server is running
     #' }
-    initialize = function(in_handler = print,
+    initialize = function(in_handler = function(x) cat(x$msg, "\n"),
                           out_handler = sketch::compile_exprs,
                           message = TRUE, port = 9454) {
         self$app <- list(

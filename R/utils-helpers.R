@@ -116,3 +116,5 @@ line_separator <- function(x = "-") {
     paste0(rep(x, getOption("width")), collapse = "")
 }
 yellow <- function(x) paste0("\033[33m", x, "\033[39m")
+# red <- function(x) paste0("\033[31m", x, "\033[39m")
+green <- function(x) paste0("\033[32m", x, "\033[39m")  # nocov

@@ -18,7 +18,7 @@ source_r(
 \item{debug}{TRUE or FALSE; if TRUE, a console for debugging is attached to your app.}
 
 \item{launch_browser}{A character string; "viewer" or "browser", which
-calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+calls `rstudioapi::viewer` and `utils::browseURL` respectively; use
 NULL to suppress display.}
 
 \item{asset_tags}{An optional list of 'shiny.tag' objects to be added to the html

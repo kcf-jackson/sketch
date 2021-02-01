@@ -56,6 +56,8 @@ browser session.}
 \item{\code{out_handler}}{A function to handle instruction sent to the
 browser session.}
 
+\item{\code{env}}{An environment to store variables temporarily.}
+
 \item{\code{port}}{An integer; the TCP port number.}
 
 \item{\code{message}}{TRUE or FALSE; whether to display a prompt when
@@ -171,7 +173,7 @@ The (invisible) temporary file path to the app.
 Initialise a WebSocket connection
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{websocket$new(
-  in_handler = print,
+  in_handler = function(x) cat(x$msg, "\\n"),
   out_handler = sketch::compile_exprs,
   message = TRUE,
   port = 9454

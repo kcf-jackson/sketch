@@ -11,6 +11,7 @@
 \alias{is_call_function}
 \alias{is_call_return}
 \alias{is_call_assignment}
+\alias{is_call_assignment_auto}
 \alias{is_call_break}
 \alias{is_call_try}
 \alias{is_call_tryCatch}
@@ -54,6 +55,8 @@ is_call_function(ast)
 is_call_return(ast)
 
 is_call_assignment(ast)
+
+is_call_assignment_auto(ast)
 
 is_call_break(ast)
 
@@ -122,6 +125,8 @@ Predicate for the 'while' keyword
 Predicate for the "function" keyword
 
 Predicate for return
+
+Predicate for assignments
 
 Predicate for assignments
 

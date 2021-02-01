@@ -1,7 +1,7 @@
 Package: sketch
 Type: Package
 Title: Interactive Sketches 
-Version: 1.0.6
+Version: 1.1.0
 Authors@R: c(
     person("Chun Fung","Kwok", role = c("aut", "cre"), email = "kwokcf@unimelb.edu.au"),
     person("Kate", "Saunders", role = "ctb")
@@ -23,6 +23,7 @@ Imports:
     base64enc,
     jsonlite,
     shiny,
+    methods
 Suggests: 
     testthat,
     covr,

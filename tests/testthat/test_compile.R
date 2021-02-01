@@ -1,8 +1,8 @@
 testthat::context("Test the rewriting and deparsing modules")
 
 # Helper functions
-green <- function(x) paste0("\033[32m", x, "\033[39m")
 red <- function(x) paste0("\033[31m", x, "\033[39m")
+green <- function(x) paste0("\033[32m", x, "\033[39m")
 color <- function(pred) if (pred) green(pred) else red(pred)
 test_equal <- function(f, input, expected, silent = TRUE) {
     if (!silent) {
@@ -43,10 +43,14 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("abc$abc[0]", "abc.abc[0]")
     unit_test("abc$abc[[0]]", "abc.abc[[0]]")
 
-    # Test variable declaration
+    # Test variable declaration and one-space keyword
     unit_test("let (x)", "let x")
     unit_test("let (x = 3)", "let x = 3")
     unit_test("const (y = 4)", "const y = 4")
+    unit_test("obj_1$new(x, y)", "new obj_1(x, y)")
+    unit_test("lib_1$obj_1$new(x, y)", "new lib_1.obj_1(x, y)")
+    unit_test("typeof(x)", "typeof x")
+    unit_test("typeof(f(x + 1))", "typeof f(x + 1)")
 
     # Test control flow
     unit_test("if (TRUE) f(x)", "if (true) f(x)")
@@ -65,6 +69,14 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("try(1 + 1)", "try {\n    1 + 1\n} catch(error) {\n    console.log(error)\n}")
     unit_test("try({1 + 2; 3 + 4})", "try {\n    1 + 2\n    3 + 4\n} catch(error) {\n    console.log(error)\n}")
     unit_test("stop(\"ERROR_MSG\")", "throw new Error(\"ERROR_MSG\")")
+
+    # Test syntactic literal
+    unit_test("x <- NULL",  "x = null")
+    unit_test("x <- NA",  "x = undefined")
+    unit_test("x <- NaN",  "x = NaN")
+    unit_test("function() {}", "function() {\n    \n}")
+
+
 })
 
 testthat::test_that("Test transpilation with default rules and deparsers (exprs)", {
@@ -94,8 +106,6 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("obj_1$attr_1$x", "obj_1.attr_1.x")
     unit_test("obj_1$attr_1$f(1 + 2)", "obj_1.attr_1.f(R.add(1, 2))")
     unit_test("(a + b)$x", "(R.add(a, b)).x")
-    unit_test("obj_1$new(x, y)", "new obj_1(x, y)")
-    unit_test("lib_1$obj_1$new(x, y)", "new lib_1.obj_1(x, y)")
     unit_test("abc$abc[0]", "R.extract(abc.abc, 0)")
     unit_test("abc$abc[[0]]", "R.extract2(abc.abc, 0)")
     unit_test("abc$abc[[]]", "null")
@@ -121,12 +131,18 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("for (i in iterables) { x }", "for (let i of iterables) {\n    x\n}")
     unit_test("while (TRUE) { do(x) }", "while (true) {\n    do(x)\n}")
 
-    # Test variable declaration
+    # Test variable declaration and one-space keyword
     unit_test("let (x)", "let x")
     unit_test("let (x = 3)", "let x = 3")
     unit_test("declare (x)", "let x")
     unit_test("declare (y = 4)", "let y = 4")
     unit_test("const (y = 4)", "const y = 4")
+    unit_test("obj_1$new(x, y)", "new obj_1(x, y)")
+    unit_test("lib_1$obj_1$new(x, y)", "new lib_1.obj_1(x, y)")
+
+    # R functions
+    unit_test("typeof(x)", "R.typeof(x)")
+    unit_test("typeof(f(x + 1))", "R.typeof(f(R.add(x, 1)))")
 
     # Test R list
     unit_test("list(x = 1, y = 2)", "{ \"x\": 1, \"y\": 2 }")
@@ -216,11 +232,17 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     testthat::expect_error(default("R6Class(\"myClass\", list(), x = \"NO LIST\")"))
     testthat::expect_error(default("R6Class(\"myClass\", list(), list(\"NO NAME\"))"))
     testthat::expect_error(default("R6Class(\"myClass\", list(initialize = \"ERROR: NOT A FUNCTION\"))"))
+
+    # Test syntactic literal
+    unit_test("x <- NULL",  "x = null")
+    unit_test("x <- NA",  "x = undefined")
+    unit_test("x <- NaN",  "x = NaN")
+    unit_test("function() {}", "function() {\n    \n}")
 })
 
 testthat::test_that("Test transpilation with default 2 deparsers", {
     # Basic 2 setup
-    basic_2 <- purrr::partial(compile_exprs, rules = basic_2_rules(), deparsers = default_2_deparsers())
+    basic_2 <- purrr::partial(compile_exprs, rules = basic_rules(), deparsers = default_2_deparsers())
     unit_test <- purrr::partial(test_equal, f = basic_2)
 
     unit_test("function(x) {x}", "function(x) {\n    return x\n}")
@@ -237,7 +259,7 @@ testthat::test_that("Test transpilation with default 2 deparsers", {
     testthat::expect_warning(basic_2("function(x) { for (i in 1:10) { print(i) } }"))
 
     # Default 2 setup
-    default_2 <- purrr::partial(compile_exprs, rules = default_2_rules(), deparsers = default_2_deparsers())
+    default_2 <- purrr::partial(compile_exprs, rules = default_rules(), deparsers = default_2_deparsers())
     unit_test <- purrr::partial(test_equal, f = default_2)
 
     unit_test("function(x) {}", "function(x) {\n    \n}")
@@ -333,7 +355,7 @@ testthat::test_that("Test transpilation with basic rules and deparsers (files)",
 })
 
 
-# Additional tests
+# Test specific features
 testthat::test_that("Test raw string", {
     fpath <- system.file("test_files/test_raw_string.R", package = "sketch")
     exprs <- rlang::parse_exprs(file(fpath))
@@ -356,6 +378,22 @@ testthat::test_that("Test R6Class", {
     file_ref <- system.file("test_files/test_R6_2.js", package = "sketch")
     temp <- compile_r(file, tempfile())
     testthat::expect_equal(read_file(temp), read_file(file_ref))
+})
+
+
+# Additional tests
+testthat:: test_that("Test CDN option in `default_tags`", {
+    script <- default_tags()$head[[2]]
+    testthat::expect_gt(
+        nchar(script)[["attribs"]],
+        10000
+    )
+
+    script <- default_tags(local = FALSE)$head[[2]]
+    testthat::expect_lt(
+        nchar(script)[["attribs"]],
+        100
+    )
 })
 
 

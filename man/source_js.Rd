@@ -23,7 +23,7 @@ containing the \code{head} and \code{body} elements, each of which is a
 list of \code{shiny.tag} object.}
 
 \item{launch_browser}{A character string; "viewer" or "browser", which
-calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
+calls `rstudioapi::viewer` and `utils::browseURL` respectively; use
 NULL to suppress display.}
 }
 \description{

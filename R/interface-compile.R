@@ -14,14 +14,17 @@
 #' compile_r(input = file)
 #'
 #' @export
-compile_r <- function(input, output = "",
-                      rules = default_rules(),
-                      deparsers = default_deparsers()) {
-    file(input) %>%
-        compile_exprs(rules, deparsers) %>%
-        write(file = output)
-    invisible(output)
-}
+compile_r <- with_config(
+    "input",
+    function(input, output = "",
+             rules = default_rules(),
+             deparsers = default_deparsers()) {
+        file(input) %>%
+            compile_exprs(rules, deparsers) %>%
+            write(file = output)
+        invisible(output)
+    }
+)
 
 
 #' Compile R code into JavaScript code
@@ -39,7 +42,9 @@ compile_r <- function(input, output = "",
 #' @export
 compile_exprs <- function(x, rules = default_rules(),
                           deparsers = default_deparsers()) {
-    rlang::parse_exprs(x) %>%
+    exprs <- rlang::parse_exprs(x)
+    safeguard(exprs, rules = rules)
+    exprs %>%
         purrr::map(rewrite, rules = rules) %>%
         purrr::map_chr(deparse_js, deparsers = deparsers)
 }

@@ -6,9 +6,14 @@
 \alias{basic_tags}
 \title{HTML templates}
 \usage{
-default_tags()
+default_tags(local = TRUE)
 
 basic_tags()
+}
+\arguments{
+\item{local}{TRUE / FALSE. If TRUE, the R base module is loaded from the
+local file stored in the package, otherwise, the module is served via a
+content delivery network (CDN).}
 }
 \description{
 A list of 'shiny.tag' objects describing a HTML template. The

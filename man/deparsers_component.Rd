@@ -3,6 +3,9 @@
 \name{deparse_Family}
 \alias{deparse_Family}
 \alias{deparse_sym}
+\alias{deparse_NULL}
+\alias{deparse_NA}
+\alias{deparse_NaN}
 \alias{deparse_call}
 \alias{deparse_infix}
 \alias{deparse_wrap}
@@ -13,6 +16,7 @@
 \alias{deparse_function_with_return}
 \alias{deparse_return}
 \alias{deparse_assignment}
+\alias{deparse_assignment_auto}
 \alias{deparse_try}
 \alias{deparse_tryCatch}
 \alias{deparse_throw}
@@ -40,6 +44,12 @@
 \usage{
 deparse_sym(ast, ...)
 
+deparse_NULL(ast, ...)
+
+deparse_NA(ast, ...)
+
+deparse_NaN(ast, ...)
+
 deparse_call(ast, ...)
 
 deparse_infix(ast, ...)
@@ -59,6 +69,8 @@ deparse_function_with_return(ast, ...)
 deparse_return(ast, ...)
 
 deparse_assignment(ast, ...)
+
+deparse_assignment_auto(ast, ...)
 
 deparse_try(ast, ...)
 
@@ -118,6 +130,12 @@ A character string.
 \description{
 Deparsers (specialised)
 
+Deparser for NULL
+
+Deparser for NA
+
+Deparser for NaN
+
 Deparser for calls
 
 Deparser for infix operators
@@ -137,6 +155,8 @@ Deparser for the "function" keyword with explicit return
 Deparser for return
 
 Deparser for assignments
+
+Deparser for assignments (automatic variable declaration)
 
 Deparser for the "try" keyword
 

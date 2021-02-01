@@ -24,6 +24,26 @@ deparse_sym <- function(ast, ...) {
   deparse(ast, width.cutoff = 500L)
 }
 
+
+# Deparser for syntactic literal ---------------------------------------
+#' Predicate for syntactic literal
+#' @inheritParams rlang::is_syntactic_literal
+#' @note This function is imported from `rlang`.
+is_syntactic_literal <- rlang::is_syntactic_literal
+
+#' Deparser for NULL
+#' @rdname deparsers_component
+deparse_NULL <- function(ast, ...) return("null")
+
+#' Deparser for NA
+#' @rdname deparsers_component
+deparse_NA <- function(ast, ...) return("undefined")
+
+#' Deparser for NaN
+#' @rdname deparsers_component
+deparse_NaN <- function(ast, ...) return("NaN")
+
+
 # Deparser for calls ---------------------------------------
 #' Predicate for calls
 #' @inheritParams rlang::is_call
@@ -376,11 +396,25 @@ deparse_return <- function(ast, ...) {
 # Deparser for assignments ----------------------------------
 #' Predicate for assignments
 #' @rdname predicate_component
-is_call_assignment <- function(ast) is_call(ast, c("<-", "=", "<<-"))
+is_call_assignment <- function(ast) is_call(ast, c("<-", "<<-"))
+
 
 #' Deparser for assignments
 #' @rdname deparsers_component
+# Replace arrow sign by equal sign
 deparse_assignment <- function(ast, ...) {
+  ast[[1]] <- as.symbol("=")
+  deparse_js(ast, ...)
+}
+
+
+#' Predicate for assignments
+#' @rdname predicate_component
+is_call_assignment_auto <- function(ast) is_call(ast, c("<-", "=", "<<-"))
+
+#' Deparser for assignments (automatic variable declaration)
+#' @rdname deparsers_component
+deparse_assignment_auto <- function(ast, ...) {
   sym_ls <- purrr::map_chr(ast, deparse_js, ...)
   # 'var' is added only when LHS is a symbol
   if (rlang::is_symbol(ast[[2]]) && !is_call(ast, "<<-")) {

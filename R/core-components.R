@@ -307,7 +307,7 @@ deparse_function_with_return <- function(ast, ...) {
 
   add_return <- function(ast) {
     template_ast <- parse_expr("return(x)")
-    template_ast[[2]] <- ast  # insert tree at x
+    template_ast[2] <- list(ast)  # insert tree at x
     ast <- template_ast
     return(ast)
   }

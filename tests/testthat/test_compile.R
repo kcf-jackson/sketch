@@ -264,7 +264,8 @@ testthat::test_that("Test transpilation with default 2 deparsers", {
 
     unit_test("function(x) {}", "function(x) {\n    \n}")
     unit_test("function(x) {x}", "function(x) {\n    return x\n}")
-    unit_test("function(x) x", "function(x) { return x }")
+    unit_test("function(x) {NULL}", "function(x) {\n    return null\n}")
+    unit_test("function(x) NULL", "function(x) { return null }")
     testthat::expect_warning(
         unit_test("function(x) {if(x) {x} else {x + 1}}",
                   "function(x) {\n    if (x) {\n        x\n    } else {\n        R.add(x, 1)\n    }\n}")

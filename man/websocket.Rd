@@ -172,12 +172,7 @@ The (invisible) temporary file path to the app.
 \subsection{Method \code{new()}}{
 Initialise a WebSocket connection
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{websocket$new(
-  in_handler = function(x) cat(x$msg, "\\n"),
-  out_handler = sketch::compile_exprs,
-  message = TRUE,
-  port = 9454
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{websocket$new(in_handler, out_handler, message = TRUE, port = 9454)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

@@ -4,13 +4,7 @@
 \alias{source_r}
 \title{Source a 'sketch' R file}
 \usage{
-source_r(
-  file,
-  debug = FALSE,
-  launch_browser = "viewer",
-  asset_tags = default_tags(),
-  ...
-)
+source_r(file, debug = FALSE, launch_browser, asset_tags = default_tags(), ...)
 }
 \arguments{
 \item{file}{A character string; path to the R file.}

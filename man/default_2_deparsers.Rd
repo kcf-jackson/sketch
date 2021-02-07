@@ -2,12 +2,13 @@
 % Please edit documentation in R/core-deparse.R
 \name{default_2_deparsers}
 \alias{default_2_deparsers}
-\title{A list of deparsers to support implicit variable declaration and explicit 'return'}
+\title{A list of deparsers with additional features}
 \usage{
 default_2_deparsers()
 }
 \description{
-A list of deparsers to support implicit variable declaration and explicit 'return'
+Support automatic variable declaration, automatic `return`
+and shorthand notation for the DOM module.
 }
 \note{
 lifecycle: experimental

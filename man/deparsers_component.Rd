@@ -40,6 +40,7 @@
 \alias{deparse_extractAssign}
 \alias{deparse_extract2}
 \alias{deparse_extract2Assign}
+\alias{deparse_html_tags}
 \title{Deparsers (specialised)}
 \usage{
 deparse_sym(ast, ...)
@@ -117,6 +118,8 @@ deparse_extractAssign(ast, ...)
 deparse_extract2(ast, ...)
 
 deparse_extract2Assign(ast, ...)
+
+deparse_html_tags(ast, ...)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -203,4 +206,6 @@ Deparser for the "extractAssign" operator
 Deparser for the "extract2" operator
 
 Deparser for the "extract2Assign" operator
+
+Deparser for the HTML tags
 }

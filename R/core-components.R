@@ -1027,3 +1027,70 @@ deparse_extract2Assign <- function(ast, ...) {
   val <- deparse_js(ast[[3]], ...)
   glue::glue("{obj} = R.extract2Assign({obj}, {val}, {ind})")
 }
+
+
+# DOM module --------------------------------------------------------
+#' Predicate for the HTML tags
+#' @rdname predicate_component
+is_html_tags <- function(ast) {
+  tags <- c("div", "span", "p", "a", "textarea",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "i", "em", "strong", "u", "ul", "li", "blockquote", "hr",
+    "img", "script", "audio", "video", "canvas", "input", "link",
+    "section", "article", "header", "nav", "footer", "iframe",
+    "table", "tbody", "thead", "td", "tr", "th",
+    "form", "option", "menu", "code", "pre", "style")
+  # tags <- c("a", "abbr", "address", "area", "article", "aside",
+  #           "audio", "b", "base", "bdi", "bdo", "blockquote", "body",
+  #           "br", "button", "canvas", "caption", "cite", "code", "col",
+  #           "colgroup", "data", "datalist", "dd", "del", "details",
+  #           "dfn", "dialog", "div", "dl", "dt", "em", "embed",
+  #           "fieldset", "figure", "footer", "form", "h1", "h2", "h3",
+  #           "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html",
+  #           "i", "iframe", "img", "input", "ins", "kbd", "keygen",
+  #           "label", "legend", "li", "link", "main", "map", "mark",
+  #           "menu", "menuitem", "meta", "meter", "nav", "noscript",
+  #           "object", "ol", "optgroup", "option", "output", "p",
+  #           "param", "pre", "progress", "q", "rb", "rp", "rt", "rtc",
+  #           "ruby", "s", "samp", "script", "section", "select", "small",
+  #           "source", "span", "strong", "style", "sub", "summary",
+  #           "sup", "table", "tbody", "td", "template", "textarea",
+  #           "tfoot", "th", "thead", "time", "title", "tr", "track",
+  #           "u", "ul", "var", "video", "wbr")
+  is_call(ast, tags)
+}
+
+#' Deparser for the HTML tags
+#' @rdname deparsers_component
+deparse_html_tags <- function(ast, ...) {
+  tag <- deparse(ast[[1]])
+  # Empty argument
+  if (length(ast) == 1) {
+    return(glue::glue("dom(\"{tag}\")"))
+  }
+
+  # No named element
+  args <- ast[-1]
+  if (is.null(names(args))) {
+    args_str <- args %>%
+      purrr::map_chr(deparse_js, ...) %>%
+      paste0(collapse = ", ")
+    return(glue::glue("dom(\"{tag}\", {{}}, {args_str})"))
+  }
+
+  # Has named elements
+  named <- names(args) != ""
+  named_ast <- ast
+  named_ast[[1]] <- as.symbol("list")
+  named_ast[1 + which(!named)] <- NULL
+  named_args <- deparse_js(named_ast, ...)
+  if (all(named)) {
+    return(glue::glue("dom(\"{tag}\", {named_args})"))
+  }
+
+  unnamed_args <- args[!named] %>%
+    purrr::map_chr(deparse_js, ...) %>%
+    paste0(collapse = ", ")
+  return(glue::glue("dom(\"{tag}\", {named_args}, {unnamed_args})"))
+}
+

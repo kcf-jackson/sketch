@@ -75,8 +75,6 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("x <- NA",  "x = undefined")
     unit_test("x <- NaN",  "x = NaN")
     unit_test("function() {}", "function() {\n    \n}")
-
-
 })
 
 testthat::test_that("Test transpilation with default rules and deparsers (exprs)", {
@@ -171,10 +169,10 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("lambda(x = 99, sin(x))", "function(x = 99) { return R.sin(x); }")
 
     # Test pipe operator
-    unit_test("a %>% b", "b(a)")
-    unit_test("a %>% b()", "b(a)")
-    unit_test("a %>% b(arg2 = 2)", "b(a, 2)")
-    unit_test("a %>% b(arg2 = 2, arg3 = 3)", "b(a, 2, 3)")
+    unit_test("x %>% b", "b(x)")
+    unit_test("x %>% b()", "b(x)")
+    unit_test("x %>% b(arg2 = 2)", "b(x, 2)")
+    unit_test("x %>% b(arg2 = 2, arg3 = 3)", "b(x, 2, 3)")
     unit_test("f(x) %>% b(arg2 = 2)", "b(f(x), 2)")
     unit_test("f(x=4) %>% b", "b(f(4))")
     unit_test("f(x=4) %>% b()", "b(f(4))")
@@ -278,6 +276,14 @@ testthat::test_that("Test transpilation with default 2 deparsers", {
     testthat::expect_warning(default_2("function(x) { x <- 10 }"))
     testthat::expect_warning(default_2("function(x) {if(x) {x} else {x + 1}}"))
     testthat::expect_warning(default_2("function(x) { for (i in 1:10) { print(i) } }"))
+
+    # Test HTML tags
+    unit_test("div()", 'dom("div")')
+    unit_test("div(span())", 'dom("div", {}, dom("span"))')
+    unit_test("div(innerHTML = \"Hello!\", span())",
+              'dom("div", { "innerHTML": "Hello!" }, dom("span"))')
+    unit_test("div(innerHTML = \"Hello!\", span(innerText = \"Hi\"))",
+              'dom("div", { "innerHTML": "Hello!" }, dom("span", { "innerText": "Hi" }))')
 })
 
 

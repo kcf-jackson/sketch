@@ -123,8 +123,10 @@ default_deparsers <- function() {
 }
 
 
-#' A list of deparsers to support implicit variable declaration and explicit 'return'
+#' A list of deparsers with additional features
 #'
+#' @description Support automatic variable declaration, automatic `return`
+#' and shorthand notation for the DOM module.
 #' @note lifecycle: experimental
 #' @note This is used as input to \link{compile_r} and \link{compile_exprs}.
 #'
@@ -137,7 +139,9 @@ default_2_deparsers <- function() {
     list(
       "assignment_auto" = make_deparser(is_call_assignment_auto, deparse_assignment_auto),
       "function" = make_deparser(is_call_function, deparse_function_with_return),
-      "return" = make_deparser(is_call_return, deparse_return)
+      "return" = make_deparser(is_call_return, deparse_return),
+      # DOM helpers
+      "dom" = make_deparser(is_html_tags, deparse_html_tags)
     ),
     default_deparsers()
   )

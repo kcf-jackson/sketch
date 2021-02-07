@@ -36,6 +36,7 @@
 \alias{is_call_extractAssign}
 \alias{is_call_extract2}
 \alias{is_call_extract2Assign}
+\alias{is_html_tags}
 \title{Predicate for symbols, i.e. symbols or syntactic literals}
 \usage{
 is_sym(ast)
@@ -105,6 +106,8 @@ is_call_extractAssign(ast)
 is_call_extract2(ast)
 
 is_call_extract2Assign(ast)
+
+is_html_tags(ast)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -177,4 +180,6 @@ Predicate for the "extractAssign" operator
 Predicate for the "extract2" operator
 
 Predicate for the "extract2Assign" operator
+
+Predicate for the HTML tags
 }

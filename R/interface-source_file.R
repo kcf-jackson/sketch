@@ -83,8 +83,15 @@ source_r <- with_config(
 source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
                       launch_browser) {
   if (debug) {
-    debugger_js <- system.file("assets/console-log-div.js", package = "sketch")
-    asset_tags <- append_to_body(asset_tags, js_to_shiny_tag(debugger_js))
+    debug_attr <- attributes(debug)
+    if (length(debug_attr) == 0 || debug_attr$local) {
+      debugger_file <- system.file("assets/console-log-div.js", package = "sketch")
+      debugger_js <- js_to_shiny_tag(debugger_file)
+    } else {
+      debugger_cdn <- "https://cdn.jsdelivr.net/gh/kcf-jackson/sketch@1.1.0/inst/assets/console-log-div.js"
+      debugger_js <- htmltools::tags$script(src = debugger_cdn)
+    }
+    asset_tags <- append_to_body(asset_tags, debugger_js)
   }
   if (missing(launch_browser)) {
     launch_browser <- ifelse(rstudioapi::isAvailable(), "viewer", "browser")

@@ -42,9 +42,25 @@ compile_r <- with_config(
 #' @export
 compile_exprs <- function(x, rules = default_rules(),
                           deparsers = default_deparsers()) {
-    exprs <- rlang::parse_exprs(x)
-    safeguard(exprs, rules = rules)
-    exprs %>%
+    rlang::parse_exprs(x) %T>%
+        purrr::map(safeguard, rules = rules) %>%
         purrr::map(rewrite, rules = rules) %>%
         purrr::map_chr(deparse_js, deparsers = deparsers)
+}
+
+
+#' Compile active file in 'RStudio'
+#'
+#' @param ... Optional arguments to pass to \code{compile_r}.
+#'
+#' @examples
+#' \dontrun{
+#' # At 'RStudio', opens a 'sketch' R file in the editor, then
+#' # run the following:
+#' compile_active()
+#' }
+#'
+#' @export
+compile_active <- function(...) {
+    compile_r(copy_active_to_tempfile(), ...)  # nocov
 }

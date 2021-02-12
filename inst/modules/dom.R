@@ -1,3 +1,5 @@
+#! config(rules = basic_rules(), deparsers = default_deparsers())
+
 # A simple interface to manipulate DOM elements in browser
 
 #' Construct a new DOM element
@@ -54,6 +56,10 @@ print_dom <- function(el, x = "body") {
         return(x)
     }
 }
+
+# alias
+render <- print_dom
+
 
 #' Attach DOM elements to a DOM element
 #' @param parent A DOM element

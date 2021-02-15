@@ -9,6 +9,7 @@
 #'
 #' @export
 src <- function(x) {
+    module_cdn_link <- "https://cdn.jsdelivr.net/gh/kcf-jackson/sketch/inst/modules/"
     switch(x,
            # Math
            "mathjs" = "https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.0.2/math.min.js",
@@ -30,6 +31,13 @@ src <- function(x) {
            "io" = system.file("modules/io.js", package = "sketch"),
            "websocket" = system.file("modules/websocket.js", package = "sketch"),
            "testthat" = system.file("modules/testthat.js", package = "sketch"),
+           "purrr" = system.file("modules/purrr.js", package = "sketch"),
+           # Modules CDN
+           "cdn-dom" = paste0(module_cdn_link, "dom.js"),
+           "cdn-io" = paste0(module_cdn_link, "io.js"),
+           "cdn-websocket" = paste0(module_cdn_link, "websocket.js"),
+           "cdn-testthat" = paste0(module_cdn_link, "testthat.js"),
+           "cdn-purrr" = paste0(module_cdn_link, "purrr.js"),
            stop(glue::glue("Library '{x}' does not exist."))
     )
 }
@@ -118,3 +126,17 @@ line_separator <- function(x = "-") {
 yellow <- function(x) paste0("\033[33m", x, "\033[39m")
 # red <- function(x) paste0("\033[31m", x, "\033[39m")
 green <- function(x) paste0("\033[32m", x, "\033[39m")  # nocov
+
+
+
+#' #' A helper function to enable debugger option
+#' #'
+#' #' @param x TRUE / FALSE; whether to attach a debugging console to
+#' #' the sketch application.
+#' #' @param local TRUE / FALSE; whether to load the debugger console
+#' #' from the local package. If FALSE, the console will be loaded from
+#' #' a Content Delivery Network (CDN) link.
+#' debug <- function(x, local = TRUE) {
+#'     attr(x, "local") <- local
+#'     x
+#' }

@@ -88,7 +88,7 @@ source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
       debugger_file <- system.file("assets/console-log-div.js", package = "sketch")
       debugger_js <- js_to_shiny_tag(debugger_file)
     } else {
-      debugger_cdn <- "https://cdn.jsdelivr.net/gh/kcf-jackson/sketch@1.1.0/inst/assets/console-log-div.js"
+      debugger_cdn <- "https://cdn.jsdelivr.net/gh/kcf-jackson/sketch/inst/assets/console-log-div.js"
       debugger_js <- htmltools::tags$script(src = debugger_cdn)
     }
     asset_tags <- append_to_body(asset_tags, debugger_js)

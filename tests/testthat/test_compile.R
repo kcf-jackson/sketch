@@ -178,7 +178,7 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("f(x=4) %>% b()", "b(f(4))")
 
     # Test function definition
-    unit_test("function(b, c) {}", "function(b, c) {\n    \n}")
+    unit_test("function(x, y) {}", "function(x, y) {\n    \n}")
     unit_test("function(x, y) x + y", "function(x, y) { R.add(x, y) }")
     unit_test("function(x, y) {x + y}", "function(x, y) {\n    R.add(x, y)\n}")
     unit_test("function(x = 3, y) {x + y}", "function(x = 3, y) {\n    R.add(x, y)\n}")
@@ -194,8 +194,8 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     testthat::expect_error(default("raw_str(123)"))
 
     # Test that function arguments are rewritten
-    unit_test("function(b = TRUE, c = FALSE) {}", "function(b = true, c = false) {\n    \n}")
-    unit_test("function(b = 1:3, c = 3:5) {}", "function(b = R.seq(1, 3), c = R.seq(3, 5)) {\n    \n}")
+    unit_test("function(x = TRUE, y = FALSE) {}", "function(x = true, y = false) {\n    \n}")
+    unit_test("function(x = 1:3, y = 3:5) {}", "function(x = R.seq(1, 3), y = R.seq(3, 5)) {\n    \n}")
     unit_test("function(n = 2 ^ 4) {}", "function(n = R.pow(2, 4)) {\n    \n}")
     unit_test("function(n = 3 ^ 2 ^ 2) {}", "function(n = R.pow(3, R.pow(2, 2))) {\n    \n}")
     unit_test("function(x = 3 + a, y) {x + y}", "function(x = R.add(3, a), y) {\n    R.add(x, y)\n}")

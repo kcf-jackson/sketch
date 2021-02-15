@@ -53,6 +53,10 @@ deparse_js <- function(ast, deparsers) {
 #'
 #' @export
 basic_deparsers <- function() {
+  # Order is strict and the deparsers must be arranged such that the
+  # specialised ones are at the top and the general ones are at the
+  # bottom. This list acts like a sieve, and only inputs that do not
+  # get caught at the top will fall to the bottom.
   list(
     "assignment" = make_deparser(is_call_assignment, deparse_assignment),
     # JavaScript template literal
@@ -100,26 +104,7 @@ basic_deparsers <- function() {
 #'
 #' @export
 default_deparsers <- function() {
-  # Order is strict and the deparsers must be arranged such that the
-  # specialised ones are at the top and the general ones are at the
-  # bottom. This list acts like a sieve, and only inputs that do not
-  # get caught at the top will fall to the bottom.
-  append(
-    list(
-      # Library functions
-      "R.add" = make_deparser(is_call_add, deparse_add),
-      "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
-      "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extract2Assign),
-      "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
-      "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
-      "R.extract" = make_deparser(is_call_extract, deparse_extract),
-      # Data structure
-      "R.data.frame" = make_deparser(is_call_df, deparse_df),
-      "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
-      "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate)
-    ),
-    basic_deparsers()
-  )
+  (basic_deparsers %<% dp_r_support)()
 }
 
 
@@ -135,17 +120,65 @@ default_deparsers <- function() {
 #'
 #' @export
 default_2_deparsers <- function() {
-  append(
-    list(
-      "assignment_auto" = make_deparser(is_call_assignment_auto, deparse_assignment_auto),
-      "function" = make_deparser(is_call_function, deparse_function_with_return),
-      "return" = make_deparser(is_call_return, deparse_return),
-      # DOM helpers
-      "dom" = make_deparser(is_html_tags, deparse_html_tags)
-    ),
-    default_deparsers()
+  (default_deparsers %<% dp_auto %<% dp_dom)()
+}
+
+
+# For internal reference, deparsers shall be referred to as `dp`.
+
+#' Low-level lists of deparsers
+#' @name list-of-deparsers
+#' @description Support of R functionalities
+dp_r_support <- function() {
+  list(
+    # Library functions
+    "R.add" = make_deparser(is_call_add, deparse_add),
+    "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
+    "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extract2Assign),
+    "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
+    "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
+    "R.extract" = make_deparser(is_call_extract, deparse_extract),
+    # Data structure
+    "R.data.frame" = make_deparser(is_call_df, deparse_df),
+    "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
+    "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate)
   )
 }
+
+#' Automatic variable declaration and return
+#' @rdname list-of-deparsers
+dp_auto <- function() {
+  list(
+    "assignment_auto" = make_deparser(is_call_assignment_auto, deparse_assignment_auto),
+    "function" = make_deparser(is_call_function, deparse_function_with_return),
+    "return" = make_deparser(is_call_return, deparse_return),
+  )
+}
+
+#' Shorthand notation for the 'dom' module
+#' @rdname list-of-deparsers
+dp_dom <- function() {
+  list("dom" = make_deparser(is_html_tags, deparse_html_tags))
+}
+
+#' Constructor function to combine low-level deparsers
+dp <- function(...) {
+  current_support <- list(
+    "basic" = basic_deparsers,
+    "r" = dp_r_support,
+    "auto" = dp_auto,
+    "dom" = dp_dom
+  )
+  res <- current_support[c(...)] %>%
+    purrr::reduce(`%<%`)
+  res()
+}
+
+# Combinator of functions that return list
+`%<%` <- function(f, g) {
+  function() { append(g(), f()) }
+}
+
 
 
 #' A constructor for a "typed" deparser

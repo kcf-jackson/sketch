@@ -27,8 +27,10 @@
 \alias{deparse_R6Class}
 \alias{deparse_new}
 \alias{deparse_typeof}
+\alias{deparse_export}
 \alias{deparse_let}
 \alias{deparse_const}
+\alias{deparse_var}
 \alias{deparse_dataURI}
 \alias{deparse_ifelse}
 \alias{deparse_lambda}
@@ -93,9 +95,13 @@ deparse_new(ast, ...)
 
 deparse_typeof(ast, ...)
 
+deparse_export(ast, ...)
+
 deparse_let(ast, ...)
 
 deparse_const(ast, ...)
+
+deparse_var(ast, ...)
 
 deparse_dataURI(ast, ...)
 
@@ -181,9 +187,13 @@ Deparser for the "new" operator
 
 Deparser for the "typeof" operator
 
+Deparser for the "export" operator
+
 Deparser for the "let" operator
 
 Deparser for the "const" operator
+
+Deparser for the "var" operator
 
 Deparser for the "dataURI" operator
 

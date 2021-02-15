@@ -23,8 +23,10 @@
 \alias{is_call_R6Class}
 \alias{is_call_new}
 \alias{is_call_typeof}
+\alias{is_call_export}
 \alias{is_call_let}
 \alias{is_call_const}
+\alias{is_call_var}
 \alias{is_call_dataURI}
 \alias{is_call_ifelse}
 \alias{is_call_lambda}
@@ -81,9 +83,13 @@ is_call_new(ast)
 
 is_call_typeof(ast)
 
+is_call_export(ast)
+
 is_call_let(ast)
 
 is_call_const(ast)
+
+is_call_var(ast)
 
 is_call_dataURI(ast)
 
@@ -155,9 +161,13 @@ Predicate for the "new" operator
 
 Predicate for the "typeof" operator
 
+Predicate for the "export" operator
+
 Predicate for the "let" operator
 
 Predicate for the "const" operator
+
+Predicate for the "var" operator
 
 Predicate for the "dataURI" operator
 

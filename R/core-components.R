@@ -322,16 +322,12 @@ deparse_function_with_return <- function(ast, ...) {
     ast_string <- deparse_js(ast, ...)
     if (is_assignment(ast)) {
       warning("You have used an assignment statement as the final expression in:", immediate. = TRUE)
-      message(line_separator("-"))
-      message(ast_string)
-      message(line_separator("-"))
+      message(yellow(ast_string))
       message("Note that automatic explicit return only applies to standalone values but not statements.")
     }
     if (is_keyword(ast)) {
       warning("You have used a control-flow statement as the final expression in:", immediate. = TRUE)
-      message(line_separator("-"))
-      message(ast_string)
-      message(line_separator("-"))
+      message(yellow(ast_string))
       message("Note that automatic explicit return only applies to standalone values but not statements.")
     }
 
@@ -741,6 +737,21 @@ deparse_typeof <- function(ast, ...) {
 }
 
 
+# Deparser for "export" ------------------------------------------------------
+#' Predicate for the "export" operator
+#' @rdname predicate_component
+is_call_export <- function(ast) {
+  is_call(ast, "export")
+}
+
+#' Deparser for the "export" operator
+#' @rdname deparsers_component
+deparse_export <- function(ast, ...) {
+  args <- deparse_js(ast[[2]], ...)
+  glue::glue("export {args}")
+}
+
+
 # Deparser for "let" and "const" -----------------------------------------------
 #' Predicate for the "let" operator
 #' @rdname predicate_component
@@ -777,6 +788,14 @@ is_call_const <- function(ast) is_call(ast, "const")
 #' @rdname deparsers_component
 deparse_const <- deparse_let
 
+
+#' Predicate for the "var" operator
+#' @rdname predicate_component
+is_call_var <- function(ast) is_call(ast, "var")
+
+#' Deparser for the "var" operator
+#' @rdname deparsers_component
+deparse_var <- deparse_let
 
 
 # Deparser for "dataURI" --------------------------------------------------

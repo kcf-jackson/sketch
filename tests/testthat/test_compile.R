@@ -75,6 +75,10 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("x <- NA",  "x = undefined")
     unit_test("x <- NaN",  "x = NaN")
     unit_test("function() {}", "function() {\n    \n}")
+
+    # Test formula
+    unit_test("~.x * .y + fun(.z)", "function(dot_x, dot_y, dot_z) { return dot_x * dot_y + fun(dot_z) }")
+    unit_test("~x * .y + fun(z)", "function(dot_y) { return x * dot_y + fun(z) }")
 })
 
 testthat::test_that("Test transpilation with default rules and deparsers (exprs)", {

@@ -82,6 +82,7 @@ basic_deparsers <- function() {
     "throw" = make_deparser(is_call_throw, deparse_throw),
     "R6Class" = make_deparser(is_call_R6Class, deparse_R6Class),
     # Operators
+    "formula" = make_deparser(is_call_formula, deparse_formula),
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
     "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
     # Syntactic literal
@@ -151,7 +152,7 @@ dp_auto <- function() {
   list(
     "assignment_auto" = make_deparser(is_call_assignment_auto, deparse_assignment_auto),
     "function" = make_deparser(is_call_function, deparse_function_with_return),
-    "return" = make_deparser(is_call_return, deparse_return),
+    "return" = make_deparser(is_call_return, deparse_return)
   )
 }
 

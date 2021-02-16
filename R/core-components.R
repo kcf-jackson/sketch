@@ -920,6 +920,67 @@ deparse_raw_string <- function(ast, ...) {
 }
 
 
+# === Deparser for formula ======================================
+#' Predicate for formula
+#' @rdname predicate_component
+is_call_formula <- function(ast) {
+  is_call(ast, "~")
+}
+
+#' Deparser for formula
+#' @rdname deparsers_component
+deparse_formula <- function(ast, ...) {
+  fun_body <- replace_dot_variable(ast[[2]])
+  fun_args <- get_all_symbols(ast[[2]]) %>%
+    paste() %>% unique() %>%
+    filter(begin_with_dot) %>%
+    purrr::map_chr(~gsub("[.]", "dot_", .x))
+
+  fun_body_str <- deparse_js(fun_body, ...)
+  fun_args_str <- paste(fun_args, collapse = ", ")
+  glue::glue("function({fun_args_str}) {{ return {fun_body_str} }}")
+}
+
+# replace_dot_variable :: ast -> ast
+replace_dot_variable <- function(ast) {
+  if (is_call(ast)) {
+    for (i in seq_along(ast)) {
+      ast[[i]] <- replace_dot_variable(ast[[i]])
+    }
+    return(ast)
+  }
+
+  if (!begin_with_dot(deparse1(ast))) {
+    return(ast)
+  }
+
+  as.symbol(gsub(pattern = "[.]", "dot_", deparse1(ast)))
+}
+
+# begin_with_dot :: character -> logical
+begin_with_dot <- function(x) {
+  substring(x, 1, 1) == "."
+}
+
+# Get all the symbols at the leaf nodes
+get_all_symbols <- function(ast, res = list()) {
+  if (is_call(ast)) {
+    for (i in seq_along(ast)) {
+      if (i > 1) {
+        res <- append(res, get_all_symbols(ast[[i]], res))
+      }
+    }
+    return(res)
+  }
+
+  if (rlang::is_symbol(ast)) {
+    return(ast)
+  }
+
+  NULL
+}
+
+
 # === Library functions and Exceptions ======================
 #' Predicate for the "add" operator
 #' @rdname predicate_component

@@ -9,9 +9,9 @@ compile_exprs(x, rules = default_rules(), deparsers = default_deparsers())
 \arguments{
 \item{x}{A character string; the expression to transpile to JS.}
 
-\item{rules}{A list of rewriting rules. See [make_rule] for more detail.}
+\item{rules}{A list of rewriting rules. See \link{make_rule} for more detail.}
 
-\item{deparsers}{A list of deparsers. See [make_deparser] for more detail.}
+\item{deparsers}{A list of deparsers. See \link{make_deparser} for more detail.}
 }
 \value{
 A character string.

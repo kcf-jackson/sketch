@@ -905,7 +905,7 @@ deparse_pipe <- function(ast, ...) {
 #' Predicate for the raw string operator
 #' @rdname predicate_component
 is_call_raw_string <- function(ast) {
-  is_call(ast, "raw_str")
+  is_call(ast, c("raw_str", "raw_string"))
 }
 
 #' Deparser for the raw string operator

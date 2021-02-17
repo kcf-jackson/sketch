@@ -163,6 +163,16 @@ dp_dom <- function() {
 }
 
 #' Constructor function to combine low-level deparsers
+#'
+#' @note lifecycle: experimental
+#'
+#' @param ... character strings indicating the features needed
+#' of the deparsers. The supported features are "basic", "r",
+#' "auto" and "dom" corresponding to the basic deparsers, the R
+#' support, the automatic variable declaration and return, and
+#' the dom shorthand notation.
+#'
+#' @export
 dp <- function(...) {
   current_support <- list(
     "basic" = basic_deparsers,

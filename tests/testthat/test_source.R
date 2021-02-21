@@ -26,7 +26,7 @@ testthat::test_that("Source sketch R script", {
     output_file <- source_r(file, launch_browser = NULL)
     testthat::expect_equal(
         md5hash(output_file),
-        "e9555c2273bedb484c8d6e38982265f0"
+        "c68f0590000998a4b82c08c6583ec8d8"
     )
     setwd(current_wd)
 })

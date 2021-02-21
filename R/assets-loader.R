@@ -34,7 +34,7 @@ extract_headers <- function(file) {
 
 # process_headers :: [char] -> asset_list
 process_headers <- function(headers, ...) {
-    first_arg <- function(x) rlang::parse_expr(x)[[2]]
+    first_arg <- function(x) deparse1(rlang::parse_expr(x)[[2]])
     is_sketch <- Vectorize(purrr::compose(is_r_script, first_arg))
 
     parent_assets <- headers %>%

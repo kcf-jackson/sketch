@@ -934,7 +934,7 @@ deparse_formula <- function(ast, ...) {
   fun_args <- get_all_symbols(ast[[2]]) %>%
     paste() %>% unique() %>%
     filter(begin_with_dot) %>%
-    purrr::map_chr(~gsub("[.]", "dot_", .x))
+    purrr::map_chr(replace_dot)
 
   fun_body_str <- deparse_js(fun_body, ...)
   fun_args_str <- paste(fun_args, collapse = ", ")
@@ -954,7 +954,12 @@ replace_dot_variable <- function(ast) {
     return(ast)
   }
 
-  as.symbol(gsub(pattern = "[.]", "dot_", deparse1(ast)))
+  as.symbol(replace_dot(deparse1(ast)))
+}
+
+# replace_dot :: character -> character
+replace_dot <- function(x) {
+  gsub("([.])([a-zA-Z0-9]+)", "dot_\\2", x)
 }
 
 # begin_with_dot :: character -> logical

@@ -1,5 +1,5 @@
 #! config(rules = basic_rules(), deparsers = default_deparsers())
-ws <- WebSocket$new("ws://0.0.0.0:9454")
+ws <- WebSocket$new("ws://localhost:9454")
 
 ws$onopen <- function() {
     ws$send(JSON::stringify(

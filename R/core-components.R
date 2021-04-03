@@ -1118,12 +1118,12 @@ deparse_extract2Assign <- function(ast, ...) {
 #' Predicate for the HTML tags
 #' @rdname predicate_component
 is_html_tags <- function(ast) {
-  tags <- c("div", "span", "p", "a", "textarea",
+  tags <- c("div", "span", "textarea",
     "h1", "h2", "h3", "h4", "h5", "h6",
-    "i", "em", "strong", "u", "ul", "li", "blockquote", "hr",
+    "em", "strong", "ul", "li", "blockquote", "hr",
     "img", "script", "audio", "video", "canvas", "input", "link",
     "section", "article", "header", "nav", "footer", "iframe",
-    "table", "tbody", "thead", "td", "tr", "th",
+    # "table", "tbody", "thead", "td", "tr", "th",
     "form", "option", "menu", "code", "pre", "style")
   # tags <- c("a", "abbr", "address", "area", "article", "aside",
   #           "audio", "b", "base", "bdi", "bdo", "blockquote", "body",

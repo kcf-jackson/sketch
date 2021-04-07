@@ -5,6 +5,7 @@
 \alias{dp_r_support}
 \alias{dp_auto}
 \alias{dp_dom}
+\alias{dp_d3}
 \title{Low-level lists of deparsers}
 \usage{
 dp_r_support()
@@ -12,6 +13,8 @@ dp_r_support()
 dp_auto()
 
 dp_dom()
+
+dp_d3()
 }
 \description{
 Support of R functionalities

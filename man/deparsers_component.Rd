@@ -44,6 +44,8 @@
 \alias{deparse_extract2}
 \alias{deparse_extract2Assign}
 \alias{deparse_html_tags}
+\alias{deparse_d3_attr}
+\alias{deparse_d3_style}
 \title{Deparsers (specialised)}
 \usage{
 deparse_sym(ast, ...)
@@ -129,6 +131,10 @@ deparse_extract2(ast, ...)
 deparse_extract2Assign(ast, ...)
 
 deparse_html_tags(ast, ...)
+
+deparse_d3_attr(ast, ...)
+
+deparse_d3_style(ast, ...)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -223,4 +229,8 @@ Deparser for the "extract2" operator
 Deparser for the "extract2Assign" operator
 
 Deparser for the HTML tags
+
+Deparser for the d3.js `attr` function
+
+Deparser for the d3.js `style` function
 }

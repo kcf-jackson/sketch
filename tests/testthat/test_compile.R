@@ -276,7 +276,7 @@ testthat::test_that("Test transpilation with default 2 deparsers", {
     unit_test("x <- 3", "var x = 3")
     unit_test("x <<- 3", "x = 3")
     unit_test("x$a <- 1", "x.a = 1")
-    unit_test("x[1] <- 1", "R.extract(x, 1) = 1")
+    unit_test("x[1] <- 1", "x = R.extractAssign(x, 1, 1)")
 
     testthat::expect_warning(default_2("function(x) { x <- 10 }"))
     testthat::expect_warning(default_2("function(x) {if(x) {x} else {x + 1}}"))
@@ -392,6 +392,26 @@ testthat::test_that("Test R6Class", {
     testthat::expect_equal(read_file(temp), read_file(file_ref))
 })
 
+
+# Test modules
+testthat::test_that("Test transpilation with d3 deparsers", {
+    basic_d3 <- purrr::partial(
+        compile_exprs,
+        rules = basic_rules(),
+        deparsers = dp("basic", "d3")
+    )
+    remove_ws <- function(x) { gsub("[ \t\n\r\v\f]", "", x) }
+    test_fun <- purrr::compose(remove_ws, basic_d3)
+    unit_test <- purrr::partial(test_equal, f = test_fun, silent = T)
+
+    input <- 'd3::select("body")$append("circle")$d3_attr(cx = 100, tag = "tag")'
+    expected <- 'd3.select("body").append("circle").attr("cx",100).attr("tag","tag")'
+    unit_test(input, expected)
+
+    input <- 'd3::select("body")$d3_attr(cx = 100)$transition()$d3_attr(cy = function(d) { d + 1 })'
+    expected <- 'd3.select("body").attr("cx",100).transition().attr("cy",function(d){d+1})'
+    unit_test(input, expected)
+})
 
 # Additional tests
 testthat:: test_that("Test CDN option in `default_tags`", {

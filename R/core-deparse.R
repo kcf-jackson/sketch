@@ -162,6 +162,15 @@ dp_dom <- function() {
   list("dom" = make_deparser(is_html_tags, deparse_html_tags))
 }
 
+#' Shorthand notation for the 'dom' module
+#' @rdname list-of-deparsers
+dp_d3 <- function() {
+  list("d3_attr" = make_deparser(is_d3_attr, deparse_d3_attr),
+       "d3_style" = make_deparser(is_d3_style, deparse_d3_style))
+}
+
+
+
 #' Constructor function to combine low-level deparsers
 #'
 #' @note lifecycle: experimental
@@ -178,7 +187,8 @@ dp <- function(...) {
     "basic" = basic_deparsers,
     "r" = dp_r_support,
     "auto" = dp_auto,
-    "dom" = dp_dom
+    "dom" = dp_dom,
+    "d3" = dp_d3
   )
   res <- current_support[c(...)] %>%
     purrr::reduce(`%<%`)

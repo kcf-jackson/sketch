@@ -40,6 +40,8 @@
 \alias{is_call_extract2}
 \alias{is_call_extract2Assign}
 \alias{is_html_tags}
+\alias{is_d3_attr}
+\alias{is_d3_style}
 \title{Predicate for symbols, i.e. symbols or syntactic literals}
 \usage{
 is_sym(ast)
@@ -117,6 +119,10 @@ is_call_extract2(ast)
 is_call_extract2Assign(ast)
 
 is_html_tags(ast)
+
+is_d3_attr(ast)
+
+is_d3_style(ast)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -197,4 +203,8 @@ Predicate for the "extract2" operator
 Predicate for the "extract2Assign" operator
 
 Predicate for the HTML tags
+
+Predicate for the d3.js `attr` function
+
+Predicate for the d3.js `style` function
 }

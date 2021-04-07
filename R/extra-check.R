@@ -34,13 +34,12 @@ safeguard <- function(ast, rules, deparsers) {
 reserved_call <- function(deparsers) {
     res <- c()
     if ("dom" %in% names(deparsers)) {
-        tags <- c("div", "span", "p", "a", "textarea",
-                  "h1", "h2", "h3", "h4", "h5", "h6",
-                  "i", "em", "strong", "u", "ul", "li", "blockquote", "hr",
-                  "img", "script", "audio", "video", "canvas", "input", "link",
-                  "section", "article", "header", "nav", "footer", "iframe",
-                  "table", "tbody", "thead", "td", "tr", "th",
-                  "form", "option", "menu", "code", "pre", "style")
+        tags <-c("div", "span", "textarea",
+                 "h1", "h2", "h3", "h4", "h5", "h6",
+                 "em", "strong", "ul", "li", "blockquote", "hr",
+                 "img", "script", "audio", "video", "canvas", "input", "link",
+                 "section", "article", "header", "nav", "footer", "iframe",
+                 "form", "option", "menu", "code", "pre", "style")
         res <- c(res, tags)
     }
 

@@ -406,14 +406,17 @@ deparse_assignment <- function(ast, ...) {
 
 #' Predicate for assignments
 #' @rdname predicate_component
-is_call_assignment_auto <- function(ast) is_call(ast, c("<-", "=", "<<-"))
+is_call_assignment_auto <- function(ast) {
+  is_call(ast, c("<-", "=", "<<-")) &&
+    # 'var' is added only when LHS is a symbol (i.e. not a call)
+    rlang::is_symbol(ast[[2]])
+}
 
 #' Deparser for assignments (automatic variable declaration)
 #' @rdname deparsers_component
 deparse_assignment_auto <- function(ast, ...) {
   sym_ls <- purrr::map_chr(ast, deparse_js, ...)
-  # 'var' is added only when LHS is a symbol
-  if (rlang::is_symbol(ast[[2]]) && !is_call(ast, "<<-")) {
+  if (!is_call(ast, "<<-")) {
     return(glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}"))
   }
   glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
@@ -987,6 +990,7 @@ get_all_symbols <- function(ast, res = list()) {
 
 
 # === Library functions and Exceptions ======================
+# R module --------------------------------------------------
 #' Predicate for the "add" operator
 #' @rdname predicate_component
 is_call_add <- function(ast) is_call(ast, "R.add")
@@ -1179,3 +1183,52 @@ deparse_html_tags <- function(ast, ...) {
   return(glue::glue("dom(\"{tag}\", {named_args}, {unnamed_args})"))
 }
 
+
+# d3 module --------------------------------------------------
+#' Predicate for the d3.js `attr` function
+#' @rdname predicate_component
+is_d3_attr <- function(ast) {
+  (length(ast) >= 2) &&
+    is_call(ast[[1]], ".") &&
+    (length(ast[[1]]) >= 3) &&
+    rlang::is_symbol(ast[[1]][[3]], "d3_attr")
+}
+
+#' Predicate for the d3.js `style` function
+#' @rdname predicate_component
+is_d3_style <- function(ast) {
+  (length(ast) >= 2) &&
+    is_call(ast[[1]], ".") &&
+    (length(ast[[1]]) >= 3) &&
+    rlang::is_symbol(ast[[1]][[3]], "d3_style")
+}
+
+#' Deparser for the d3.js `attr` function
+#' @rdname deparsers_component
+deparse_d3_attr <- function(ast, ...) {
+  lhs <- ast[[1]][[2]]
+  lhs_chr <- deparse_js(lhs, ...)
+
+  fname <- ast[[1]][[3]] %>%
+    deparse_js(...) %>%
+    strsplit("_") %>%
+    unlist() %>%
+    tail(1)
+
+  rhs <- ast[-1]
+  args <- rhs
+  arg_names <- names(args)
+  arg_chr <- purrr::map_chr(args, deparse_js, ...)
+  if (is.null(arg_names) || any(arg_names == "")) {
+    stop("All attributes / styles of a SVG element must be named.")
+  }
+  rhs_chr <- list(arg_names, arg_chr) %>%
+    purrr::pmap_chr(~glue::glue("  .{fname}(\"{..1}\", {..2})")) %>%
+    paste(collapse = "\n")
+
+  glue::glue("{lhs_chr}\n{rhs_chr}")
+}
+
+#' Deparser for the d3.js `style` function
+#' @rdname deparsers_component
+deparse_d3_style <- deparse_d3_attr

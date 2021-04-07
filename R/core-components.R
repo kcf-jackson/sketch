@@ -1128,7 +1128,7 @@ is_html_tags <- function(ast) {
     "img", "script", "audio", "video", "canvas", "input", "link",
     "section", "article", "header", "nav", "footer", "iframe",
     # "table", "tbody", "thead", "td", "tr", "th",
-    "form", "option", "menu", "code", "pre", "style")
+    "form", "option", "menu", "code", "pre", "style", "button")
   # tags <- c("a", "abbr", "address", "area", "article", "aside",
   #           "audio", "b", "base", "bdi", "bdo", "blockquote", "body",
   #           "br", "button", "canvas", "caption", "cite", "code", "col",

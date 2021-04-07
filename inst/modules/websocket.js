@@ -1,4 +1,4 @@
-ws = new WebSocket("ws://0.0.0.0:9454")
+ws = new WebSocket("ws://localhost:9454")
 ws.onopen = function() {
     ws.send(JSON.stringify({ "type": "WebSocket.onopen", "message": "App connected." }))
 }

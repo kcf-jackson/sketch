@@ -70,6 +70,8 @@ basic_deparsers <- function() {
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
     "new"  = make_deparser(is_call_new, deparse_new),
     "typeof"  = make_deparser(is_call_typeof, deparse_typeof),
+    "export"  = make_deparser(is_call_export, deparse_export),
+    "async_await"  = make_deparser(is_call_async_await, deparse_async_await),
     "let"    = make_deparser(is_call_let, deparse_let),
     "const"  = make_deparser(is_call_const, deparse_const),
     "for"    = make_deparser(is_call_for, deparse_for),

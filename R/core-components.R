@@ -755,6 +755,22 @@ deparse_export <- function(ast, ...) {
 }
 
 
+# Deparser for "async" and "await" ------------------------------------------
+#' Predicate for the "async" and "await" operators
+#' @rdname predicate_component
+is_call_async_await <- function(ast) {
+  is_call(ast, c("async", "await"))
+}
+
+#' Deparser for the ""async" and "await" operators
+#' @rdname deparsers_component
+deparse_async_await <- function(ast, ...) {
+  keyword <- deparse_sym(ast[[1]])
+  args <- deparse_js(ast[[2]], ...)
+  glue::glue("{keyword} {args}")
+}
+
+
 # Deparser for "let" and "const" -----------------------------------------------
 #' Predicate for the "let" operator
 #' @rdname predicate_component
@@ -779,7 +795,7 @@ deparse_let <- function(ast, ...) {
     }
   }
 
-  paste(deparse(ast[[1]]), deparse_arg(ast[-1]))
+  paste(deparse_sym(ast[[1]]), deparse_arg(ast[-1]))
 }
 
 
@@ -1152,7 +1168,7 @@ is_html_tags <- function(ast) {
 #' Deparser for the HTML tags
 #' @rdname deparsers_component
 deparse_html_tags <- function(ast, ...) {
-  tag <- deparse(ast[[1]])
+  tag <- deparse_sym(ast[[1]])
   # Empty argument
   if (length(ast) == 1) {
     return(glue::glue("dom(\"{tag}\")"))

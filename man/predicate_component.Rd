@@ -24,6 +24,7 @@
 \alias{is_call_new}
 \alias{is_call_typeof}
 \alias{is_call_export}
+\alias{is_call_async_await}
 \alias{is_call_let}
 \alias{is_call_const}
 \alias{is_call_var}
@@ -87,6 +88,8 @@ is_call_new(ast)
 is_call_typeof(ast)
 
 is_call_export(ast)
+
+is_call_async_await(ast)
 
 is_call_let(ast)
 
@@ -171,6 +174,8 @@ Predicate for the "new" operator
 Predicate for the "typeof" operator
 
 Predicate for the "export" operator
+
+Predicate for the "async" and "await" operators
 
 Predicate for the "let" operator
 

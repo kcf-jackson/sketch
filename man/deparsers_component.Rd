@@ -28,6 +28,7 @@
 \alias{deparse_new}
 \alias{deparse_typeof}
 \alias{deparse_export}
+\alias{deparse_async_await}
 \alias{deparse_let}
 \alias{deparse_const}
 \alias{deparse_var}
@@ -99,6 +100,8 @@ deparse_new(ast, ...)
 deparse_typeof(ast, ...)
 
 deparse_export(ast, ...)
+
+deparse_async_await(ast, ...)
 
 deparse_let(ast, ...)
 
@@ -197,6 +200,8 @@ Deparser for the "new" operator
 Deparser for the "typeof" operator
 
 Deparser for the "export" operator
+
+Deparser for the ""async" and "await" operators
 
 Deparser for the "let" operator
 

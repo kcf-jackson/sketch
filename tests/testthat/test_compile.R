@@ -80,6 +80,10 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("~.x * .y + fun(.z)", "function(dot_x, dot_y, dot_z) { return dot_x * dot_y + fun(dot_z) }")
     unit_test("~x * .y + fun(z)", "function(dot_y) { return x * dot_y + fun(z) }")
     unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
+    unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
+    unit_test("res$map(~.x)", "res.map(function(dot_x) { return dot_x })")
+    unit_test("res$map(~.x$replace(a, b))", "res.map(function(dot_x) { return dot_x.replace(a, b) })")
+    unit_test("res$reduce(~.x %+% '\n' %+% .y)", "res.reduce(function(dot_x, dot_y) { return dot_x + \"\\n\" + dot_y })")
 })
 
 testthat::test_that("Test transpilation with default rules and deparsers (exprs)", {

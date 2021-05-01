@@ -17,6 +17,7 @@
 \alias{deparse_return}
 \alias{deparse_assignment}
 \alias{deparse_assignment_auto}
+\alias{deparse_next}
 \alias{deparse_try}
 \alias{deparse_tryCatch}
 \alias{deparse_throw}
@@ -78,6 +79,8 @@ deparse_return(ast, ...)
 deparse_assignment(ast, ...)
 
 deparse_assignment_auto(ast, ...)
+
+deparse_next(ast, ...)
 
 deparse_try(ast, ...)
 
@@ -178,6 +181,8 @@ Deparser for return
 Deparser for assignments
 
 Deparser for assignments (automatic variable declaration)
+
+Deparser for the "next" keyword
 
 Deparser for the "try" keyword
 

@@ -79,6 +79,7 @@ basic_deparsers <- function() {
     "while"  = make_deparser(is_call_while, deparse_while),
     "function" = make_deparser(is_call_function, deparse_function),
     "break" = make_deparser(is_call_break, deparse_sym),
+    "next" = make_deparser(is_call_next, deparse_next),
     "try" = make_deparser(is_call_try, deparse_try),
     "tryCatch" = make_deparser(is_call_tryCatch, deparse_tryCatch),
     "throw" = make_deparser(is_call_throw, deparse_throw),

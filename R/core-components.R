@@ -429,6 +429,20 @@ deparse_assignment_auto <- function(ast, ...) {
 #' @rdname predicate_component
 is_call_break <- function(ast) is_call(ast, "break")
 
+# "break" uses `deparse_sym` as deparser
+
+
+# Deparser for the "next" keyword --------------------------
+#' Predicate for the "next" keyword
+#' @rdname predicate_component
+is_call_next <- function(ast) is_call(ast, "next")
+
+#' Deparser for the "next" keyword
+#' @rdname deparsers_component
+deparse_next <- function(ast, ...) {
+  return("continue")
+}
+
 
 # === Deparser for Error handling =============================
 # Deparser for the "try" keyword --------------------------
@@ -622,6 +636,7 @@ deparse_R6Class <- function(ast, ...) {
   }
 
   const_arg <- get_constructor_arg(public, ...)
+  const_arg_wo_default <- get_constructor_arg_no_default(public, ...)
   public_list <- deparse_public_list(public, ...)
   private_list <- deparse_private_list(private, ...)
 
@@ -647,6 +662,24 @@ get_constructor_arg <- function(ast, ...) {
         glue::glue(if (y == "") "{x}" else "{x} = {y}")
       }
     )
+    paste(alist2, collapse = ", ")
+  }
+
+  if (!"initialize" %in% names(ast)) {
+    return("")
+  }
+
+  if (!is_call(ast$initialize, "function")) {
+    stop("The constructor must be a function.")
+  }
+
+  deparse_arg(ast$initialize[[2]], ...)
+}
+
+get_constructor_arg_no_default <- function(ast, ...) {
+  deparse_arg <- function(alist0, ...) {
+    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist2 <- names(alist1)
     paste(alist2, collapse = ", ")
   }
 
@@ -990,9 +1023,8 @@ begin_with_dot <- function(x) {
 get_all_symbols <- function(ast, res = list()) {
   if (is_call(ast)) {
     for (i in seq_along(ast)) {
-      if (i > 1) {
+        if (i == 1 && rlang::is_symbol(ast[[i]])) next  # See note below.
         res <- append(res, get_all_symbols(ast[[i]], res))
-      }
     }
     return(res)
   }
@@ -1003,6 +1035,11 @@ get_all_symbols <- function(ast, res = list()) {
 
   NULL
 }
+
+# `get_all_symbols` note: The first element in the AST needs to be
+# skipped when it is a symbol since we want only leaf nodes. However,
+# sometimes the first node itself can be another call which has its
+# own leaves, and it needs to be processed as well.
 
 
 # === Library functions and Exceptions ======================

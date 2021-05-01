@@ -241,8 +241,10 @@ default_rules <- function() {
         make_rule("JS_NAN", "NaN"),
         make_rule("JS_ARRAY", "Array"),
 
-        # jQuery ----
+        # Special symbol for jQuery, Lodash and Underscore.js ----
         make_rule("jQuery", "$"),
+        make_rule("Lodash", "_"),
+        make_rule("Underscore", "_"),
 
         # Distributions functions ----
         # make_rule("discrete_inverse", "R.discrete_inverse"),

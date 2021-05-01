@@ -13,6 +13,7 @@
 \alias{is_call_assignment}
 \alias{is_call_assignment_auto}
 \alias{is_call_break}
+\alias{is_call_next}
 \alias{is_call_try}
 \alias{is_call_tryCatch}
 \alias{is_call_throw}
@@ -66,6 +67,8 @@ is_call_assignment(ast)
 is_call_assignment_auto(ast)
 
 is_call_break(ast)
+
+is_call_next(ast)
 
 is_call_try(ast)
 
@@ -152,6 +155,8 @@ Predicate for assignments
 Predicate for assignments
 
 Predicate for the "break" keyword
+
+Predicate for the "next" keyword
 
 Predicate for the "try" keyword
 

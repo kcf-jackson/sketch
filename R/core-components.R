@@ -317,6 +317,7 @@ deparse_function_with_return <- function(ast, ...) {
   # Handle special forms, e.g. if, for, while, as JavaScript only
   # allows returning values.
   is_keyword <- function(ast) is_call(ast, c("if", "for", "while"))
+  is_exception <- function(ast) is_call(ast, c("throw", "try", "tryCatch"))
   is_valid_add <- function(ast, ...) {
     # Provide more informative message
     ast_string <- deparse_js(ast, ...)
@@ -330,9 +331,14 @@ deparse_function_with_return <- function(ast, ...) {
       message(yellow(ast_string))
       message("Note that automatic explicit return only applies to standalone values but not statements.")
     }
+    if (is_exception(ast)) {
+      warning("You have used an error/exception statement as the final expression in:", immediate. = TRUE)
+      message(yellow(ast_string))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
 
     # The actual check
-    !is_return(ast) && !is_assignment(ast) && !is_keyword(ast)
+    !is_return(ast) && !is_assignment(ast) && !is_keyword(ast) && !is_exception(ast)
   }
 
   # TODO: Consider adding support to return of assignment.

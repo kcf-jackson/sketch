@@ -1,3 +1,5 @@
+#! config(rules = basic_rules(), deparsers = default_deparsers())
+
 map <- function(x, f) {
     return(x$map(f))
 }

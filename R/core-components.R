@@ -535,8 +535,8 @@ deparse_list <- function(ast, ...) {
   paste0("{ ", deparse_list_arg(ast[-1], err_msg, ...), " }")
 }
 
-#' Deparser for the arguments in a "list" call
-#' @keywords internal
+# Deparser for the arguments in a "list" call
+# @keywords internal
 # This function is not in `deparse_list`, because it needs to be reused
 # by `deparse_df`
 deparse_list_arg <- function(list0, err_msg, ...) {
@@ -579,8 +579,8 @@ deparse_df <- function(ast, ...) {
   paste0("R.data_frame({ ", deparse_df_arg(ast[-1], err_msg, ...), " })")
 }
 
-#' Deparser for the arguments in a "data.frame" call
-#' @keywords internal
+# Deparser for the arguments in a "data.frame" call
+# @keywords internal
 # A duplicate function is created to maintain code consistency throughout
 # the package. The rule here is that each deparser must have its own
 # argument deparser (if it needs one).

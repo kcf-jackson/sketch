@@ -104,7 +104,7 @@ websocket <- R6::R6Class("websocket", public = list(
             input <- read_multilines("sketch > ")
             # Ensure `q()` is used appropriately
             quit <- rlang::parse_exprs(input) %>%
-                purrr::map_lgl(~deparse(.x) == "q()")
+                purrr::map_lgl(~deparse1(.x) == "q()")
             if (any(quit)) {
                 if (length(quit) == 1) break
                 cat("`q()` must be used standalone.", "\n")

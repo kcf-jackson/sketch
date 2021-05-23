@@ -14,3 +14,8 @@
 \description{
 Print function for 'rule' objects
 }
+\examples{
+rule_1 <- make_rule("+", "Math.add")
+print(rule_1)
+
+}

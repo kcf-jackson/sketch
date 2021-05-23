@@ -4,9 +4,11 @@ myStyle <- 'width: 800px; height: 500px; font-family: monospace; font-size:20px;
 consoleStyle <- 'background: black; display: none; color: white; height: 1005px; font-family: monospace; font-size:20px; word-wrap: normal; white-space: pre; padding-left:12px;'
 `%+%` <- paste0
 
-init_example <- 'textbox <- document$createElement("div")
-textbox$innerText <- "Hello World!"
-document$querySelector("body")$appendChild(textbox)
+init_example <- 'window$onload <- function() {
+    textbox <- document$createElement("div")
+    textbox$innerText <- "Hello World!"
+    document$querySelector("body")$appendChild(textbox)
+}
 '
 
 shinyUI(fluidPage(

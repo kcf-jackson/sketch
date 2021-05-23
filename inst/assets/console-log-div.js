@@ -42,10 +42,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         outer.classList.add(id);
 
         var style = outer.style;
-        // style.width = '100%';
+        style.width = '95%';
         // style.minHeight = '200px';
         style.fontFamily = 'monospace';
         style.marginTop = '20px';
+        style.marginBottom = '20px';  // Modified (CFK)
         style.marginLeft = '10px';
         style.marginRight = '10px';
         style.whiteSpace = 'pre';

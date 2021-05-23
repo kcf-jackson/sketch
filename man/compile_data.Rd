@@ -2,7 +2,7 @@
 % Please edit documentation in R/assets-to_json.R
 \name{compile_data}
 \alias{compile_data}
-\title{Compile a data file into a JS file}
+\title{Compile a data file into a JavaScript file}
 \usage{
 compile_data(input, output = tempfile(), ...)
 }
@@ -11,8 +11,13 @@ compile_data(input, output = tempfile(), ...)
 
 \item{output}{A character string; the path to the output file.}
 
-\item{...}{Extra arguments to be passed to `to_json`.}
+\item{...}{Extra arguments to be passed to \link{to_json}.}
 }
 \description{
-Compile a data file into a JS file
+Compile a data file into a JavaScript file
+}
+\examples{
+file <- system.file("test_files/test_csv.csv", package = "sketch")
+readLines(compile_data(file))
+
 }

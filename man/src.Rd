@@ -9,6 +9,14 @@ src(x)
 \arguments{
 \item{x}{A character string; name of the JavaScript library}
 }
+\value{
+A character string; the path to the library.
+}
 \description{
 Get the source link of a JavaScript library
+}
+\examples{
+src("mathjs")
+src("p5")
+
 }

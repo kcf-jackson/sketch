@@ -2,7 +2,7 @@
 % Please edit documentation in R/assets-to_json.R
 \name{to_json}
 \alias{to_json}
-\title{Convert a file into JS expression}
+\title{Convert a file into a JavaScript expression}
 \usage{
 to_json(input, as_data_frame, read_fun, ...)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/assets-to_shiny_tag.R
 \name{to_shiny_tag}
 \alias{to_shiny_tag}
-\title{Load JavaScript / CSS / R Sketch Script / CSV file}
+\title{Load JavaScript / CSS / 'sketch' R / CSV file}
 \usage{
 to_shiny_tag(src, ...)
 }
@@ -10,6 +10,6 @@ to_shiny_tag(src, ...)
 \item{x}{A character string; the link / path to the JS / CSS / R script / CSV file.}
 }
 \description{
-Load JavaScript / CSS / R Sketch Script / CSV file
+Load JavaScript / CSS / 'sketch' R / CSV file
 }
 \keyword{internal}

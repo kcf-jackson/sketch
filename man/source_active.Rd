@@ -2,15 +2,21 @@
 % Please edit documentation in R/interface-source_file.R
 \name{source_active}
 \alias{source_active}
-\title{Source active file in RStudio}
+\title{Source active file in 'RStudio'}
 \usage{
-source_active(launch_browser = "viewer")
+source_active(...)
 }
 \arguments{
-\item{launch_browser}{A character string; "viewer" or "browser", which
-calls `rstudioapi::viewer` and `utils::browserURL` respectively; use
-`NULL` to suppress display.}
+\item{...}{Optional arguments to pass to \code{source_r}.}
 }
 \description{
-Source active file in RStudio
+Source active file in 'RStudio'
+}
+\examples{
+\dontrun{
+# At 'RStudio', opens a 'sketch' R file in the editor, then
+# run the following:
+source_active()  # This launches the default HTML viewer.
+}
+
 }

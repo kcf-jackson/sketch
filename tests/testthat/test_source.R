@@ -6,16 +6,16 @@ testthat::test_that("Source sketch R script", {
     testthat::skip_on_os("windows") # see notes at the bottom of "test_assets.R"
 
     file <- system.file("test_files/test_sketch_basic.R", package = "sketch")
-    output_file <- source_r(file, debug = T, launch_browser = NULL)
+    output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
     testthat::expect_equal(
         md5hash(output_file),
-        "c6c895056833c15955ad62e94d5f7584"
+        "23ecbac88d9499d294df9455e5abe856"
     )
 
     output_file <- source_r(file, launch_browser = "NULL") # NULL in string is intentional here
     testthat::expect_equal(
         md5hash(output_file),
-        "ba464b41ce469fe2c32893c7890162ed"
+        "d0b93897c639a62387501fe095678d88"
     )
 
     # Need to set path so that referencing to another file would work
@@ -26,7 +26,35 @@ testthat::test_that("Source sketch R script", {
     output_file <- source_r(file, launch_browser = NULL)
     testthat::expect_equal(
         md5hash(output_file),
-        "8806c1ee07d391aaebec40067b757df4"
+        "e9555c2273bedb484c8d6e38982265f0"
+    )
+    setwd(current_wd)
+})
+
+
+testthat::test_that("basic_tags()", {
+    # Simple file structure
+    file <- system.file("test_files/test_sketch_basic.R", package = "sketch")
+    output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
+    output_file_2 <- source_r(file, debug = TRUE, launch_browser = NULL,
+                              asset_tags = basic_tags())
+    testthat::expect_gt(
+        file.size(output_file),   # with R functions
+        file.size(output_file_2)  # without R functions
+    )
+
+    # With recursive dependencies
+    current_wd <- getwd()
+    dir <- system.file("test_files", package = "sketch")
+    file <- "test_sketch.R"
+    setwd(dir)
+    file <- system.file("test_files/test_sketch.R", package = "sketch")
+    output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
+    output_file_2 <- source_r(file, debug = TRUE, launch_browser = NULL,
+                              asset_tags = basic_tags())
+    testthat::expect_gt(
+        file.size(output_file),   # with R functions
+        file.size(output_file_2)  # without R functions
     )
     setwd(current_wd)
 })

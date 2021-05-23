@@ -2,7 +2,7 @@
 % Please edit documentation in R/interface-compile.R
 \name{compile_r}
 \alias{compile_r}
-\title{Compile a 'sketch' R file into a JS file}
+\title{Compile an R file into a JavaScript file}
 \usage{
 compile_r(
   input,
@@ -21,6 +21,15 @@ output is "", the result is printed to the standard output.}
 
 \item{deparsers}{A list of deparsers. See [make_deparser] for more detail.}
 }
+\value{
+A character string; the output file path.
+}
 \description{
-Compile a 'sketch' R file into a JS file
+Compile an R file into a JavaScript file
+}
+\examples{
+file <- system.file("test_files/test_source.R", package = "sketch")
+readLines(file)
+compile_r(input = file)
+
 }

@@ -1,4 +1,4 @@
-# Deparsers for symbols and calls ===========================
+# === Deparsers for symbols and calls ========================
 # To construct a "master"-deparser, at the most basic level
 # one must provide a deparser for each of symbols and calls.
 
@@ -8,11 +8,13 @@
 # For completeness, we use the negation of `is_call` to include
 # also the pairlist case.
 # Reference: https://adv-r.hadley.nz/expressions.html#summary
+#' @name is_Family
 #' @rdname predicate_component
 #' @param ast A language object.
 is_sym <- function(ast) !is_call(ast)
 
 #' Deparsers (specialised)
+#' @name deparse_Family
 #' @rdname deparsers_component
 #' @param ast A language object.
 #' @param ... The contextual information to be passed on to
@@ -21,6 +23,26 @@ is_sym <- function(ast) !is_call(ast)
 deparse_sym <- function(ast, ...) {
   deparse(ast, width.cutoff = 500L)
 }
+
+
+# Deparser for syntactic literal ---------------------------------------
+#' Predicate for syntactic literal
+#' @inheritParams rlang::is_syntactic_literal
+#' @note This function is imported from `rlang`.
+is_syntactic_literal <- rlang::is_syntactic_literal
+
+#' Deparser for NULL
+#' @rdname deparsers_component
+deparse_NULL <- function(ast, ...) return("null")
+
+#' Deparser for NA
+#' @rdname deparsers_component
+deparse_NA <- function(ast, ...) return("undefined")
+
+#' Deparser for NaN
+#' @rdname deparsers_component
+deparse_NaN <- function(ast, ...) return("NaN")
+
 
 # Deparser for calls ---------------------------------------
 #' Predicate for calls
@@ -38,7 +60,7 @@ deparse_call <- function(ast, ...) {
 }
 
 
-# Deparsers for infix and wrap operators =====================
+# === Deparsers for infix and wrap operators ==================
 # Continuing from above, one could further distinguish special
 # cases of calls. Here we consider the infix operators and
 # wrap operators ("{", "[", "[[", "(").
@@ -172,7 +194,7 @@ sep_symbol <- function(chr) {
 }
 
 
-# Deparsers for control flow and function definition =========
+# === Deparsers for control flow and function definition ======
 # Continuing from above, one could further distinguish special
 # cases of calls. Here we consider the control flow and
 # function definition.
@@ -237,11 +259,11 @@ deparse_while <- function(ast, ...) {
 
 
 # Deparser for function definition --------------------------
-#' Predicate for the 'function' keyword
+#' Predicate for the "function" keyword
 #' @rdname predicate_component
 is_call_function <- function(ast) is_call(ast, "function")
 
-#' Deparser for the 'function' keyword
+#' Deparser for the "function" keyword
 #' @rdname deparsers_component
 deparse_function <- function(ast, ...) {
   deparse_arg <- function(alist0, ...) {
@@ -255,24 +277,239 @@ deparse_function <- function(ast, ...) {
     paste(alist2, collapse = ", ")
   }
 
+  fun_body_str <- deparse_js(ast[[3]], ...)
+  if (!is_call(ast[[3]], "{")) {
+    fun_body_str <- paste0("{ ", fun_body_str, " }")
+  }
+
   paste0(
     deparse_js(ast[[1]], ...), # function
     "(", deparse_arg(ast[[2]], ...), ") ", # function-args
-    deparse_js(ast[[3]], ...) # function-body
+    fun_body_str # function-body
+  )
+}
+
+#' Deparser for the "function" keyword with explicit return
+#' @rdname deparsers_component
+deparse_function_with_return <- function(ast, ...) {
+  deparse_arg <- function(alist0, ...) {
+    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist2 <- purrr::map2_chr(
+      .x = names(alist1), .y = alist1,
+      function(x, y) {
+        glue::glue(if (y == "") "{x}" else "{x} = {y}")
+      }
+    )
+    paste(alist2, collapse = ", ")
+  }
+
+  last <- function(x) x[[length(x)]]
+
+  add_return <- function(ast) {
+    template_ast <- parse_expr("return(x)")
+    template_ast[[2]] <- ast  # insert tree at x
+    ast <- template_ast
+    return(ast)
+  }
+
+  is_return <- function(ast) is_call(ast, "return")
+  is_assignment <- function(ast) is_call(ast, c("=", "<-", "<<-"))
+  # Handle special forms, e.g. if, for, while, as JavaScript only
+  # allows returning values.
+  is_keyword <- function(ast) is_call(ast, c("if", "for", "while"))
+  is_valid_add <- function(ast, ...) {
+    # Provide more informative message
+    ast_string <- deparse_js(ast, ...)
+    if (is_assignment(ast)) {
+      warning("You have used an assignment statement as the final expression in:", immediate. = TRUE)
+      message(line_separator("-"))
+      message(ast_string)
+      message(line_separator("-"))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
+    if (is_keyword(ast)) {
+      warning("You have used a control-flow statement as the final expression in:", immediate. = TRUE)
+      message(line_separator("-"))
+      message(ast_string)
+      message(line_separator("-"))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
+
+    # The actual check
+    !is_return(ast) && !is_assignment(ast) && !is_keyword(ast)
+  }
+
+  # TODO: Consider adding support to return of assignment.
+  # Note that it may not play well with the subset assignment implementation
+  # because that always returns the full object. While I think this is a
+  # sensible default, it differs from the R behaviour.
+  # warning_of_assignment <- function(ast) {
+  #   fun_line <- deparse(ast)
+  #   if (is_assignment(ast)) {
+  #     warning(glue::glue("You have used an variable assignment as the final expression of the function: \n\t{fun_line}\nThis is currently not supported. Please end the function by putting the variable or a value `JS_NULL` on a standalone line."))
+  #   }
+  # }
+
+  fun_body <- ast[[3]]
+  if (is_call(fun_body, "{")) {
+    last_expr <- last(fun_body)
+    # Add explicit return if it is not there and the expression
+    # is non-empty
+    if (is_valid_add(last_expr, ...) && length(fun_body) > 1) {
+      ast[[3]][[length(fun_body)]] <- add_return(last(fun_body))
+    }
+  } else {
+    # function body is an atom
+    if (is_valid_add(fun_body, ...)) {
+      ast[[3]] <- add_return(fun_body)
+    }
+  }
+
+  # Return the resulting string
+  fun_body_str <- deparse_js(ast[[3]], ...)
+  # Wrap with { . } if function uses shorthand notation
+  if (!is_call(ast[[3]], "{")) {
+    fun_body_str <- paste0("{ ", fun_body_str, " }")
+  }
+  paste0(
+    deparse_js(ast[[1]], ...), # function
+    "(", deparse_arg(ast[[2]], ...), ") ", # function-args
+    fun_body_str # function-body
   )
 }
 
 
-# R data structure ===========================================
+# Deparser for return ----------------------------------
+#' Predicate for return
+#' @rdname predicate_component
+is_call_return <- function(ast) is_call(ast, "return")
+
+#' Deparser for return
+#' @rdname deparsers_component
+deparse_return <- function(ast, ...) {
+  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  glue::glue("return {sym_ls[[2]]}")
+}
+
+
+
+# Deparser for assignments ----------------------------------
+#' Predicate for assignments
+#' @rdname predicate_component
+is_call_assignment <- function(ast) is_call(ast, c("<-", "<<-"))
+
+
+#' Deparser for assignments
+#' @rdname deparsers_component
+# Replace arrow sign by equal sign
+deparse_assignment <- function(ast, ...) {
+  ast[[1]] <- as.symbol("=")
+  deparse_js(ast, ...)
+}
+
+
+#' Predicate for assignments
+#' @rdname predicate_component
+is_call_assignment_auto <- function(ast) is_call(ast, c("<-", "=", "<<-"))
+
+#' Deparser for assignments (automatic variable declaration)
+#' @rdname deparsers_component
+deparse_assignment_auto <- function(ast, ...) {
+  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  # 'var' is added only when LHS is a symbol
+  if (rlang::is_symbol(ast[[2]]) && !is_call(ast, "<<-")) {
+    return(glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}"))
+  }
+  glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
+}
+
+
+
+# Deparser for the "break" keyword --------------------------
+#' Predicate for the "break" keyword
+#' @rdname predicate_component
+is_call_break <- function(ast) is_call(ast, "break")
+
+
+# === Deparser for Error handling =============================
+# Deparser for the "try" keyword --------------------------
+#' Predicate for the "try" keyword
+#' @rdname predicate_component
+is_call_try <- function(ast) is_call(ast, "try")
+
+#' Deparser for the "try" keyword
+#' @rdname deparsers_component
+deparse_try <- function(ast, ...) {
+  arg <- deparse_js(ast[[2]], ...)
+  if (!is_call(ast[[2]], "{")) {
+    arg <- add_curly_bracket(arg)
+  }
+  glue::glue("try <arg> catch(error) {\n    console.log(error)\n}",
+             .open = "<", .close = ">")
+}
+
+add_curly_bracket <- function(x) {
+  paste0("{\n    ", x, "\n}")
+}
+
+# Deparser for the "tryCatch" keyword --------------------------
+#' Predicate for the "tryCatch" keyword
+#' @rdname predicate_component
+is_call_tryCatch <- function(ast) is_call(ast, "tryCatch")
+
+#' Deparser for the "tryCatch" keyword
+#' @rdname deparsers_component
+deparse_tryCatch <- function(ast, ...) {
+  try_arg <- deparse_js(ast[[2]], ...)
+  catch_fun <- deparse_js(ast[[3]], ...) %>%
+    gsub(pattern = "\n", replacement = "\n    ")  # increase indent
+
+  if (!is_call(ast[[2]], "{")) {
+    try_arg <- add_curly_bracket(try_arg)
+  }
+  res <- glue::glue(
+    "try <try_arg> catch(error) {\n    (<catch_fun>)(error)\n}",
+    .open = "<", .close = ">"
+  )
+  if (length(ast) < 4) {
+    return(res)
+  }
+
+  fin_arg <- deparse_js(ast[[4]], ...)
+  if (!is_call(ast[[4]], "{")) {
+    fin_arg <- add_curly_bracket(fin_arg)
+  }
+  fin <- glue::glue("finally <fin_arg>",
+                    .open = "<", .close = ">")
+  paste(res, fin)
+}
+
+
+# Deparser for the "throw" keyword --------------------------
+#' Predicate for the "throw" keyword
+#' @rdname predicate_component
+is_call_throw <- function(ast) is_call(ast, "throw")
+
+#' Deparser for the "throw" keyword
+#' @rdname deparsers_component
+# Reference: https://stackoverflow.com/questions/9156176/what-is-the-difference-between-throw-new-error-and-throw-someobject
+deparse_throw <- function(ast, ...) {
+  err_msg <- deparse_js(ast[[2]], ...)
+  glue::glue("throw new Error({err_msg})")
+}
+
+
+
+# === R data structure =======================================
 # Continuing from above, one could further distinguish special
 # cases of calls. Here we consider the R data structure.
 
 
-#' Predicate for the "list" operators
+#' Predicate for the "list" operator
 #' @rdname predicate_component
 is_call_list <- function(ast) is_call(ast, "list")
 
-#' Deparser for the "list" operators
+#' Deparser for the "list" operator
 #' @rdname deparsers_component
 deparse_list <- function(ast, ...) {
   err_msg <- "All elements in a list must be named to convert into JavaScript properly."
@@ -288,7 +525,9 @@ deparse_list_arg <- function(list0, err_msg, ...) {
   labels <- names(list1)
 
   if (is.null(labels)) {   # all labels are missing
-    warning(err_msg)
+    if (length(list1) != 0) {
+      warning(err_msg)
+    }
     paste(list1, collapse = ", ")
 
   } else {
@@ -300,7 +539,7 @@ deparse_list_arg <- function(list0, err_msg, ...) {
           warning(err_msg)
           glue::glue("{y}")
         } else {
-          glue::glue("{x}: {y}")
+          glue::glue("\"{x}\": {y}")
         }
       }
     ) %>%
@@ -364,9 +603,112 @@ is_call_df_mutate <- function(ast) is_call(ast, "R.mutate")
 deparse_df_mutate <- deparse_df_summarise
 
 
-# Special forms ==========================================================
-# Continuing from above, one could further distinguish special cases of
-# calls. Here we consider the special forms.
+
+# Deparser for the "R6Class" function --------------------------
+#' Predicate for the "R6Class" function
+#' @rdname predicate_component
+is_call_R6Class <- function(ast) is_call(ast, "R6Class")
+
+#' Deparser for the "R6Class" function
+#' @rdname deparsers_component
+deparse_R6Class <- function(ast, ...) {
+  public <- if (length(ast) < 3) NULL else ast[[3]]
+  private <- if (length(ast) < 4) NULL else ast[[4]]
+
+  if (!is.null(public) && !is_call(public, "list")) {
+    stop("The argument 'public' must be a list.")
+  }
+  if (!is.null(private) && !is_call(private, "list")) {
+    stop("The argument 'private' must be a list.")
+  }
+
+  const_arg <- get_constructor_arg(public, ...)
+  public_list <- deparse_public_list(public, ...)
+  private_list <- deparse_private_list(private, ...)
+
+  return(glue::glue("function(<const_arg>) {
+        // public variables and methods
+        let self = this
+        <public_list>
+        // private variables and methods
+        let private = {}
+        <private_list>
+        if (self.initialize) {
+            self.initialize(<const_arg>)
+        }
+    }", .open = "<", .close = ">"))
+}
+
+get_constructor_arg <- function(ast, ...) {
+  deparse_arg <- function(alist0, ...) {
+    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist2 <- purrr::map2_chr(
+      .x = names(alist1), .y = alist1,
+      function(x, y) {
+        glue::glue(if (y == "") "{x}" else "{x} = {y}")
+      }
+    )
+    paste(alist2, collapse = ", ")
+  }
+
+  if (!"initialize" %in% names(ast)) {
+    return("")
+  }
+
+  if (!is_call(ast$initialize, "function")) {
+    stop("The constructor must be a function.")
+  }
+
+  deparse_arg(ast$initialize[[2]], ...)
+}
+
+deparse_public_list <- function(ast, ...) {
+  if (is.null(ast) || length(ast) == 1) {
+    return("")
+  }
+
+  args <- ast[-1]
+  public_vars <- names(args)
+  if (is.null(public_vars) || any(public_vars == "")) {
+    stop("All (public) variables / methods of an R6 object must be named.")
+  }
+
+  rhs <- purrr::map_chr(args, deparse_js, ...)
+  purrr::map2_chr(
+    public_vars, rhs, function(x, y) {
+      glue::glue("self.<x> = <y>", .open = "<", .close = ">")
+    }) %>%
+    paste(collapse = "\n") %>%
+    gsub(pattern = "\n", replacement = "\n    ")  # increase indent
+}
+
+deparse_private_list <- function(ast, ...) {
+  if (is.null(ast) || length(ast) == 1) {
+    return("")
+  }
+
+  args <- ast[-1]
+  private_vars <- names(args)
+  if (is.null(private_vars) || any(private_vars == "")) {
+    stop("All (private) variables / methods of an R6 object must be named.")
+  }
+
+  # Reference: http://crockford.com/javascript/private.html
+  rhs <- args %>%
+    purrr::map_chr(deparse_js, ...)
+
+  purrr::map2_chr(
+    private_vars, rhs, function(x, y) {
+      glue::glue("private.<x> = <y>", .open = "<", .close = ">")
+    }) %>%
+    paste(collapse = "\n") %>%
+    gsub(pattern = "\n", replacement = "\n    ")  # increase indent
+}
+
+
+# === Special forms ===========================================
+# Continuing from above, one could further distinguish special
+# cases of calls. Here we consider the special forms.
 
 
 # Deparser for "new" ------------------------------------------------------
@@ -384,7 +726,22 @@ deparse_new <- function(ast, ...) {
 }
 
 
-# Deparser for "let" ------------------------------------------------------
+# Deparser for "typeof" ------------------------------------------------------
+#' Predicate for the "typeof" operator
+#' @rdname predicate_component
+is_call_typeof <- function(ast) {
+  is_call(ast, "typeof")
+}
+
+#' Deparser for the "typeof" operator
+#' @rdname deparsers_component
+deparse_typeof <- function(ast, ...) {
+  args <- deparse_js(ast[[2]], ...)
+  glue::glue("typeof {args}")
+}
+
+
+# Deparser for "let" and "const" -----------------------------------------------
 #' Predicate for the "let" operator
 #' @rdname predicate_component
 is_call_let <- function(ast) is_call(ast, "let")
@@ -408,8 +765,18 @@ deparse_let <- function(ast, ...) {
     }
   }
 
-  paste("let", deparse_arg(ast[-1]))
+  paste(deparse(ast[[1]]), deparse_arg(ast[-1]))
 }
+
+
+#' Predicate for the "const" operator
+#' @rdname predicate_component
+is_call_const <- function(ast) is_call(ast, "const")
+
+#' Deparser for the "const" operator
+#' @rdname deparsers_component
+deparse_const <- deparse_let
+
 
 
 # Deparser for "dataURI" --------------------------------------------------
@@ -495,7 +862,7 @@ deparse_lambda <- function(ast, ...) {
 # Deparser for "pipe" ---------------------------------------------------
 #' Predicate for the "pipe" operator
 #' @rdname predicate_component
-is_call_pipe <- function(ast) is_call(ast, "R.pipe")
+is_call_pipe <- function(ast) is_call(ast, "pipe")
 
 #' Deparser for the "pipe" operator
 #' @rdname deparsers_component
@@ -514,7 +881,27 @@ deparse_pipe <- function(ast, ...) {
 }
 
 
-# Library functions and Exceptions -------------------------------------------------
+# Template literal in JavaScript
+# Deparser for the raw string operator "r" -----------------------------------------
+#' Predicate for the raw string operator
+#' @rdname predicate_component
+is_call_raw_string <- function(ast) {
+  is_call(ast, "raw_str")
+}
+
+#' Deparser for the raw string operator
+#' @rdname deparsers_component
+deparse_raw_string <- function(ast, ...) {
+  arg <- ast[[2]]   # must be a character string
+  # Safeguard
+  if (!is.character(arg)) {
+    stop("The argument of the raw string function 'r' must be a character string.")
+  }
+  arg  # parsing naturally removes the outer quotation marks
+}
+
+
+# === Library functions and Exceptions ======================
 #' Predicate for the "add" operator
 #' @rdname predicate_component
 is_call_add <- function(ast) is_call(ast, "R.add")

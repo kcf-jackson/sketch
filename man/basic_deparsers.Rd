@@ -9,3 +9,10 @@ basic_deparsers()
 \description{
 A minimal list of deparsers for deparsing JavaScript
 }
+\note{
+This is used as input to \link{deparse_js}, \link{compile_r} and \link{compile_exprs}.
+}
+\examples{
+basic_deparsers()
+
+}

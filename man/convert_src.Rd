@@ -12,7 +12,7 @@ convert_src(x, processors = default_processors())
 \item{processors}{A list of handlers for processing the '#!' header.}
 }
 \value{
-A shiny.tag object.
+A 'shiny.tag' object.
 }
 \description{
 Convert an asset link into a 'shiny.tag' object

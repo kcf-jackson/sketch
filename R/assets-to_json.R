@@ -1,8 +1,12 @@
-#' Compile a data file into a JS file
+#' Compile a data file into a JavaScript file
 #'
 #' @param input A character string; the path to the input file.
 #' @param output A character string; the path to the output file.
-#' @param ... Extra arguments to be passed to `to_json`.
+#' @param ... Extra arguments to be passed to \link{to_json}.
+#'
+#' @examples
+#' file <- system.file("test_files/test_csv.csv", package = "sketch")
+#' readLines(compile_data(file))
 #'
 #' @export
 compile_data <- function(input, output = tempfile(), ...) {
@@ -15,7 +19,7 @@ compile_data <- function(input, output = tempfile(), ...) {
 }
 
 
-#' Convert a file into JS expression
+#' Convert a file into a JavaScript expression
 #'
 #' @param input A character string; the path to the input file.
 #' @param as_data_frame TRUE or FALSE; whether the data are loaded as a data-frame.
@@ -42,7 +46,7 @@ to_json <- function(input, as_data_frame, read_fun, ...) {
         as_data_frame <- as_data_frame %||% TRUE
         read_fun <- read_fun %||% read.csv
     } else {
-        as_data_frame <- as_data_frame %||% stop("'as_data_frame' (T or F) must be provided when the file is not a CSV file or a JSON file.")
+        as_data_frame <- as_data_frame %||% stop("'as_data_frame' (TRUE or FALSE) must be provided when the file is not a CSV file or a JSON file.")
         read_fun <- read_fun %||% stop("'read_fun' (function) must be provided when the file is not a CSV file or a JSON file.")
     }
     contents <- read_fun(input, ...)
@@ -53,7 +57,7 @@ to_json <- function(input, as_data_frame, read_fun, ...) {
 # Set default parameter
 `%||%` <- function(x, y) if (missing(x)) y else x
 
-embed_data <- function(sym, json, as_data_frame = F) {
+embed_data <- function(sym, json, as_data_frame = FALSE) {
     json <- glue::single_quote(json)
     ifelse(as_data_frame,
            glue::glue({"const {sym} = R.data_frame(JSON.parse({json}))"}),

@@ -17,3 +17,7 @@ A list; a deparser ready to be dispatched by "type".
 \description{
 A constructor for a "typed" deparser
 }
+\examples{
+str(make_deparser(predicate_fun = rlang::is_call, deparse_fun = deparse))
+
+}

@@ -2,10 +2,16 @@
 % Please edit documentation in R/assets-to_shiny_tag.R
 \name{default_processors}
 \alias{default_processors}
-\title{List of handlers for processing the '#!' header}
+\title{A list of handlers for processing the '#!' header}
 \usage{
 default_processors()
 }
 \description{
-List of handlers for processing the '#!' header
+A list of handlers for processing the '#!' header
+}
+\note{
+This is used as input to \link{assets}.
+}
+\examples{
+default_processors()
 }

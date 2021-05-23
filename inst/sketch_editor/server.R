@@ -19,7 +19,7 @@ shinyServer(function(input, output, session) {
     # Switch engine
     observeEvent(input$engine, {
         session$sendCustomMessage('toggle_engine', "")  # empty message
-    }, ignoreInit = T)
+    }, ignoreInit = TRUE)
 
     # # Switch example
     # observeEvent(input$example, {
@@ -44,7 +44,7 @@ shinyServer(function(input, output, session) {
             # cat("Input:\n")
             # print(text_input)
             compile_exprs(text_input)
-        }, silent = T)
+        }, silent = TRUE)
         # cat("Output:\n")
         # print(res)
         if (inherits(res, 'try-error')) {
@@ -53,16 +53,21 @@ shinyServer(function(input, output, session) {
         } else {
             if (input$engine == "Browser") {
                 msg <- paste(res, collapse = "\n")
-                print(msg)
+                # print(msg)
                 path <- html_print(tags$script(msg))
-                file.copy(path, "./www/index.html", overwrite = T)
+                temp_www <- file.path(tempdir(), "www")
+                if (!dir.exists(temp_www)) {
+                    dir.create(temp_www)
+                }
+                file.copy(path, file.path(temp_www, "index.html"), overwrite = TRUE)
+                addResourcePath("index.html", temp_www)
                 message_obj <- shiny_msg(input$engine, msg, msg, "./index.html")
             } else { # input$engine == "V8"
                 ct <- V8::v8()
                 ct$source(R_web)
-                print(res)
+                # print(res)
                 msg <- res %>%
-                    purrr::map_chr(~paste(">", .x, "\n", ct$eval(.x, serialize = T), "\n")) %>%
+                    purrr::map_chr(~paste(">", .x, "\n", ct$eval(.x, serialize = TRUE), "\n")) %>%
                     paste(collapse = "\n")
                 message_obj <- shiny_msg(input$engine, paste(res, collapse = "\n"), msg, "")
             }

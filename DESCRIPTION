@@ -1,14 +1,14 @@
 Package: sketch
 Type: Package
-Title: Interactive Sketches in R
-Version: 1.0.0
+Title: Interactive Sketches 
+Version: 1.1.0
 Authors@R: c(
     person("Chun Fung","Kwok", role = c("aut", "cre"), email = "kwokcf@unimelb.edu.au"),
     person("Kate", "Saunders", role = "ctb")
     )
-Description: Creates static / animated / interactive sketches and illustrations
-    embeddable in R Markdown documents. It implements an R-to-JavaScript transpiler
-    and enables users to write JavaScript applications using the syntax of R.
+Description: Creates static / animated / interactive visualisations embeddable
+    in R Markdown documents. It implements an R-to-JavaScript transpiler and
+    enables users to write JavaScript applications using the syntax of R.
 License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
@@ -22,7 +22,8 @@ Imports:
     htmltools,
     base64enc,
     jsonlite,
-    shiny
+    shiny,
+    methods
 Suggests: 
     testthat,
     covr,

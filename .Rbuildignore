@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\..*$
+^.*\.md$
+^.*\.Rmd$
+^.*\.yml$
+^sketch.code-workspace$
+^doc$
+^docs$
+^Meta$
+^examples$

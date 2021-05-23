@@ -2,7 +2,7 @@
 % Please edit documentation in R/interface-compile.R
 \name{compile_exprs}
 \alias{compile_exprs}
-\title{Compile 'sketch' R code into JS code}
+\title{Compile R code into JavaScript code}
 \usage{
 compile_exprs(x, rules = default_rules(), deparsers = default_deparsers())
 }
@@ -17,5 +17,10 @@ compile_exprs(x, rules = default_rules(), deparsers = default_deparsers())
 A character string.
 }
 \description{
-Compile 'sketch' R code into JS code
+Compile R code into JavaScript code
+}
+\examples{
+compile_exprs("R + Cpp", list(make_rule('Cpp', 'JS')))
+compile_exprs("math.add(a, b)", list(make_rule('math.add', '+')))
+
 }

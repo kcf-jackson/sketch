@@ -28,8 +28,8 @@ install.packages("sketch")
 remotes::install_github("kcf-jackson/sketch")
 ```
 
-Visit the [website](https://kcf-jackson.github.io/sketch-doc) for
+Visit the [website](https://kcf-jackson.github.io/sketch-website/) for
 [getting-started
-guide](https://kcf-jackson.github.io/sketch-doc/getting_started/),
-[tutorials](https://kcf-jackson.github.io/sketch-doc/tutorials/) and
+guide](https://kcf-jackson.github.io/sketch-website/docs/),
+[tutorials](https://kcf-jackson.github.io/sketch-website/tutorial/) and
 other documentation\!

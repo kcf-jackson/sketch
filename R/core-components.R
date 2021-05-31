@@ -654,7 +654,7 @@ deparse_R6Class <- function(ast, ...) {
         let private = {}
         <private_list>
         if (self.initialize) {
-            self.initialize(<const_arg>)
+            self.initialize(<const_arg_wo_default>)
         }
     }", .open = "<", .close = ">"))
 }

@@ -394,6 +394,12 @@ testthat::test_that("Test R6Class", {
     file_ref <- system.file("test_files/test_R6_2.js", package = "sketch")
     temp <- compile_r(file, tempfile())
     testthat::expect_equal(read_file(temp), read_file(file_ref))
+
+    # Test that default argument is not used incorrectly as calling argument
+    file <- system.file("test_files/test_R6_3.R", package = "sketch")
+    file_ref <- system.file("test_files/test_R6_3.js", package = "sketch")
+    temp <- compile_r(file, tempfile())
+    testthat::expect_equal(read_file(temp), read_file(file_ref))
 })
 
 

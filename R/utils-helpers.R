@@ -121,7 +121,7 @@ dataURI <- base64enc::dataURI
 
 
 line_separator <- function(x = "-") {
-    paste0(rep(x, getOption("width")), collapse = "")
+    paste0(rep(x, getOption("width")), collapse = "")   # nocov
 }
 yellow <- function(x) paste0("\033[33m", x, "\033[39m")
 # red <- function(x) paste0("\033[31m", x, "\033[39m")

@@ -55,13 +55,14 @@ scan <- function(f = console::log) {
 #'
 #' @param x A character string; the input string.
 #' @param file A character string; the file name.
+#' @param type A character string; the dataURL type.
 #'
 #' @export
-write <- function(x, file) {
+write <- function(x, file, type = "text/plain") {
     let (a = document$createElement("a"))
     a$href <- x %>%
         Array() %>%
-        Blob$new(list(type = "text/plain")) %>%
+        Blob$new(list(type = type)) %>%
         URL::createObjectURL()
     a$download <- file
     a$click()

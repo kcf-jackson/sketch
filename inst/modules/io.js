@@ -5,7 +5,7 @@ readLines = function(con) {
     }
     return(fetch(con).then(response => response.text()))
 }
-scan = function(f) {
+scan = function(f = console.log) {
     let file_loader = document.createElement("input")
     file_loader.type = "file"
     file_loader.onchange = function(event) {
@@ -15,9 +15,9 @@ scan = function(f) {
     }
     file_loader.click()
 }
-write = function(x, file) {
+write = function(x, file, type = "text/plain") {
     let a = document.createElement("a")
-    a.href = URL.createObjectURL(new Blob(Array(x), { "type": "text/plain" }))
+    a.href = URL.createObjectURL(new Blob(Array(x), { "type": type }))
     a.download = file
     a.click()
     return(true)

@@ -53,6 +53,10 @@ deparse_js <- function(ast, deparsers) {
 #'
 #' @export
 basic_deparsers <- function() {
+  # Order is strict and the deparsers must be arranged such that the
+  # specialised ones are at the top and the general ones are at the
+  # bottom. This list acts like a sieve, and only inputs that do not
+  # get caught at the top will fall to the bottom.
   list(
     "assignment" = make_deparser(is_call_assignment, deparse_assignment),
     # JavaScript template literal
@@ -66,6 +70,8 @@ basic_deparsers <- function() {
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
     "new"  = make_deparser(is_call_new, deparse_new),
     "typeof"  = make_deparser(is_call_typeof, deparse_typeof),
+    "export"  = make_deparser(is_call_export, deparse_export),
+    "async_await"  = make_deparser(is_call_async_await, deparse_async_await),
     "let"    = make_deparser(is_call_let, deparse_let),
     "const"  = make_deparser(is_call_const, deparse_const),
     "for"    = make_deparser(is_call_for, deparse_for),
@@ -73,11 +79,13 @@ basic_deparsers <- function() {
     "while"  = make_deparser(is_call_while, deparse_while),
     "function" = make_deparser(is_call_function, deparse_function),
     "break" = make_deparser(is_call_break, deparse_sym),
+    "next" = make_deparser(is_call_next, deparse_next),
     "try" = make_deparser(is_call_try, deparse_try),
     "tryCatch" = make_deparser(is_call_tryCatch, deparse_tryCatch),
     "throw" = make_deparser(is_call_throw, deparse_throw),
     "R6Class" = make_deparser(is_call_R6Class, deparse_R6Class),
     # Operators
+    "formula" = make_deparser(is_call_formula, deparse_formula),
     "infix"  = make_deparser(is_call %&&% is_infix, deparse_infix),
     "wrap"   = make_deparser(is_call %&&% is_wrap, deparse_wrap),
     # Syntactic literal
@@ -100,31 +108,14 @@ basic_deparsers <- function() {
 #'
 #' @export
 default_deparsers <- function() {
-  # Order is strict and the deparsers must be arranged such that the
-  # specialised ones are at the top and the general ones are at the
-  # bottom. This list acts like a sieve, and only inputs that do not
-  # get caught at the top will fall to the bottom.
-  append(
-    list(
-      # Library functions
-      "R.add" = make_deparser(is_call_add, deparse_add),
-      "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
-      "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extract2Assign),
-      "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
-      "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
-      "R.extract" = make_deparser(is_call_extract, deparse_extract),
-      # Data structure
-      "R.data.frame" = make_deparser(is_call_df, deparse_df),
-      "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
-      "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate)
-    ),
-    basic_deparsers()
-  )
+  (basic_deparsers %<% dp_r_support)()
 }
 
 
-#' A list of deparsers to support implicit variable declaration and explicit 'return'
+#' A list of deparsers with additional features
 #'
+#' @description Support automatic variable declaration, automatic `return`
+#' and shorthand notation for the DOM module.
 #' @note lifecycle: experimental
 #' @note This is used as input to \link{compile_r} and \link{compile_exprs}.
 #'
@@ -133,15 +124,85 @@ default_deparsers <- function() {
 #'
 #' @export
 default_2_deparsers <- function() {
-  append(
-    list(
-      "assignment_auto" = make_deparser(is_call_assignment_auto, deparse_assignment_auto),
-      "function" = make_deparser(is_call_function, deparse_function_with_return),
-      "return" = make_deparser(is_call_return, deparse_return)
-    ),
-    default_deparsers()
+  (default_deparsers %<% dp_auto %<% dp_dom)()
+}
+
+
+# For internal reference, deparsers shall be referred to as `dp`.
+
+#' Low-level lists of deparsers
+#' @name list-of-deparsers
+#' @description Support of R functionalities
+dp_r_support <- function() {
+  list(
+    # Library functions
+    "R.add" = make_deparser(is_call_add, deparse_add),
+    "R.subtract" = make_deparser(is_call_subtract, deparse_subtract),
+    "R.extract2Assign" = make_deparser(is_call_extract2Assign, deparse_extract2Assign),
+    "R.extractAssign" = make_deparser(is_call_extractAssign, deparse_extractAssign),
+    "R.extract2" = make_deparser(is_call_extract2, deparse_extract2),
+    "R.extract" = make_deparser(is_call_extract, deparse_extract),
+    # Data structure
+    "R.data.frame" = make_deparser(is_call_df, deparse_df),
+    "R.summarise" = make_deparser(is_call_df_summarise, deparse_df_summarise),
+    "R.mutate" = make_deparser(is_call_df_mutate, deparse_df_mutate)
   )
 }
+
+#' Automatic variable declaration and return
+#' @rdname list-of-deparsers
+dp_auto <- function() {
+  list(
+    "assignment_auto" = make_deparser(is_call_assignment_auto, deparse_assignment_auto),
+    "function" = make_deparser(is_call_function, deparse_function_with_return),
+    "return" = make_deparser(is_call_return, deparse_return)
+  )
+}
+
+#' Shorthand notation for the 'dom' module
+#' @rdname list-of-deparsers
+dp_dom <- function() {
+  list("dom" = make_deparser(is_html_tags, deparse_html_tags))
+}
+
+#' Shorthand notation for the 'dom' module
+#' @rdname list-of-deparsers
+dp_d3 <- function() {
+  list("d3_attr" = make_deparser(is_d3_attr, deparse_d3_attr),
+       "d3_style" = make_deparser(is_d3_style, deparse_d3_style))
+}
+
+
+
+#' Constructor function to combine low-level deparsers
+#'
+#' @note lifecycle: experimental
+#'
+#' @param ... character strings indicating the features needed
+#' of the deparsers. The supported features are "basic", "r",
+#' "auto" and "dom" corresponding to the basic deparsers, the R
+#' support, the automatic variable declaration and return, and
+#' the dom shorthand notation.
+#'
+#' @export
+dp <- function(...) {
+  current_support <- list(
+    "basic" = basic_deparsers,
+    "r" = dp_r_support,
+    "auto" = dp_auto,
+    "dom" = dp_dom,
+    "d3" = dp_d3
+  )
+  res <- current_support[c(...)] %>%
+    purrr::reduce(`%<%`)
+  res()
+}
+
+# Combinator of functions that return list
+`%<%` <- function(f, g) {
+  function() { append(g(), f()) }
+}
+
 
 
 #' A constructor for a "typed" deparser

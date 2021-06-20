@@ -2,6 +2,10 @@ testthat::context("Test WebSocket")
 
 testthat::test_that("Test WebSocket server", {
     ws <- websocket$new()
+    if (length(ws$listServers()) > 0) {
+        ws$stopAllServers()
+    }
+
     testthat::expect_length(ws$listServers(), 0)
 
     # test: start server

@@ -2,3 +2,8 @@ Name: Source sketch R file
 Description: Source a sketch R file
 Binding: source_active
 Interactive: false
+
+Name: Compile sketch R file
+Description: Compile a sketch R file
+Binding: compile_active
+Interactive: false

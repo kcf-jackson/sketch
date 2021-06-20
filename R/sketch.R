@@ -8,7 +8,7 @@
 #' @aliases sketch
 #' @docType package
 #'
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% %T>%
 #' @importFrom utils head tail read.csv
 #' @importFrom methods formalArgs
 #' @importFrom stats setNames

@@ -3,8 +3,8 @@
 #' @param input A character string; the input file.
 #' @param output A character string; the output file. When the
 #' output is "", the result is printed to the standard output.
-#' @param rules A list of rewriting rules. See [make_rule] for more detail.
-#' @param deparsers A list of deparsers. See [make_deparser] for more detail.
+#' @param rules A list of rewriting rules. See \link{make_rule} for more detail.
+#' @param deparsers A list of deparsers. See \link{make_deparser} for more detail.
 #'
 #' @return A character string; the output file path.
 #'
@@ -30,8 +30,8 @@ compile_r <- with_config(
 #' Compile R code into JavaScript code
 #'
 #' @param x A character string; the expression to transpile to JS.
-#' @param rules A list of rewriting rules. See [make_rule] for more detail.
-#' @param deparsers A list of deparsers. See [make_deparser] for more detail.
+#' @param rules A list of rewriting rules. See \link{make_rule} for more detail.
+#' @param deparsers A list of deparsers. See \link{make_deparser} for more detail.
 #'
 #' @return A character string.
 #'
@@ -42,9 +42,25 @@ compile_r <- with_config(
 #' @export
 compile_exprs <- function(x, rules = default_rules(),
                           deparsers = default_deparsers()) {
-    exprs <- rlang::parse_exprs(x)
-    safeguard(exprs, rules = rules)
-    exprs %>%
+    rlang::parse_exprs(x) %T>%
+        purrr::map(safeguard, rules = rules, deparsers = deparsers) %>%
         purrr::map(rewrite, rules = rules) %>%
         purrr::map_chr(deparse_js, deparsers = deparsers)
+}
+
+
+#' Compile active file in 'RStudio'
+#'
+#' @param ... Optional arguments to pass to \code{compile_r}.
+#'
+#' @examples
+#' \dontrun{
+#' # At 'RStudio', opens a 'sketch' R file in the editor, then
+#' # run the following:
+#' compile_active()
+#' }
+#'
+#' @export
+compile_active <- function(...) {
+    compile_r(copy_active_to_tempfile(), ...)  # nocov
 }

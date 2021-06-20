@@ -2,18 +2,22 @@
 #'
 #' @param ast A language object.
 #' @param rules A list of functions; the rewriting rules, each of which
-#' is the output from `make_rule`.
+#' is the output from \link{make_rule}.
+#' @param deparsers A list of functions; the deparsers, each of which
+#' is the output from \link{make_deparser}.
+#'
 #' @return TRUE when the check is complete.
 #'
 #' @export
-safeguard <- function(ast, rules) {
+safeguard <- function(ast, rules, deparsers) {
     to <- rules %>%
         purrr::map(~attr(.x, "to")) %>%
         purrr::reduce(c)
     from <- rules %>%
         purrr::map(~attr(.x, "from")) %>%
         purrr::reduce(c)
-    reserved_words <- c(to, from)
+    fun_name <- reserved_call(deparsers)
+    reserved_words <- c(to, from, fun_name)
 
     check <- function(ast) {
         if (rlang::is_call(ast)) {
@@ -26,6 +30,32 @@ safeguard <- function(ast, rules) {
     check(ast)
     return(TRUE)
 }
+
+reserved_call <- function(deparsers) {
+    res <- c()
+    if ("dom" %in% names(deparsers)) {
+        tags <-c("div", "span", "textarea",
+                 "h1", "h2", "h3", "h4", "h5", "h6",
+                 "em", "strong", "ul", "li", "blockquote", "hr",
+                 "img", "script", "audio", "video", "canvas", "input", "link",
+                 "section", "article", "header", "nav", "footer", "iframe",
+                 "form", "option", "menu", "code", "pre", "style")
+        res <- c(res, tags)
+    }
+
+    call_names <- c("lambda", "raw_str", "raw_string", "list",
+                    "ifelse", "dataURI", "R6Class",
+                    "new", "typeof", "let", "const",
+                    "NULL", "NaN", "NA")
+    for (call_name in call_names) {
+        if (call_name %in% names(deparsers)) {
+            res <- c(res, call_name)
+        }
+    }
+
+    res
+}
+
 
 # Check that reserved words are not assigned any value
 check_assignment <- function(ast, reserved_words) {

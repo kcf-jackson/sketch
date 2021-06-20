@@ -18,16 +18,17 @@
 #' }
 test_sketch <- function(app_script, test_script, port = 9454, ...) {
     # helpers
-    load_library <- function(path) {
-        glue::glue("#! load_library(\"{path}\")")
-    }
-    load_script <- function(path) {
-        glue::glue("#! load_script(\"{path}\")")
+    load_library <- function(path) glue::glue("#! load_library(\"{path}\")")
+    load_script <- function(path) glue::glue("#! load_script(\"{path}\")")
+    command <- function(x) {
+        message <- list(type = "command", message = x)
+        jsonlite::toJSON(message, auto_unbox = TRUE)
     }
 
     # main
     app <- tempfile(fileext = ".R")
-    new_script <- ifelse(has_websocket(app_script), c(), load_library("websocket"))
+    new_script <- ifelse(has_websocket(app_script),
+                         c(), load_library("websocket"))
     new_script %>%
         c(load_library("testthat")) %>%
         c(load_script(app_script)) %>%
@@ -37,27 +38,28 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
         msg <- jsonlite::fromJSON(msg)
 
         if (msg$type == "WebSocket.onopen") {
-            message(msg$msg)
+            message(msg$message)
             message("Testing App: ", appendLF = FALSE)
             # Compile and send test script over to App
             test_script %>%
                 compile_r(output = tempfile(fileext = ".js")) %>%
                 readLines() %>%
                 paste(collapse = "\n") %>%
+                command() %>%
                 con$ws$send()
             # On completion, request App to send the test report to R
-            con$ws$send(
+            con$ws$send(command(
                 "ws.send(JSON.stringify({
                     \"type\": \"testthat\",
-                    \"msg\": testthat.report()
+                    \"message\": testthat.report()
                 }))"
-            )
+            ))
         }
 
         if (msg$type == "testthat") {
-            report <- msg$msg
+            report <- msg$message
             message(glue::glue("[ {yellow('FAIL')} {report$fail} | {green('PASS')} {report$pass} ]"))
-            con$env$result <- msg$msg
+            con$env$result <- msg$message
             con$stopServer()
         }
     }  # nocov end

@@ -48,6 +48,7 @@
 \alias{deparse_html_tags}
 \alias{deparse_d3_attr}
 \alias{deparse_d3_style}
+\alias{deparse_macro}
 \title{Deparsers (specialised)}
 \usage{
 deparse_sym(ast, ...)
@@ -141,6 +142,8 @@ deparse_html_tags(ast, ...)
 deparse_d3_attr(ast, ...)
 
 deparse_d3_style(ast, ...)
+
+deparse_macro(ast, ...)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -243,4 +246,6 @@ Deparser for the HTML tags
 Deparser for the d3.js `attr` function
 
 Deparser for the d3.js `style` function
+
+Deparser for 'macro'
 }

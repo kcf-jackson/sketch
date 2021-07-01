@@ -79,6 +79,10 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     # Test formula
     unit_test("~.x * .y + fun(.z)", "function(dot_x, dot_y, dot_z) { return dot_x * dot_y + fun(dot_z) }")
     unit_test("~x * .y + fun(z)", "function(dot_y) { return x * dot_y + fun(z) }")
+    unit_test("~.x$y(.z)", "function(dot_x, dot_z) { return dot_x.y(dot_z) }")
+    unit_test("~.a$b(.c$d(e$f))", "function(dot_a, dot_c) { return dot_a.b(dot_c.d(e.f)) }")
+    unit_test("~.a$.b(.c$.d(.e$.f))", "function(dot_a, dot_c, dot_e) { return dot_a..b(dot_c..d(dot_e..f)) }")
+    unit_test("~.x(.z)", "function(dot_x, dot_z) { return dot_x(dot_z) }")
     unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
     unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
     unit_test("res$map(~.x)", "res.map(function(dot_x) { return dot_x })")
@@ -400,6 +404,30 @@ testthat::test_that("Test R6Class", {
     file_ref <- system.file("test_files/test_R6_3.js", package = "sketch")
     temp <- compile_r(file, tempfile())
     testthat::expect_equal(read_file(temp), read_file(file_ref))
+})
+
+testthat::test_that("Test macro", {
+    # The macro cannot be tested with `compile_exprs` because it relies on
+    # global variables defined by the user. This cannot be replicated in
+    # a local environment because `deparse_macro` is initiated on-the-fly,
+    # so the search path would end up at the global environment without
+    # going through the calling environment.
+    test_macro_predicate <- purrr::compose(is_macro, parse_expr)
+    test_macro_deparse <- purrr::compose(deparse_macro, parse_expr)
+
+    unit_test <- purrr::partial(test_equal, f = test_macro_predicate, silent = T)
+    unit_test_2 <- purrr::partial(test_equal, f = test_macro_deparse, silent = T)
+    transform <- function(x, y) glue::glue("{deparse1(x)}:{deparse1(y)}")
+
+    input <- '.macro(transform, arg1, arg2)'
+    expected <- 'arg1:arg2'
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+
+    input <- '.macro(transform, a = arg1, b = arg2)'
+    expected <- 'a = arg1:b = arg2'
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
 })
 
 

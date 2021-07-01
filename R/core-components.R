@@ -1002,7 +1002,9 @@ deparse_formula <- function(ast, ...) {
 # replace_dot_variable :: ast -> ast
 replace_dot_variable <- function(ast) {
   if (is_call(ast)) {
-    for (i in seq_along(ast)) {
+    # traverse the Left Child for "." and all elements otherwise
+    s <- if (is_call(ast, ".")) 2 else seq_along(ast)
+    for (i in s) {
       ast[[i]] <- replace_dot_variable(ast[[i]])
     }
     return(ast)
@@ -1028,8 +1030,9 @@ begin_with_dot <- function(x) {
 # Get all the symbols at the leaf nodes
 get_all_symbols <- function(ast, res = list()) {
   if (is_call(ast)) {
-    for (i in seq_along(ast)) {
-        if (i == 1 && rlang::is_symbol(ast[[i]])) next  # See note below.
+    # traverse the Left Child for "." and all elements otherwise
+    s <- if (is_call(ast, ".")) 2 else seq_along(ast)
+    for (i in s) {
         res <- append(res, get_all_symbols(ast[[i]], res))
     }
     return(res)
@@ -1048,7 +1051,7 @@ get_all_symbols <- function(ast, res = list()) {
 # own leaves, and it needs to be processed as well.
 
 
-# === Library functions and Exceptions ======================
+# === Library functions and Exceptions =======================
 # R module --------------------------------------------------
 #' Predicate for the "add" operator
 #' @rdname predicate_component
@@ -1291,3 +1294,40 @@ deparse_d3_attr <- function(ast, ...) {
 #' Deparser for the d3.js `style` function
 #' @rdname deparsers_component
 deparse_d3_style <- deparse_d3_attr
+
+# Macro ------------------------------------------------------
+# Macro for inline expansion
+# Usage: .macro(f, x, y)
+# `f` is a function that takes `x`, `y` as arguments and return a character.
+
+#' Predicate for 'macro'
+#' @rdname predicate_component
+is_macro <- function(ast) {
+  is_call(ast, ".macro")
+}
+
+#' Deparser for 'macro'
+#' @rdname deparsers_component
+deparse_macro <- function(ast, ...) {
+  if (length(ast) <= 1) {
+    stop("The macro functions must have at least 2 arguments.")
+  }
+  call_name <- deparse1(ast[[1]])
+  fun_name <- deparse1(ast[[2]])
+  fun_args <- deparse_raw_args(ast[-(1:2)])
+  fun <- match.fun(fun_name)
+  do.call(fun, fun_args, quote = TRUE)
+}
+
+# deparse_raw_args :: ast -> [ast]
+deparse_raw_args <- function(ast, ...) {
+  ast_list <- as.list(ast)
+  nm <- names(ast_list)
+  if (is.null(nm)) return(ast_list)
+
+  purrr::map2(nm, ast_list, function(x, y) {
+    yc <- deparse1(y)
+    ifelse(x == "", yc, glue::glue("{x} = {yc}"))
+  }) %>%
+    purrr::map(parse_expr)
+}

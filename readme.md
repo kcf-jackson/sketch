@@ -23,9 +23,9 @@ using only the R syntax.
 ``` r
 install.packages("sketch")
 
-# For the development version
+# For the latest development version
 # install.packages("remotes")
-remotes::install_github("kcf-jackson/sketch")
+remotes::install_github("kcf-jackson/sketch", "develop")
 ```
 
 Visit the [website](https://kcf-jackson.github.io/sketch-website/) for

@@ -1,7 +1,7 @@
 Package: sketch
 Type: Package
 Title: Interactive Sketches 
-Version: 1.1.4
+Version: 1.1.5
 Authors@R: c(
     person("Chun Fung","Kwok", role = c("aut", "cre"), email = "kcf.jackson@gmail.com"),
     person("Kate", "Saunders", role = "ctb")

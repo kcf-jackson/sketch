@@ -19,7 +19,7 @@
 test_sketch <- function(app_script, test_script, port = 9454, ...) {
     # helpers
     load_library <- function(path) glue::glue("#! load_library(\"{path}\")")
-    load_script <- function(path) glue::glue("#! load_script(\"{path}\")")
+    # load_script <- function(path) glue::glue("#! load_script(\"{path}\")")
     command <- function(x) {
         message <- list(type = "command", message = x)
         jsonlite::toJSON(message, auto_unbox = TRUE)
@@ -31,7 +31,7 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
                          c(), load_library("websocket"))
     new_script %>%
         c(load_library("testthat")) %>%
-        c(load_script(app_script)) %>%
+        c(readLines(app_script)) %>%
         writeLines(con = app)
 
     in_handler <- function(msg) {  # nocov start
@@ -68,7 +68,7 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
     con <- websocket$new(in_handler = in_handler, port = port)
     con$startServer()
     source_r(app, ...)
-    return(con)
+    return(invisible(con))
 }
 
 # has_websocket :: File char -> logical

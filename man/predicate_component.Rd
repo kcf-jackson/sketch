@@ -45,6 +45,7 @@
 \alias{is_d3_attr}
 \alias{is_d3_style}
 \alias{is_macro}
+\alias{is_data}
 \title{Predicate for symbols, i.e. symbols or syntactic literals}
 \usage{
 is_sym(ast)
@@ -132,6 +133,8 @@ is_d3_attr(ast)
 is_d3_style(ast)
 
 is_macro(ast)
+
+is_data(ast)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -221,5 +224,7 @@ Predicate for the d3.js `attr` function
 
 Predicate for the d3.js `style` function
 
-Predicate for 'macro'
+Predicate for '.macro'
+
+Predicate for '.data'
 }

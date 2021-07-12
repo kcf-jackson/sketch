@@ -1300,17 +1300,17 @@ deparse_d3_style <- deparse_d3_attr
 # Usage: .macro(f, x, y)
 # `f` is a function that takes `x`, `y` as arguments and return a character.
 
-#' Predicate for 'macro'
+#' Predicate for '.macro'
 #' @rdname predicate_component
 is_macro <- function(ast) {
   is_call(ast, ".macro")
 }
 
-#' Deparser for 'macro'
+#' Deparser for '.macro'
 #' @rdname deparsers_component
 deparse_macro <- function(ast, ...) {
   if (length(ast) <= 1) {
-    stop("The macro functions must have at least 2 arguments.")
+    stop("The .macro function must have at least 1 argument.")
   }
   call_name <- deparse1(ast[[1]])
   fun_name <- deparse1(ast[[2]])
@@ -1330,4 +1330,35 @@ deparse_raw_args <- function(ast, ...) {
     ifelse(x == "", yc, glue::glue("{x} = {yc}"))
   }) %>%
     purrr::map(parse_expr)
+}
+
+
+#' Predicate for '.data'
+#' @rdname predicate_component
+is_data <- function(ast) {
+  is_call(ast, ".data")
+}
+
+#' Deparser for '.data'
+#' @rdname deparsers_component
+deparse_data <- function(ast, ...) {
+  match_arg <- function(x) {
+    # perform matching in the parent of the caller
+    get(x, mode = "any", envir = parent.frame(2))
+  }
+
+  if (length(ast) <= 1) {
+    stop("The .data function must have at least 1 argument.")
+  }
+  call_name <- deparse1(ast[[1]])
+  fun_args <- list(x = match_arg(deparse1(ast[[2]])))
+
+  options <- as.list(ast[-(1:2)])
+  # Set default for 'auto_unbox' to TRUE as it is the most common case
+  if (!"auto_unbox" %in% names(options)) {
+    fun_args %<>% append(list(auto_unbox = TRUE))
+  }
+
+  fun_args %<>% append(options)
+  do.call(jsonlite::toJSON, fun_args)
 }

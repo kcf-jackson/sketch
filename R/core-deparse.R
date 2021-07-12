@@ -175,7 +175,8 @@ dp_d3 <- function() {
 #' Macro
 #' @rdname list-of-deparsers
 dp_macro <- function() {
-  list("macro" = make_deparser(is_macro, deparse_macro))
+  list("macro" = make_deparser(is_macro, deparse_macro),
+       "data" = make_deparser(is_data, deparse_data))
 }
 
 

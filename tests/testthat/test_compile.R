@@ -428,6 +428,37 @@ testthat::test_that("Test macro", {
     expected <- 'a = arg1:b = arg2'
     testthat::expect_equal(test_macro_predicate(input), TRUE)
     testthat::expect_equal(test_macro_deparse(input), expected)
+
+    hi <- function() "hi"
+    input <- '.macro(hi)'
+    expected <- "hi"
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+})
+
+testthat::test_that("Test data (passing)", {
+    test_data_predicate <- purrr::compose(is_data, parse_expr)
+    test_data_deparse <- purrr::compose(deparse_data, parse_expr)
+
+    unit_test <- purrr::partial(test_equal, f = test_data_predicate, silent = T)
+    unit_test_2 <- purrr::partial(test_equal, f = test_data_deparse, silent = T)
+    x <- 100
+
+    input <- '.data(x)'
+    expected <- jsonlite::toJSON(100, auto_unbox = TRUE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(deparse_data(parse_expr(input)), expected)
+
+    input <- '.data(x, auto_unbox = F)'
+    expected <- jsonlite::toJSON(100, auto_unbox = FALSE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(test_data_deparse(input), expected)
+
+    x <- 1:3
+    input <- '.data(x)'
+    expected <- jsonlite::toJSON(x, auto_unbox = TRUE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(test_data_deparse(input), expected)
 })
 
 

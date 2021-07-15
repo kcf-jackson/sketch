@@ -1308,6 +1308,8 @@ is_macro <- function(ast) {
 
 #' Deparser for '.macro'
 #' @rdname deparsers_component
+#' @note At the moment, the '.macro' / `deparse_macro` function must be
+#' used with the `compile_exprs` call.
 deparse_macro <- function(ast, ...) {
   if (length(ast) <= 1) {
     stop("The .macro function must have at least 1 argument.")
@@ -1315,8 +1317,20 @@ deparse_macro <- function(ast, ...) {
   call_name <- deparse1(ast[[1]])
   fun_name <- deparse1(ast[[2]])
   fun_args <- deparse_raw_args(ast[-(1:2)])
-  fun <- match.fun(fun_name)
+  fun <- get(fun_name, mode = "function",
+             envir = find_compile_exprs_env())
   do.call(fun, fun_args, quote = TRUE)
+}
+
+find_compile_exprs_env <- function() {
+  call_stack <- rlang::trace_back(globalenv())
+  env_ind <- call_stack$calls %>%
+    purrr::map_lgl(~rlang::is_call(.x, "compile_exprs")) %>%
+    rev() %>%
+    which()
+  # Set default to the caller environment of `deparse_macro`
+  env_ind <- ifelse(purrr::is_empty(env_ind), 2, env_ind - 1)
+  rlang::caller_env(env_ind)
 }
 
 # deparse_raw_args :: ast -> [ast]
@@ -1341,17 +1355,15 @@ is_data <- function(ast) {
 
 #' Deparser for '.data'
 #' @rdname deparsers_component
+#' @note At the moment, the '.data' / `deparse_data` function must be
+#' used with the `compile_exprs` call.
 deparse_data <- function(ast, ...) {
-  match_arg <- function(x) {
-    # perform matching in the parent of the caller
-    get(x, mode = "any", envir = parent.frame(2))
-  }
-
   if (length(ast) <= 1) {
     stop("The .data function must have at least 1 argument.")
   }
   call_name <- deparse1(ast[[1]])
-  fun_args <- list(x = match_arg(deparse1(ast[[2]])))
+  fun_args <- list(x = get(deparse1(ast[[2]]),
+                           envir = find_compile_exprs_env()))
 
   options <- as.list(ast[-(1:2)])
   # Set default for 'auto_unbox' to TRUE as it is the most common case

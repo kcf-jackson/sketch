@@ -407,11 +407,6 @@ testthat::test_that("Test R6Class", {
 })
 
 testthat::test_that("Test macro", {
-    # The macro cannot be tested with `compile_exprs` because it relies on
-    # global variables defined by the user. This cannot be replicated in
-    # a local environment because `deparse_macro` is initiated on-the-fly,
-    # so the search path would end up at the global environment without
-    # going through the calling environment.
     test_macro_predicate <- purrr::compose(is_macro, parse_expr)
     test_macro_deparse <- purrr::compose(deparse_macro, parse_expr)
 
@@ -436,6 +431,24 @@ testthat::test_that("Test macro", {
     testthat::expect_equal(test_macro_deparse(input), expected)
 })
 
+testthat::test_that("Test macro - top level", {
+    g <- function() {
+        f <- function(x) as.character(eval(x))
+        compile_exprs(".macro(f, 12)", deparsers = dp("basic", "macro"))
+    }
+    testthat::expect_equal(g(), "12")
+
+    h <- function() {
+        f <- function(x) as.character(eval(x) + 1)
+        g <- function() {
+            compile_exprs(".macro(f, 12)", deparsers = dp("basic", "macro"))
+        }
+        g()
+    }
+    testthat::expect_equal(h(), "13")
+})
+
+
 testthat::test_that("Test data (passing)", {
     test_data_predicate <- purrr::compose(is_data, parse_expr)
     test_data_deparse <- purrr::compose(deparse_data, parse_expr)
@@ -459,6 +472,23 @@ testthat::test_that("Test data (passing)", {
     expected <- jsonlite::toJSON(x, auto_unbox = TRUE)
     testthat::expect_equal(test_data_predicate(input), TRUE)
     testthat::expect_equal(test_data_deparse(input), expected)
+})
+
+testthat::test_that("Test data - top level", {
+    g <- function() {
+        x <- 100
+        compile_exprs(".data(x)", deparsers = dp("basic", "macro"))
+    }
+    testthat::expect_equal(g(), "100")
+
+    h <- function() {
+        x <- 101
+        g <- function() {
+            compile_exprs(".data(x)", deparsers = dp("basic", "macro"))
+        }
+        g()
+    }
+    testthat::expect_equal(h(), "101")
 })
 
 

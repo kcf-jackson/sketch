@@ -24,9 +24,18 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
         message <- list(type = "command", message = x)
         jsonlite::toJSON(message, auto_unbox = TRUE)
     }
+    add_DOM_command <- function(x) {
+        command(glue::glue(
+            "var tmp_1IOP2A551 = document.createElement('script');
+            tmp_1IOP2A551.type = 'text/javascript';
+            tmp_1IOP2A551.src = new DOMParser().parseFromString('{x}', 'text/xml').firstChild.getAttribute('src');
+            document.querySelector('head').appendChild(tmp_1IOP2A551);"
+        ))
+    }
 
     # main
-    app <- tempfile(fileext = ".R")
+    dir0 <- tempdir()
+    app <- file.path(dir0, "app.R")
     new_script <- ifelse(has_websocket(app_script),
                          c(), load_library("websocket"))
     new_script %>%
@@ -34,12 +43,23 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
         c(readLines(app_script)) %>%
         writeLines(con = app)
 
+    # copy local dependencies to the temporary folder from which the app is served
+    file_dependencies <- get_dependencies(app_script)
+    file.copy(file_dependencies, dir0)
+
     in_handler <- function(msg) {  # nocov start
         msg <- jsonlite::fromJSON(msg)
 
         if (msg$type == "WebSocket.onopen") {
             message(msg$message)
             message("Testing App: ", appendLF = FALSE)
+            # Extract dependencies of the test script and add that to the app
+            test_script %>%
+                assets() %>%
+                `$`("head") %>%
+                purrr::map(as.character) %>%
+                add_DOM_command() %>%
+                con$ws$send()
             # Compile and send test script over to App
             test_script %>%
                 compile_r(output = tempfile(fileext = ".js")) %>%
@@ -69,6 +89,27 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
     con$startServer()
     source_r(app, ...)
     return(invisible(con))
+}
+
+# get_dependencies :: File char -> [char]
+# Extract the content of all the load_script headers
+get_dependencies <- function(app_script, local_only = TRUE) {
+    get_argument <- function(x) parse_expr(x)[[2]]
+
+    headers <- app_script %>%
+        assets(trace = TRUE) %>%
+        `$`("head")
+
+    keep <- headers %>%
+        purrr::map_lgl(~load_script_pred(.x))
+
+    res <- headers[keep] %>%
+        purrr::map_chr(get_argument) %>%
+        as.character()
+    if (local_only) {
+        return(res[purrr::map_lgl(res, is_local)])
+    }
+    res
 }
 
 # has_websocket :: File char -> logical

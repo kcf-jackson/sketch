@@ -1,3 +1,29 @@
+#! config(rules = basic_rules(), deparsers = dp("basic"))
+
+#' @export
+equal <- function(x, y) {
+    isArray <- Array::isArray
+    if (typeof(x) != typeof(y))   return(FALSE)
+    if (isArray(x) && isArray(y)) return(equal_array(x, y))
+    if (typeof(x) == "object")    return(equal_object(x, y))
+    return(x == y)
+}
+
+#' @keywords internal
+equal_array <- function(xs, ys) {
+    return(
+        (xs$length == ys$length) &&
+        (xs$length == 0 ||
+             (equal(xs$shift(), ys$shift()) && equal_array(xs, ys)))
+    )
+}
+
+#' @keywords internal
+equal_object <- function(x, y) {
+    return(JSON::stringify(x) == JSON::stringify(y))  # heuristic
+}
+
+
 test <- R6Class("testthat", list(
     total = 0,
     pass = 0,
@@ -44,10 +70,10 @@ test <- R6Class("testthat", list(
             self$pass_test()
         }
     },
-    expect_equal = function(object, expected) {
+    expect_equal = function(object, expected, equal = equal) {
         declare (msg)
         self$conduct_test()
-        if (object != expected) {
+        if (!equal(object, expected)) {
             msg <- raw_str("`Error: ${object} not equal to ${expected}.`")
             self$error_msg$push(msg)
             try(stop(msg))

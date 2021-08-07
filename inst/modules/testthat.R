@@ -28,6 +28,7 @@ test <- R6Class("testthat", list(
     total = 0,
     pass = 0,
     error_msg = Array(),
+    equal = equal,
 
     reset = function() {
         self$total <- 0
@@ -70,7 +71,7 @@ test <- R6Class("testthat", list(
             self$pass_test()
         }
     },
-    expect_equal = function(object, expected, equal = equal) {
+    expect_equal = function(object, expected, equal = self$equal) {
         declare (msg)
         self$conduct_test()
         if (!equal(object, expected)) {

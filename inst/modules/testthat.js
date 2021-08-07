@@ -17,6 +17,7 @@ test = function() {
     self.total = 0
     self.pass = 0
     self.error_msg = Array()
+    self.equal = equal
     self.reset = function() {
         self.total = 0
         self.pass = 0
@@ -60,7 +61,7 @@ test = function() {
             self.pass_test()
         }
     }
-    self.expect_equal = function(object, expected, equal = equal) {
+    self.expect_equal = function(object, expected, equal = self.equal) {
         let msg
         self.conduct_test()
         if (!equal(object, expected)) {

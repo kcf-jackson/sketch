@@ -57,9 +57,12 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
             test_script %>%
                 assets() %>%
                 `$`("head") %>%
-                purrr::map(as.character) %>%
-                add_DOM_command() %>%
-                con$ws$send()
+                purrr::map(
+                    ~.x %>%
+                       as.character() %>%
+                       add_DOM_command() %>%
+                       con$ws$send()
+                )
             # Compile and send test script over to App
             test_script %>%
                 compile_r(output = tempfile(fileext = ".js")) %>%

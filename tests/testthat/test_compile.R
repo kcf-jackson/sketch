@@ -190,6 +190,12 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("f(x=4) %>% b", "b(f(4))")
     unit_test("f(x=4) %>% b()", "b(f(4))")
 
+    # Test assignment pipe operator
+    unit_test("x %<>% b", "x = b(x)")
+    unit_test("x %<>% b()", "x = b(x)")
+    unit_test("x %<>% b(arg2 = 2)", "x = b(x, 2)")
+    unit_test("x %<>% b(arg2 = 2, arg3 = 3)", "x = b(x, 2, 3)")
+
     # Test function definition
     unit_test("function(x, y) {}", "function(x, y) {\n    \n}")
     unit_test("function(x, y) x + y", "function(x, y) { R.add(x, y) }")

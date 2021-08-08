@@ -957,6 +957,30 @@ deparse_pipe <- function(ast, ...) {
   }
 }
 
+#' Predicate for the "assignment pipe" operator
+#' @rdname predicate_component
+is_call_assignment_pipe <- function(ast) {
+  is_call(ast, "assignment_pipe")
+}
+
+#' Deparser for the "assignment pipe" operator
+#' @rdname deparsers_component
+deparse_assignment_pipe <- function(ast, ...) {
+  if (rlang::is_symbol(ast[[3]])) {
+    arg <- deparse_js(ast[[2]], ...)
+    fname <- deparse_js(ast[[3]], ...)
+    glue::glue("{arg} = {fname}({arg})")
+  } else {
+    lhs <- deparse_js(ast[[2]], ...)
+    new_ast <- ast[[3]] %>%
+      as.list() %>%
+      append(ast[[2]], 1) %>%
+      as.call()
+    rhs <- deparse_js(new_ast, ...)
+    glue::glue("{lhs} = {rhs}")
+  }
+}
+
 
 # Template literal in JavaScript
 # Deparser for the raw string operator "r" -----------------------------------------

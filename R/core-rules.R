@@ -23,6 +23,7 @@ basic_rules <- function() {
         make_rule("%+%", "+"),
         make_rule("%=>%", "=>"),
         make_rule("%>%", "pipe"),
+        make_rule("%<>%", "assignment_pipe"),
         make_rule("T", "true"),
         make_rule("F", "false"),
         make_rule("TRUE", "true"),
@@ -83,6 +84,7 @@ default_rules <- function() {
         make_rule("%/%", "R.intDivide"),
         make_rule("%o%", "R.compose"),
         make_rule("%>%", "pipe"),
+        make_rule("%<>%", "assignment_pipe"),
 
         # Base Javascript ----
         make_rule("TRUE", "true"),

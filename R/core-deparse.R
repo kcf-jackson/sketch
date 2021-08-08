@@ -65,6 +65,7 @@ basic_deparsers <- function() {
     "list"    = make_deparser(is_call_list, deparse_list),
     # Keywords
     "pipe" = make_deparser(is_call_pipe, deparse_pipe),
+    "assignment_pipe" = make_deparser(is_call_assignment_pipe, deparse_assignment_pipe),
     "lambda" = make_deparser(is_call_lambda, deparse_lambda),
     "ifelse" = make_deparser(is_call_ifelse, deparse_ifelse),
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),

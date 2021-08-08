@@ -33,6 +33,7 @@
 \alias{is_call_ifelse}
 \alias{is_call_lambda}
 \alias{is_call_pipe}
+\alias{is_call_assignment_pipe}
 \alias{is_call_raw_string}
 \alias{is_call_formula}
 \alias{is_call_add}
@@ -109,6 +110,8 @@ is_call_ifelse(ast)
 is_call_lambda(ast)
 
 is_call_pipe(ast)
+
+is_call_assignment_pipe(ast)
 
 is_call_raw_string(ast)
 
@@ -201,6 +204,8 @@ Predicate for the "ifelse" operator
 Predicate for the "lambda" operator
 
 Predicate for the "pipe" operator
+
+Predicate for the "assignment pipe" operator
 
 Predicate for the raw string operator
 

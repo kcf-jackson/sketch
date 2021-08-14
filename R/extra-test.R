@@ -94,8 +94,14 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
     return(invisible(con))
 }
 
+
+#' Extract the content of the `load_script` headers of a sketch R file
+#'
+#' @param app_script A character string; the path to the sketch R file.
+#' @param local_only TRUE / FALSE; if TRUE, exclude the ones that are web link.
+#'
+#' @export
 # get_dependencies :: File char -> [char]
-# Extract the content of all the load_script headers
 get_dependencies <- function(app_script, local_only = TRUE) {
     get_argument <- function(x) parse_expr(x)[[2]]
 

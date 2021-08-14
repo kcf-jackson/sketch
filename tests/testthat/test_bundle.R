@@ -36,3 +36,22 @@ testthat::test_that("Bundling JavaScript and sketch R files - error when a file 
 
     expect_error(bundle(c(js_file, r_file, "random_file.Cpp")))
 })
+
+testthat::test_that("Bundling JavaScript and sketch R directories and files", {
+    js_file <- tempfile(fileext = ".js")
+    r_file <- tempfile(fileext = ".R")
+
+    writeLines("x = 1", js_file)
+    writeLines("y <- 2", r_file)
+
+    dir0 <- tempdir()
+    dir1 <- file.path(dir0, "group")
+    if (!dir.exists(dir1)) dir.create(dir1)
+    file.copy(js_file, dir1)
+
+    bundle_file <- bundle(c(dir1, r_file))
+    bundle_lines <- readLines(bundle_file)
+
+    # Note that 2 empty lines are inserted between two files by `bundle`
+    expect_equal(bundle_lines[1], "x = 1")
+})

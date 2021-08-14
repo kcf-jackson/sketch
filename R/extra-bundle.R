@@ -10,12 +10,10 @@
 #'
 #' @export
 bundle <- function(fs) {
+    fs <- flatten_filelist(fs, "[.]((r)|(js))$", full.names = TRUE,
+                           recursive = TRUE, ignore.case = TRUE)
     res_js <- file.path(tempdir(), "bundle.js")
     for (file in fs) {
-        if (!file.exists(file)) {
-            stop("File '", file, "' does not exist.")
-        }
-
         file_extension <-  tolower(tools::file_ext(file))
         if (file_extension %in% c("r", "js")) {
             if (file_extension == "r") {
@@ -32,4 +30,29 @@ bundle <- function(fs) {
         }
     }
     res_js
+}
+
+
+#' Flatten a list of files and directories into a list of files
+#'
+#' @param fs A character vector; a list of files.
+#' @param pattern An optional regular expression to pass to `list.files` for
+#' filtering files while expanding a directory into a list of files.
+#' @param ... Additional parameters to pass to `list.files`.
+#'
+#' @export
+flatten_filelist <- function(fs, pattern = NULL, ...) {
+    fs %>%
+        purrr::map(function(path) {
+            if (!file.exists(path) && !dir.exists(path)) {
+                stop("Path '", path, "' does not exist.")
+            }
+            if (dir.exists(path)) {
+                return(list.files(path, pattern, ...))
+            }
+            if (file.exists(path)) {
+                return(path)
+            }
+        }) %>%
+        unlist()
 }

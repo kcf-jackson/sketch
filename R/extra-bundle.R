@@ -13,6 +13,7 @@ bundle <- function(fs) {
     fs <- flatten_filelist(fs, "[.]((r)|(js))$", full.names = TRUE,
                            recursive = TRUE, ignore.case = TRUE)
     res_js <- file.path(tempdir(), "bundle.js")
+    if (file.exists(res_js)) file.remove(res_js)
     for (file in fs) {
         file_extension <-  tolower(tools::file_ext(file))
         if (file_extension %in% c("r", "js")) {

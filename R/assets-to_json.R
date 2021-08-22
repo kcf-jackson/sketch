@@ -42,6 +42,11 @@ to_json <- function(input, as_data_frame, read_fun, ...) {
         return(embed_data(sym, json, as_data_frame))
     }
 
+    if (is_gz(input)) {
+        raw <- readBin(input, "int", 1e6, size = 1, signed = FALSE)
+        return(embed_gz_data(sym, raw))
+    }
+
     if (is_csv(input)) {
         as_data_frame <- as_data_frame %||% TRUE
         read_fun <- read_fun %||% read.csv
@@ -62,4 +67,9 @@ embed_data <- function(sym, json, as_data_frame = FALSE) {
     ifelse(as_data_frame,
            glue::glue({"const {sym} = R.data_frame(JSON.parse({json}))"}),
            glue::glue({"const {sym} = JSON.parse({json})"})) # use JSON.parse as a safeguard / linter
+}
+
+embed_gz_data <- function(sym, raw) {
+    raw <- jsonlite::toJSON(raw)
+    glue::glue("const {sym} = JSON.parse(pako.inflate({raw}, {{to: 'string'}}))")
 }

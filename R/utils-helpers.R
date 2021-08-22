@@ -26,6 +26,7 @@ src <- function(x) {
            "tailwind" = "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css",
            # Utility
            "ramda" = "https://cdnjs.cloudflare.com/ajax/libs/ramda/0.25.0/ramda.min.js",
+           "pako" = "https://cdn.jsdelivr.net/npm/pako@2.0.4/dist/pako.min.js",
            # Modules
            "dom" = system.file("modules/dom.js", package = "sketch"),
            "io" = system.file("modules/io.js", package = "sketch"),
@@ -66,7 +67,8 @@ license_info <- function(x) {
            "fontawesome" = list(license = "MIT", url = "https://fontawesome.com/v4.7.0/license/"),
            "ionicons" = list(license = "MIT", url = "https://unpkg.com/browse/ionicons@5.2.3/LICENSE"),
            "tailwind" = list(license = "MIT", url = "https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE"),
-           "ramda" = list(license = "MIT", url = "https://github.com/ramda/ramda/blob/master/LICENSE.txt")
+           "ramda" = list(license = "MIT", url = "https://github.com/ramda/ramda/blob/master/LICENSE.txt"),
+           "pako" = list(license = "MIT", url = "https://github.com/nodeca/pako/blob/master/LICENSE")
     )
 }
 

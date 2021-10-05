@@ -261,8 +261,10 @@ Deparser for '.data'
 }
 \note{
 At the moment, the '.macro' / `deparse_macro` function must be
-used with the `compile_exprs` call.
+used with the `compile_exprs` call. This is currently an experimental
+feature.
 
 At the moment, the '.data' / `deparse_data` function must be
-used with the `compile_exprs` call.
+used with the `compile_exprs` call. This is currently an experimental
+feature.
 }

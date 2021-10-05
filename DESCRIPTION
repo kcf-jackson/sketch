@@ -1,9 +1,9 @@
 Package: sketch
 Type: Package
 Title: Interactive Sketches 
-Version: 1.1.14
+Version: 1.1.15
 Authors@R: c(
-    person("Chun Fung","Kwok", role = c("aut", "cre"), email = "kcf.jackson@gmail.com"),
+    person("Chun Fung","Kwok", role = c("aut", "cre"), email = "jkwok@svi.edu.au", comment = c(ORCID = "0000-0002-0716-3879")),
     person("Kate", "Saunders", role = "ctb")
     )
 Description: Creates static / animated / interactive visualisations embeddable

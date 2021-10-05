@@ -17,3 +17,8 @@ filtering files while expanding a directory into a list of files.}
 \description{
 Flatten a list of files and directories into a list of files
 }
+\examples{
+modules_dir <- system.file("modules", package = "sketch")
+flatten_filelist(modules_dir)
+
+}

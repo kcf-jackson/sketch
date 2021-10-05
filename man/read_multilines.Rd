@@ -2,9 +2,9 @@
 % Please edit documentation in R/extra-websocket.R
 \name{read_multilines}
 \alias{read_multilines}
-\title{Read one or more lines from the Terminal}
+\title{Read one or more lines from the console for the first successful parse}
 \usage{
-read_multilines(prompt)
+read_multilines(prompt = "")
 }
 \arguments{
 \item{prompt}{the string printed when prompting the user for input.
@@ -19,4 +19,17 @@ This function repeatedly calls \code{readline} until enough inputs
 are provided to reach a successful parse.
 
 This can only be used in an interactive session.
+}
+\examples{
+\dontrun{
+# In an interactive session
+read_multilines()
+1 + 2  # expect immediate success
+
+read_multilines()
+1 +
+2 +
+3  # expect success here
+}
+
 }

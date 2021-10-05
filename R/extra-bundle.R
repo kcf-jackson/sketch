@@ -41,6 +41,10 @@ bundle <- function(fs) {
 #' filtering files while expanding a directory into a list of files.
 #' @param ... Additional parameters to pass to `list.files`.
 #'
+#' @examples
+#' modules_dir <- system.file("modules", package = "sketch")
+#' flatten_filelist(modules_dir)
+#'
 #' @export
 flatten_filelist <- function(fs, pattern = NULL, ...) {
     fs %>%

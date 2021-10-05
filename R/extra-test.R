@@ -100,6 +100,12 @@ test_sketch <- function(app_script, test_script, port = 9454, ...) {
 #' @param app_script A character string; the path to the sketch R file.
 #' @param local_only TRUE / FALSE; if TRUE, exclude the ones that are web link.
 #'
+#' @examples
+#'
+#' sample_file <- system.file("test_files/test_sketch.R", package = "sketch")
+#' cat(readLines(sample_file), sep = "\n")  # Preview the file content
+#' get_dependencies(sample_file)
+#'
 #' @export
 # get_dependencies :: File char -> [char]
 get_dependencies <- function(app_script, local_only = TRUE) {

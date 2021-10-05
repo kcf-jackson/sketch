@@ -3,12 +3,12 @@
 #' @param args A named list; the list of arguments given by \code{list(...)}.
 #' @param capture A character vector; the variables to keep.
 #'
-#' @examples
-#' f <- function(...) {
-#'    capture_args(list(...), c("a", "b"))
-#' }
-#' f(a = 1, b = 2, c = 3, d = 4)
-#'
+# @examples
+# f <- function(...) {
+#    capture_args(list(...), c("a", "b"))
+# }
+# f(a = 1, b = 2, c = 3, d = 4)
+#
 #' @keywords internal
 #' @noRd
 capture_args <- function(args, capture) {

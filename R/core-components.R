@@ -1333,7 +1333,8 @@ is_macro <- function(ast) {
 #' Deparser for '.macro'
 #' @rdname deparsers_component
 #' @note At the moment, the '.macro' / `deparse_macro` function must be
-#' used with the `compile_exprs` call.
+#' used with the `compile_exprs` call. This is currently an experimental
+#' feature.
 deparse_macro <- function(ast, ...) {
   if (length(ast) <= 1) {
     stop("The .macro function must have at least 1 argument.")
@@ -1348,7 +1349,7 @@ deparse_macro <- function(ast, ...) {
 
 find_compile_exprs_env <- function() {
   call_stack <- rlang::trace_back(globalenv())
-  env_ind <- call_stack$calls %>%
+  env_ind <- call_stack$call %>%
     purrr::map_lgl(~rlang::is_call(.x, "compile_exprs")) %>%
     rev() %>%
     which()
@@ -1380,7 +1381,8 @@ is_data <- function(ast) {
 #' Deparser for '.data'
 #' @rdname deparsers_component
 #' @note At the moment, the '.data' / `deparse_data` function must be
-#' used with the `compile_exprs` call.
+#' used with the `compile_exprs` call. This is currently an experimental
+#' feature.
 deparse_data <- function(ast, ...) {
   if (length(ast) <= 1) {
     stop("The .data function must have at least 1 argument.")

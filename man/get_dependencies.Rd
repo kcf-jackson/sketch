@@ -14,3 +14,10 @@ get_dependencies(app_script, local_only = TRUE)
 \description{
 Extract the content of the `load_script` headers of a sketch R file
 }
+\examples{
+
+sample_file <- system.file("test_files/test_sketch.R", package = "sketch")
+cat(readLines(sample_file), sep = "\n")  # Preview the file content
+get_dependencies(sample_file)
+
+}

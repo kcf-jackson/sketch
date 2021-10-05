@@ -131,14 +131,25 @@ green <- function(x) paste0("\033[32m", x, "\033[39m")  # nocov
 
 
 
-#' #' A helper function to enable debugger option
-#' #'
-#' #' @param x TRUE / FALSE; whether to attach a debugging console to
-#' #' the sketch application.
-#' #' @param local TRUE / FALSE; whether to load the debugger console
-#' #' from the local package. If FALSE, the console will be loaded from
-#' #' a Content Delivery Network (CDN) link.
-#' debug <- function(x, local = TRUE) {
-#'     attr(x, "local") <- local
-#'     x
-#' }
+#' A helper function to enable debugger option
+#'
+#' @param x TRUE / FALSE; whether to attach a debugging console to
+#' the sketch application.
+#' @param from_local TRUE / FALSE; whether to load the debugger console
+#' from the local package. If FALSE, the console will be loaded from
+#' a Content Delivery Network (CDN) link.
+#'
+#' @note Use `from_local=TRUE` for self-contained applications, and
+#' `from_local=FALSE` for reduced file size.
+#'
+#' @examples
+#' # This function is designed to be used in the configuration header, e.g.
+#' # config(debug = local(TRUE), rules = basic_rules(), deparsers = basic_deparsers())
+#'
+#' local(TRUE)
+#'
+#' @export
+local <- function(x, from_local = TRUE) {
+    attr(x, "local") <- from_local
+    x
+}

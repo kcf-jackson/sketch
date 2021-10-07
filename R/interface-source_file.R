@@ -47,8 +47,11 @@ copy_active_to_tempfile <- function() {
 #' @export
 source_r <- with_config(
   "file",
-  function(file, debug = FALSE, launch_browser = "viewer",
+  function(file, debug = FALSE, launch_browser,
            asset_tags = default_tags(), ...) {
+    if (missing(launch_browser)) {
+      launch_browser <- ifelse(rstudioapi::isAvailable(), "viewer", "browser")
+    }
     index_js <- compile_r(file, tempfile(), ...)
     file_asset <- assets(file)   # this line is needed to keep the working directory unchanged
     asset_tags <- c(asset_tags, file_asset)
@@ -78,10 +81,20 @@ source_r <- with_config(
 #' }
 #' @export
 source_js <- function(file, debug = FALSE, asset_tags = default_tags(),
-                      launch_browser = "viewer") {
+                      launch_browser) {
   if (debug) {
-    debugger_js <- system.file("assets/console-log-div.js", package = "sketch")
-    asset_tags <- append_to_body(asset_tags, js_to_shiny_tag(debugger_js))
+    debug_attr <- attributes(debug)
+    if (length(debug_attr) == 0 || debug_attr$local) {
+      debugger_file <- system.file("assets/console-log-div.js", package = "sketch")
+      debugger_js <- js_to_shiny_tag(debugger_file)
+    } else {
+      debugger_cdn <- "https://cdn.jsdelivr.net/gh/kcf-jackson/sketch/inst/assets/console-log-div.js"
+      debugger_js <- htmltools::tags$script(src = debugger_cdn)
+    }
+    asset_tags <- append_to_body(asset_tags, debugger_js)
+  }
+  if (missing(launch_browser)) {
+    launch_browser <- ifelse(rstudioapi::isAvailable(), "viewer", "browser")
   }
 
   file_tag <- js_to_shiny_tag(file)

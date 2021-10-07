@@ -307,7 +307,7 @@ deparse_function_with_return <- function(ast, ...) {
 
   add_return <- function(ast) {
     template_ast <- parse_expr("return(x)")
-    template_ast[[2]] <- ast  # insert tree at x
+    template_ast[2] <- list(ast)  # insert tree at x
     ast <- template_ast
     return(ast)
   }
@@ -317,26 +317,28 @@ deparse_function_with_return <- function(ast, ...) {
   # Handle special forms, e.g. if, for, while, as JavaScript only
   # allows returning values.
   is_keyword <- function(ast) is_call(ast, c("if", "for", "while"))
+  is_exception <- function(ast) is_call(ast, c("throw", "try", "tryCatch"))
   is_valid_add <- function(ast, ...) {
     # Provide more informative message
     ast_string <- deparse_js(ast, ...)
     if (is_assignment(ast)) {
       warning("You have used an assignment statement as the final expression in:", immediate. = TRUE)
-      message(line_separator("-"))
-      message(ast_string)
-      message(line_separator("-"))
+      message(yellow(ast_string))
       message("Note that automatic explicit return only applies to standalone values but not statements.")
     }
     if (is_keyword(ast)) {
       warning("You have used a control-flow statement as the final expression in:", immediate. = TRUE)
-      message(line_separator("-"))
-      message(ast_string)
-      message(line_separator("-"))
+      message(yellow(ast_string))
+      message("Note that automatic explicit return only applies to standalone values but not statements.")
+    }
+    if (is_exception(ast)) {
+      warning("You have used an error/exception statement as the final expression in:", immediate. = TRUE)
+      message(yellow(ast_string))
       message("Note that automatic explicit return only applies to standalone values but not statements.")
     }
 
     # The actual check
-    !is_return(ast) && !is_assignment(ast) && !is_keyword(ast)
+    !is_return(ast) && !is_assignment(ast) && !is_keyword(ast) && !is_exception(ast)
   }
 
   # TODO: Consider adding support to return of assignment.
@@ -410,14 +412,17 @@ deparse_assignment <- function(ast, ...) {
 
 #' Predicate for assignments
 #' @rdname predicate_component
-is_call_assignment_auto <- function(ast) is_call(ast, c("<-", "=", "<<-"))
+is_call_assignment_auto <- function(ast) {
+  is_call(ast, c("<-", "=", "<<-")) &&
+    # 'var' is added only when LHS is a symbol (i.e. not a call)
+    rlang::is_symbol(ast[[2]])
+}
 
 #' Deparser for assignments (automatic variable declaration)
 #' @rdname deparsers_component
 deparse_assignment_auto <- function(ast, ...) {
   sym_ls <- purrr::map_chr(ast, deparse_js, ...)
-  # 'var' is added only when LHS is a symbol
-  if (rlang::is_symbol(ast[[2]]) && !is_call(ast, "<<-")) {
+  if (!is_call(ast, "<<-")) {
     return(glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}"))
   }
   glue::glue("{sym_ls[[2]]} = {sym_ls[[3]]}")
@@ -429,6 +434,20 @@ deparse_assignment_auto <- function(ast, ...) {
 #' Predicate for the "break" keyword
 #' @rdname predicate_component
 is_call_break <- function(ast) is_call(ast, "break")
+
+# "break" uses `deparse_sym` as deparser
+
+
+# Deparser for the "next" keyword --------------------------
+#' Predicate for the "next" keyword
+#' @rdname predicate_component
+is_call_next <- function(ast) is_call(ast, "next")
+
+#' Deparser for the "next" keyword
+#' @rdname deparsers_component
+deparse_next <- function(ast, ...) {
+  return("continue")
+}
 
 
 # === Deparser for Error handling =============================
@@ -516,8 +535,8 @@ deparse_list <- function(ast, ...) {
   paste0("{ ", deparse_list_arg(ast[-1], err_msg, ...), " }")
 }
 
-#' Deparser for the arguments in a "list" call
-#' @keywords internal
+# Deparser for the arguments in a "list" call
+# @keywords internal
 # This function is not in `deparse_list`, because it needs to be reused
 # by `deparse_df`
 deparse_list_arg <- function(list0, err_msg, ...) {
@@ -560,8 +579,8 @@ deparse_df <- function(ast, ...) {
   paste0("R.data_frame({ ", deparse_df_arg(ast[-1], err_msg, ...), " })")
 }
 
-#' Deparser for the arguments in a "data.frame" call
-#' @keywords internal
+# Deparser for the arguments in a "data.frame" call
+# @keywords internal
 # A duplicate function is created to maintain code consistency throughout
 # the package. The rule here is that each deparser must have its own
 # argument deparser (if it needs one).
@@ -623,6 +642,7 @@ deparse_R6Class <- function(ast, ...) {
   }
 
   const_arg <- get_constructor_arg(public, ...)
+  const_arg_wo_default <- get_constructor_arg_no_default(public, ...)
   public_list <- deparse_public_list(public, ...)
   private_list <- deparse_private_list(private, ...)
 
@@ -634,7 +654,7 @@ deparse_R6Class <- function(ast, ...) {
         let private = {}
         <private_list>
         if (self.initialize) {
-            self.initialize(<const_arg>)
+            self.initialize(<const_arg_wo_default>)
         }
     }", .open = "<", .close = ">"))
 }
@@ -648,6 +668,24 @@ get_constructor_arg <- function(ast, ...) {
         glue::glue(if (y == "") "{x}" else "{x} = {y}")
       }
     )
+    paste(alist2, collapse = ", ")
+  }
+
+  if (!"initialize" %in% names(ast)) {
+    return("")
+  }
+
+  if (!is_call(ast$initialize, "function")) {
+    stop("The constructor must be a function.")
+  }
+
+  deparse_arg(ast$initialize[[2]], ...)
+}
+
+get_constructor_arg_no_default <- function(ast, ...) {
+  deparse_arg <- function(alist0, ...) {
+    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist2 <- names(alist1)
     paste(alist2, collapse = ", ")
   }
 
@@ -741,6 +779,37 @@ deparse_typeof <- function(ast, ...) {
 }
 
 
+# Deparser for "export" ------------------------------------------------------
+#' Predicate for the "export" operator
+#' @rdname predicate_component
+is_call_export <- function(ast) {
+  is_call(ast, "export")
+}
+
+#' Deparser for the "export" operator
+#' @rdname deparsers_component
+deparse_export <- function(ast, ...) {
+  args <- deparse_js(ast[[2]], ...)
+  glue::glue("export {args}")
+}
+
+
+# Deparser for "async" and "await" ------------------------------------------
+#' Predicate for the "async" and "await" operators
+#' @rdname predicate_component
+is_call_async_await <- function(ast) {
+  is_call(ast, c("async", "await"))
+}
+
+#' Deparser for the ""async" and "await" operators
+#' @rdname deparsers_component
+deparse_async_await <- function(ast, ...) {
+  keyword <- deparse_sym(ast[[1]])
+  args <- deparse_js(ast[[2]], ...)
+  glue::glue("{keyword} {args}")
+}
+
+
 # Deparser for "let" and "const" -----------------------------------------------
 #' Predicate for the "let" operator
 #' @rdname predicate_component
@@ -765,7 +834,7 @@ deparse_let <- function(ast, ...) {
     }
   }
 
-  paste(deparse(ast[[1]]), deparse_arg(ast[-1]))
+  paste(deparse_sym(ast[[1]]), deparse_arg(ast[-1]))
 }
 
 
@@ -777,6 +846,14 @@ is_call_const <- function(ast) is_call(ast, "const")
 #' @rdname deparsers_component
 deparse_const <- deparse_let
 
+
+#' Predicate for the "var" operator
+#' @rdname predicate_component
+is_call_var <- function(ast) is_call(ast, "var")
+
+#' Deparser for the "var" operator
+#' @rdname deparsers_component
+deparse_var <- deparse_let
 
 
 # Deparser for "dataURI" --------------------------------------------------
@@ -880,13 +957,37 @@ deparse_pipe <- function(ast, ...) {
   }
 }
 
+#' Predicate for the "assignment pipe" operator
+#' @rdname predicate_component
+is_call_assignment_pipe <- function(ast) {
+  is_call(ast, "assignment_pipe")
+}
+
+#' Deparser for the "assignment pipe" operator
+#' @rdname deparsers_component
+deparse_assignment_pipe <- function(ast, ...) {
+  if (rlang::is_symbol(ast[[3]])) {
+    arg <- deparse_js(ast[[2]], ...)
+    fname <- deparse_js(ast[[3]], ...)
+    glue::glue("{arg} = {fname}({arg})")
+  } else {
+    lhs <- deparse_js(ast[[2]], ...)
+    new_ast <- ast[[3]] %>%
+      as.list() %>%
+      append(ast[[2]], 1) %>%
+      as.call()
+    rhs <- deparse_js(new_ast, ...)
+    glue::glue("{lhs} = {rhs}")
+  }
+}
+
 
 # Template literal in JavaScript
 # Deparser for the raw string operator "r" -----------------------------------------
 #' Predicate for the raw string operator
 #' @rdname predicate_component
 is_call_raw_string <- function(ast) {
-  is_call(ast, "raw_str")
+  is_call(ast, c("raw_str", "raw_string"))
 }
 
 #' Deparser for the raw string operator
@@ -901,7 +1002,81 @@ deparse_raw_string <- function(ast, ...) {
 }
 
 
-# === Library functions and Exceptions ======================
+# === Deparser for formula ======================================
+#' Predicate for formula
+#' @rdname predicate_component
+is_call_formula <- function(ast) {
+  is_call(ast, "~")
+}
+
+#' Deparser for formula
+#' @rdname deparsers_component
+deparse_formula <- function(ast, ...) {
+  fun_body <- replace_dot_variable(ast[[2]])
+  fun_args <- get_all_symbols(ast[[2]]) %>%
+    paste() %>% unique() %>%
+    filter(begin_with_dot) %>%
+    purrr::map_chr(replace_dot)
+
+  fun_body_str <- deparse_js(fun_body, ...)
+  fun_args_str <- paste(fun_args, collapse = ", ")
+  glue::glue("function({fun_args_str}) {{ return {fun_body_str} }}")
+}
+
+# replace_dot_variable :: ast -> ast
+replace_dot_variable <- function(ast) {
+  if (is_call(ast)) {
+    # traverse the Left Child for "." and all elements otherwise
+    s <- if (is_call(ast, ".")) 2 else seq_along(ast)
+    for (i in s) {
+      ast[[i]] <- replace_dot_variable(ast[[i]])
+    }
+    return(ast)
+  }
+
+  if (!begin_with_dot(deparse1(ast))) {
+    return(ast)
+  }
+
+  as.symbol(replace_dot(deparse1(ast)))
+}
+
+# replace_dot :: character -> character
+replace_dot <- function(x) {
+  gsub("([.])([a-zA-Z0-9]+)", "dot_\\2", x)
+}
+
+# begin_with_dot :: character -> logical
+begin_with_dot <- function(x) {
+  substring(x, 1, 1) == "."
+}
+
+# Get all the symbols at the leaf nodes
+get_all_symbols <- function(ast, res = list()) {
+  if (is_call(ast)) {
+    # traverse the Left Child for "." and all elements otherwise
+    s <- if (is_call(ast, ".")) 2 else seq_along(ast)
+    for (i in s) {
+        res <- append(res, get_all_symbols(ast[[i]], res))
+    }
+    return(res)
+  }
+
+  if (rlang::is_symbol(ast)) {
+    return(ast)
+  }
+
+  NULL
+}
+
+# `get_all_symbols` note: The first element in the AST needs to be
+# skipped when it is a symbol since we want only leaf nodes. However,
+# sometimes the first node itself can be another call which has its
+# own leaves, and it needs to be processed as well.
+
+
+# === Library functions and Exceptions =======================
+# R module --------------------------------------------------
 #' Predicate for the "add" operator
 #' @rdname predicate_component
 is_call_add <- function(ast) is_call(ast, "R.add")
@@ -1026,4 +1201,202 @@ deparse_extract2Assign <- function(ast, ...) {
   obj <- deparse_js(ast[[2]][[2]], ...)
   val <- deparse_js(ast[[3]], ...)
   glue::glue("{obj} = R.extract2Assign({obj}, {val}, {ind})")
+}
+
+
+# DOM module --------------------------------------------------------
+#' Predicate for the HTML tags
+#' @rdname predicate_component
+is_html_tags <- function(ast) {
+  tags <- c("div", "span", "textarea",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "em", "strong", "ul", "li", "blockquote", "hr",
+    "img", "script", "audio", "video", "canvas", "input", "link",
+    "section", "article", "header", "nav", "footer", "iframe",
+    # "table", "tbody", "thead", "td", "tr", "th",
+    "form", "option", "menu", "code", "pre", "style", "button")
+  # tags <- c("a", "abbr", "address", "area", "article", "aside",
+  #           "audio", "b", "base", "bdi", "bdo", "blockquote", "body",
+  #           "br", "button", "canvas", "caption", "cite", "code", "col",
+  #           "colgroup", "data", "datalist", "dd", "del", "details",
+  #           "dfn", "dialog", "div", "dl", "dt", "em", "embed",
+  #           "fieldset", "figure", "footer", "form", "h1", "h2", "h3",
+  #           "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html",
+  #           "i", "iframe", "img", "input", "ins", "kbd", "keygen",
+  #           "label", "legend", "li", "link", "main", "map", "mark",
+  #           "menu", "menuitem", "meta", "meter", "nav", "noscript",
+  #           "object", "ol", "optgroup", "option", "output", "p",
+  #           "param", "pre", "progress", "q", "rb", "rp", "rt", "rtc",
+  #           "ruby", "s", "samp", "script", "section", "select", "small",
+  #           "source", "span", "strong", "style", "sub", "summary",
+  #           "sup", "table", "tbody", "td", "template", "textarea",
+  #           "tfoot", "th", "thead", "time", "title", "tr", "track",
+  #           "u", "ul", "var", "video", "wbr")
+  is_call(ast, tags)
+}
+
+#' Deparser for the HTML tags
+#' @rdname deparsers_component
+deparse_html_tags <- function(ast, ...) {
+  tag <- deparse_sym(ast[[1]])
+  # Empty argument
+  if (length(ast) == 1) {
+    return(glue::glue("dom(\"{tag}\")"))
+  }
+
+  # No named element
+  args <- ast[-1]
+  if (is.null(names(args))) {
+    args_str <- args %>%
+      purrr::map_chr(deparse_js, ...) %>%
+      paste0(collapse = ", ")
+    return(glue::glue("dom(\"{tag}\", {{}}, {args_str})"))
+  }
+
+  # Has named elements
+  named <- names(args) != ""
+  named_ast <- ast
+  named_ast[[1]] <- as.symbol("list")
+  named_ast[1 + which(!named)] <- NULL
+  named_args <- deparse_js(named_ast, ...)
+  if (all(named)) {
+    return(glue::glue("dom(\"{tag}\", {named_args})"))
+  }
+
+  unnamed_args <- args[!named] %>%
+    purrr::map_chr(deparse_js, ...) %>%
+    paste0(collapse = ", ")
+  return(glue::glue("dom(\"{tag}\", {named_args}, {unnamed_args})"))
+}
+
+
+# d3 module --------------------------------------------------
+#' Predicate for the d3.js `attr` function
+#' @rdname predicate_component
+is_d3_attr <- function(ast) {
+  (length(ast) >= 2) &&
+    is_call(ast[[1]], ".") &&
+    (length(ast[[1]]) >= 3) &&
+    rlang::is_symbol(ast[[1]][[3]], "d3_attr")
+}
+
+#' Predicate for the d3.js `style` function
+#' @rdname predicate_component
+is_d3_style <- function(ast) {
+  (length(ast) >= 2) &&
+    is_call(ast[[1]], ".") &&
+    (length(ast[[1]]) >= 3) &&
+    rlang::is_symbol(ast[[1]][[3]], "d3_style")
+}
+
+#' Deparser for the d3.js `attr` function
+#' @rdname deparsers_component
+deparse_d3_attr <- function(ast, ...) {
+  lhs <- ast[[1]][[2]]
+  lhs_chr <- deparse_js(lhs, ...)
+
+  fname <- ast[[1]][[3]] %>%
+    deparse_js(...) %>%
+    strsplit("_") %>%
+    unlist() %>%
+    tail(1)
+
+  rhs <- ast[-1]
+  args <- rhs
+  arg_names <- names(args)
+  arg_chr <- purrr::map_chr(args, deparse_js, ...)
+  if (is.null(arg_names) || any(arg_names == "")) {
+    stop("All attributes / styles of a SVG element must be named.")
+  }
+  rhs_chr <- list(arg_names, arg_chr) %>%
+    purrr::pmap_chr(~glue::glue("  .{fname}(\"{..1}\", {..2})")) %>%
+    paste(collapse = "\n")
+
+  glue::glue("{lhs_chr}\n{rhs_chr}")
+}
+
+#' Deparser for the d3.js `style` function
+#' @rdname deparsers_component
+deparse_d3_style <- deparse_d3_attr
+
+# Macro ------------------------------------------------------
+# Macro for inline expansion
+# Usage: .macro(f, x, y)
+# `f` is a function that takes `x`, `y` as arguments and return a character.
+
+#' Predicate for '.macro'
+#' @rdname predicate_component
+is_macro <- function(ast) {
+  is_call(ast, ".macro")
+}
+
+#' Deparser for '.macro'
+#' @rdname deparsers_component
+#' @note At the moment, the '.macro' / `deparse_macro` function must be
+#' used with the `compile_exprs` call. This is currently an experimental
+#' feature.
+deparse_macro <- function(ast, ...) {
+  if (length(ast) <= 1) {
+    stop("The .macro function must have at least 1 argument.")
+  }
+  call_name <- deparse1(ast[[1]])
+  fun_name <- deparse1(ast[[2]])
+  fun_args <- deparse_raw_args(ast[-(1:2)])
+  fun <- get(fun_name, mode = "function",
+             envir = find_compile_exprs_env())
+  do.call(fun, fun_args, quote = TRUE)
+}
+
+find_compile_exprs_env <- function() {
+  call_stack <- rlang::trace_back(globalenv())
+  env_ind <- call_stack$call %>%
+    purrr::map_lgl(~rlang::is_call(.x, "compile_exprs")) %>%
+    rev() %>%
+    which()
+  # Set default to the caller environment of `deparse_macro`
+  env_ind <- ifelse(purrr::is_empty(env_ind), 2, env_ind - 1)
+  rlang::caller_env(env_ind)
+}
+
+# deparse_raw_args :: ast -> [ast]
+deparse_raw_args <- function(ast, ...) {
+  ast_list <- as.list(ast)
+  nm <- names(ast_list)
+  if (is.null(nm)) return(ast_list)
+
+  purrr::map2(nm, ast_list, function(x, y) {
+    yc <- deparse1(y)
+    ifelse(x == "", yc, glue::glue("{x} = {yc}"))
+  }) %>%
+    purrr::map(parse_expr)
+}
+
+
+#' Predicate for '.data'
+#' @rdname predicate_component
+is_data <- function(ast) {
+  is_call(ast, ".data")
+}
+
+#' Deparser for '.data'
+#' @rdname deparsers_component
+#' @note At the moment, the '.data' / `deparse_data` function must be
+#' used with the `compile_exprs` call. This is currently an experimental
+#' feature.
+deparse_data <- function(ast, ...) {
+  if (length(ast) <= 1) {
+    stop("The .data function must have at least 1 argument.")
+  }
+  call_name <- deparse1(ast[[1]])
+  fun_args <- list(x = get(deparse1(ast[[2]]),
+                           envir = find_compile_exprs_env()))
+
+  options <- as.list(ast[-(1:2)])
+  # Set default for 'auto_unbox' to TRUE as it is the most common case
+  if (!"auto_unbox" %in% names(options)) {
+    fun_args %<>% append(list(auto_unbox = TRUE))
+  }
+
+  fun_args %<>% append(options)
+  do.call(jsonlite::toJSON, fun_args)
 }

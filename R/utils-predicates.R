@@ -19,6 +19,7 @@ is_javascript <- function(x) extname(x) == "js"
 is_r_script   <- function(x) extname(x) == "r"
 is_css        <- function(x) extname(x) == "css"
 is_json       <- function(x) extname(x) == "json"
+is_gz         <- function(x) extname(x) == "gz"
 is_csv        <- function(x) extname(x) == "csv"
 is_font       <- function(x) extname(x) %in% c("woff", "ttf", "eot", "otf")
 

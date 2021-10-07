@@ -4,17 +4,32 @@
 \alias{safeguard}
 \title{Perform pre-transpilation check}
 \usage{
-safeguard(ast, rules)
+safeguard(ast, rules, deparsers)
 }
 \arguments{
 \item{ast}{A language object.}
 
 \item{rules}{A list of functions; the rewriting rules, each of which
-is the output from `make_rule`.}
+is the output from \link{make_rule}.}
+
+\item{deparsers}{A list of functions; the deparsers, each of which
+is the output from \link{make_deparser}.}
 }
 \value{
 TRUE when the check is complete.
 }
 \description{
 Perform pre-transpilation check
+}
+\examples{
+# Expect no warning
+safeguard(parse_expr("a <- 3"),
+          rules = default_rules(),
+          deparsers = default_deparsers())
+
+# Expect a warning (as `max` is reserved to be a function by the transpiler)
+safeguard(parse_expr("max <- 3"),
+          rules = default_rules(),
+          deparsers = default_deparsers())
+
 }

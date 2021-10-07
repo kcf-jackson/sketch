@@ -16,6 +16,13 @@ testthat::test_that("`src` returns correct type: character.", {
     testthat::expect_true(is.character(src("ionicons")))
     testthat::expect_true(is.character(src("tailwind")))
     testthat::expect_true(is.character(src("ramda")))
+    testthat::expect_true(is.character(src("purrr")))
+    # Modules CDN
+    testthat::expect_true(is.character(src("cdn-dom")))
+    testthat::expect_true(is.character(src("cdn-io")))
+    testthat::expect_true(is.character(src("cdn-websocket")))
+    testthat::expect_true(is.character(src("cdn-testthat")))
+    testthat::expect_true(is.character(src("cdn-purrr")))
     testthat::expect_error(src("d4"))
 })
 

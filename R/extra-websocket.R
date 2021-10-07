@@ -102,8 +102,15 @@ websocket <- R6::R6Class("websocket", public = list(
         cat("(Type `q()` to exit sketch mode)")
         while (TRUE) {
             input <- read_multilines("sketch > ")
+            # Ensure `q()` is used appropriately
+            quit <- rlang::parse_exprs(input) %>%
+                purrr::map_lgl(~deparse1(.x) == "q()")
+            if (any(quit)) {
+                if (length(quit) == 1) break
+                cat("`q()` must be used standalone.", "\n")
+                next
+            }
             self$log <- c(self$log, input)
-            if (deparse(parse_expr(input)) == "q()") break
             purrr::walk(self$out_handler(input), ~self$ws$send(.x))
         }    # nocov end
     },
@@ -172,9 +179,18 @@ websocket <- R6::R6Class("websocket", public = list(
     #' ws$stopServer()
     #' ws$listServers()    # Confirm no server is running
     #' }
-    initialize = function(in_handler = function(x) cat(x$msg, "\n"),
-                          out_handler = sketch::compile_exprs,
-                          message = TRUE, port = 9454) {
+    initialize = function(in_handler, out_handler, message = TRUE, port = 9454) {
+        if (missing(in_handler)) {
+            in_handler <- purrr::compose(print, jsonlite::fromJSON)
+        }
+        if (missing(out_handler)) {
+            out_handler <- function(x) {
+                compile_exprs(x) %>%
+                    purrr::map(~list(type = "command", message = .x)) %>%
+                    purrr::map(~jsonlite::toJSON(.x, auto_unbox = TRUE))
+            }
+        }
+
         self$app <- list(
             call = function(req) {  # nocov start
                 if (message) message("Received http request.")
@@ -187,7 +203,13 @@ websocket <- R6::R6Class("websocket", public = list(
             onWSOpen = function(ws) {
                 self$ws <- ws
                 self$connected <- TRUE
-                ws$send("console.log(\"Connection established.\")")
+                ws$send(
+                    jsonlite::toJSON(
+                        list(type = "text",
+                             message = "\"Connection established\""),
+                        auto_unbox = TRUE
+                    )
+                )
                 ws$onMessage(function(binary, input) {
                     in_handler(input)
                 })
@@ -201,7 +223,7 @@ websocket <- R6::R6Class("websocket", public = list(
 ))
 
 
-#' Read one or more lines from the Terminal
+#' Read one or more lines from the console for the first successful parse
 #'
 #' @description \code{read_multilines} reads one or more lines from
 #' the terminal (in interactive use).
@@ -214,10 +236,22 @@ websocket <- R6::R6Class("websocket", public = list(
 #'
 #' This can only be used in an interactive session.
 #'
+#' @examples
+#' \dontrun{
+#' # In an interactive session
+#' read_multilines()
+#' 1 + 2  # expect immediate success
+#'
+#' read_multilines()
+#' 1 +
+#' 2 +
+#' 3  # expect success here
+#' }
+#'
 #' @export
-read_multilines <- function(prompt) {  # nocov start
+read_multilines <- function(prompt = "") {  # nocov start
     success_parse <- function(x) {
-        is.null(purrr::safely(parse_expr)(x)$error)
+        is.null(purrr::safely(rlang::parse_exprs)(x)$error)
     }
     # Main
     res <- readline(prompt = prompt)

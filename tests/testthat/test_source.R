@@ -9,13 +9,13 @@ testthat::test_that("Source sketch R script", {
     output_file <- source_r(file, debug = TRUE, launch_browser = NULL)
     testthat::expect_equal(
         md5hash(output_file),
-        "23ecbac88d9499d294df9455e5abe856"
+        "1710008f6cee4d0b283dfae2fe436f34"
     )
 
     output_file <- source_r(file, launch_browser = "NULL") # NULL in string is intentional here
     testthat::expect_equal(
         md5hash(output_file),
-        "d0b93897c639a62387501fe095678d88"
+        "24578465eee10b27fe3c6a83098e3098"
     )
 
     # Need to set path so that referencing to another file would work
@@ -26,7 +26,7 @@ testthat::test_that("Source sketch R script", {
     output_file <- source_r(file, launch_browser = NULL)
     testthat::expect_equal(
         md5hash(output_file),
-        "e9555c2273bedb484c8d6e38982265f0"
+        "8b7958d316c698a7b7c1519d7203abc5"
     )
     setwd(current_wd)
 })

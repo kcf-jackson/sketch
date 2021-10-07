@@ -76,7 +76,18 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     unit_test("x <- NaN",  "x = NaN")
     unit_test("function() {}", "function() {\n    \n}")
 
-
+    # Test formula
+    unit_test("~.x * .y + fun(.z)", "function(dot_x, dot_y, dot_z) { return dot_x * dot_y + fun(dot_z) }")
+    unit_test("~x * .y + fun(z)", "function(dot_y) { return x * dot_y + fun(z) }")
+    unit_test("~.x$y(.z)", "function(dot_x, dot_z) { return dot_x.y(dot_z) }")
+    unit_test("~.a$b(.c$d(e$f))", "function(dot_a, dot_c) { return dot_a.b(dot_c.d(e.f)) }")
+    unit_test("~.a$.b(.c$.d(.e$.f))", "function(dot_a, dot_c, dot_e) { return dot_a..b(dot_c..d(dot_e..f)) }")
+    unit_test("~.x(.z)", "function(dot_x, dot_z) { return dot_x(dot_z) }")
+    unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
+    unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
+    unit_test("res$map(~.x)", "res.map(function(dot_x) { return dot_x })")
+    unit_test("res$map(~.x$replace(a, b))", "res.map(function(dot_x) { return dot_x.replace(a, b) })")
+    unit_test("res$reduce(~.x %+% '\n' %+% .y)", "res.reduce(function(dot_x, dot_y) { return dot_x + \"\\n\" + dot_y })")
 })
 
 testthat::test_that("Test transpilation with default rules and deparsers (exprs)", {
@@ -171,16 +182,22 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("lambda(x = 99, sin(x))", "function(x = 99) { return R.sin(x); }")
 
     # Test pipe operator
-    unit_test("a %>% b", "b(a)")
-    unit_test("a %>% b()", "b(a)")
-    unit_test("a %>% b(arg2 = 2)", "b(a, 2)")
-    unit_test("a %>% b(arg2 = 2, arg3 = 3)", "b(a, 2, 3)")
+    unit_test("x %>% b", "b(x)")
+    unit_test("x %>% b()", "b(x)")
+    unit_test("x %>% b(arg2 = 2)", "b(x, 2)")
+    unit_test("x %>% b(arg2 = 2, arg3 = 3)", "b(x, 2, 3)")
     unit_test("f(x) %>% b(arg2 = 2)", "b(f(x), 2)")
     unit_test("f(x=4) %>% b", "b(f(4))")
     unit_test("f(x=4) %>% b()", "b(f(4))")
 
+    # Test assignment pipe operator
+    unit_test("x %<>% b", "x = b(x)")
+    unit_test("x %<>% b()", "x = b(x)")
+    unit_test("x %<>% b(arg2 = 2)", "x = b(x, 2)")
+    unit_test("x %<>% b(arg2 = 2, arg3 = 3)", "x = b(x, 2, 3)")
+
     # Test function definition
-    unit_test("function(b, c) {}", "function(b, c) {\n    \n}")
+    unit_test("function(x, y) {}", "function(x, y) {\n    \n}")
     unit_test("function(x, y) x + y", "function(x, y) { R.add(x, y) }")
     unit_test("function(x, y) {x + y}", "function(x, y) {\n    R.add(x, y)\n}")
     unit_test("function(x = 3, y) {x + y}", "function(x = 3, y) {\n    R.add(x, y)\n}")
@@ -196,8 +213,8 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     testthat::expect_error(default("raw_str(123)"))
 
     # Test that function arguments are rewritten
-    unit_test("function(b = TRUE, c = FALSE) {}", "function(b = true, c = false) {\n    \n}")
-    unit_test("function(b = 1:3, c = 3:5) {}", "function(b = R.seq(1, 3), c = R.seq(3, 5)) {\n    \n}")
+    unit_test("function(x = TRUE, y = FALSE) {}", "function(x = true, y = false) {\n    \n}")
+    unit_test("function(x = 1:3, y = 3:5) {}", "function(x = R.seq(1, 3), y = R.seq(3, 5)) {\n    \n}")
     unit_test("function(n = 2 ^ 4) {}", "function(n = R.pow(2, 4)) {\n    \n}")
     unit_test("function(n = 3 ^ 2 ^ 2) {}", "function(n = R.pow(3, R.pow(2, 2))) {\n    \n}")
     unit_test("function(x = 3 + a, y) {x + y}", "function(x = R.add(3, a), y) {\n    R.add(x, y)\n}")
@@ -264,7 +281,8 @@ testthat::test_that("Test transpilation with default 2 deparsers", {
 
     unit_test("function(x) {}", "function(x) {\n    \n}")
     unit_test("function(x) {x}", "function(x) {\n    return x\n}")
-    unit_test("function(x) x", "function(x) { return x }")
+    unit_test("function(x) {NULL}", "function(x) {\n    return null\n}")
+    unit_test("function(x) NULL", "function(x) { return null }")
     testthat::expect_warning(
         unit_test("function(x) {if(x) {x} else {x + 1}}",
                   "function(x) {\n    if (x) {\n        x\n    } else {\n        R.add(x, 1)\n    }\n}")
@@ -272,11 +290,19 @@ testthat::test_that("Test transpilation with default 2 deparsers", {
     unit_test("x <- 3", "var x = 3")
     unit_test("x <<- 3", "x = 3")
     unit_test("x$a <- 1", "x.a = 1")
-    unit_test("x[1] <- 1", "R.extract(x, 1) = 1")
+    unit_test("x[1] <- 1", "x = R.extractAssign(x, 1, 1)")
 
     testthat::expect_warning(default_2("function(x) { x <- 10 }"))
     testthat::expect_warning(default_2("function(x) {if(x) {x} else {x + 1}}"))
     testthat::expect_warning(default_2("function(x) { for (i in 1:10) { print(i) } }"))
+
+    # Test HTML tags
+    unit_test("div()", 'dom("div")')
+    unit_test("div(span())", 'dom("div", {}, dom("span"))')
+    unit_test("div(innerHTML = \"Hello!\", span())",
+              'dom("div", { "innerHTML": "Hello!" }, dom("span"))')
+    unit_test("div(innerHTML = \"Hello!\", span(innerText = \"Hi\"))",
+              'dom("div", { "innerHTML": "Hello!" }, dom("span", { "innerText": "Hi" }))')
 })
 
 
@@ -378,8 +404,119 @@ testthat::test_that("Test R6Class", {
     file_ref <- system.file("test_files/test_R6_2.js", package = "sketch")
     temp <- compile_r(file, tempfile())
     testthat::expect_equal(read_file(temp), read_file(file_ref))
+
+    # Test that default argument is not used incorrectly as calling argument
+    file <- system.file("test_files/test_R6_3.R", package = "sketch")
+    file_ref <- system.file("test_files/test_R6_3.js", package = "sketch")
+    temp <- compile_r(file, tempfile())
+    testthat::expect_equal(read_file(temp), read_file(file_ref))
 })
 
+testthat::test_that("Test macro", {
+    test_macro_predicate <- purrr::compose(is_macro, parse_expr)
+    test_macro_deparse <- purrr::compose(deparse_macro, parse_expr)
+
+    unit_test <- purrr::partial(test_equal, f = test_macro_predicate, silent = T)
+    unit_test_2 <- purrr::partial(test_equal, f = test_macro_deparse, silent = T)
+    transform <- function(x, y) glue::glue("{deparse1(x)}:{deparse1(y)}")
+
+    input <- '.macro(transform, arg1, arg2)'
+    expected <- 'arg1:arg2'
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+
+    input <- '.macro(transform, a = arg1, b = arg2)'
+    expected <- 'a = arg1:b = arg2'
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+
+    hi <- function() "hi"
+    input <- '.macro(hi)'
+    expected <- "hi"
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+})
+
+testthat::test_that("Test macro - top level", {
+    g <- function() {
+        f <- function(x) as.character(eval(x))
+        compile_exprs(".macro(f, 12)", deparsers = dp("basic", "macro"))
+    }
+    testthat::expect_equal(g(), "12")
+
+    h <- function() {
+        f <- function(x) as.character(eval(x) + 1)
+        g <- function() {
+            compile_exprs(".macro(f, 12)", deparsers = dp("basic", "macro"))
+        }
+        g()
+    }
+    testthat::expect_equal(h(), "13")
+})
+
+
+testthat::test_that("Test data (passing)", {
+    test_data_predicate <- purrr::compose(is_data, parse_expr)
+    test_data_deparse <- purrr::compose(deparse_data, parse_expr)
+
+    unit_test <- purrr::partial(test_equal, f = test_data_predicate, silent = T)
+    unit_test_2 <- purrr::partial(test_equal, f = test_data_deparse, silent = T)
+    x <- 100
+
+    input <- '.data(x)'
+    expected <- jsonlite::toJSON(100, auto_unbox = TRUE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(deparse_data(parse_expr(input)), expected)
+
+    input <- '.data(x, auto_unbox = F)'
+    expected <- jsonlite::toJSON(100, auto_unbox = FALSE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(test_data_deparse(input), expected)
+
+    x <- 1:3
+    input <- '.data(x)'
+    expected <- jsonlite::toJSON(x, auto_unbox = TRUE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(test_data_deparse(input), expected)
+})
+
+testthat::test_that("Test data - top level", {
+    g <- function() {
+        x <- 100
+        compile_exprs(".data(x)", deparsers = dp("basic", "macro"))
+    }
+    testthat::expect_equal(g(), "100")
+
+    h <- function() {
+        x <- 101
+        g <- function() {
+            compile_exprs(".data(x)", deparsers = dp("basic", "macro"))
+        }
+        g()
+    }
+    testthat::expect_equal(h(), "101")
+})
+
+
+# Test modules
+testthat::test_that("Test transpilation with d3 deparsers", {
+    basic_d3 <- purrr::partial(
+        compile_exprs,
+        rules = basic_rules(),
+        deparsers = dp("basic", "d3")
+    )
+    remove_ws <- function(x) { gsub("[ \t\n\r\v\f]", "", x) }
+    test_fun <- purrr::compose(remove_ws, basic_d3)
+    unit_test <- purrr::partial(test_equal, f = test_fun, silent = T)
+
+    input <- 'd3::select("body")$append("circle")$d3_attr(cx = 100, tag = "tag")'
+    expected <- 'd3.select("body").append("circle").attr("cx",100).attr("tag","tag")'
+    unit_test(input, expected)
+
+    input <- 'd3::select("body")$d3_attr(cx = 100)$transition()$d3_attr(cy = function(d) { d + 1 })'
+    expected <- 'd3.select("body").attr("cx",100).transition().attr("cy",function(d){d+1})'
+    unit_test(input, expected)
+})
 
 # Additional tests
 testthat:: test_that("Test CDN option in `default_tags`", {

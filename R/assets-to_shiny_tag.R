@@ -2,7 +2,7 @@
 #' @param x A character string; the header line (without the prefix #!).
 #' @param processors A list of handlers for processing the '#!' header.
 #' @return A 'shiny.tag' object.
-# convert_src :: char -> [header_processor] -> char
+# convert_src :: char -> [header_processor] -> shiny.tag
 # where header_processor := (predicate, process)
 convert_src <- function(x, processors = default_processors()) {
     for (processor in processors) {
@@ -94,6 +94,12 @@ load_library <- function(package, ...) {
 #' @rdname header-functions
 # load_script :: char -> ... -> shiny.tag
 load_script <- function(src, ...) {
+    if (dir.exists(src)) {
+        files <- list.files(src, pattern = "[.](r|(js))$", full.names = TRUE,
+                            recursive = TRUE, ignore.case = TRUE)
+        res <- purrr::map(files, ~to_shiny_tag(.x, ...))
+        return(res)
+    }
     to_shiny_tag(src = src, ...)
 }
 

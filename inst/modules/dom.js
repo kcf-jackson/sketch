@@ -29,6 +29,7 @@ print_dom = function(el, x = "body") {
         return(x)
     }
 }
+render = print_dom
 append_doms = function(parent) {
     let args = Array(...arguments), args_len = args.length
     if (args_len == 1) {

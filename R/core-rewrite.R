@@ -51,7 +51,7 @@ rewrite <- function(ast, rules) {
 # make_rule :: char -> char -> (language -> language)
 make_rule <- function(from, to) {
   f <- function(x) subst(x, pattern = from, replacement = to)
-  structure(f, class = "rule", from = from, to = to)  # facilitate custom print function
+  structure(f, class = "sketch_rule", from = from, to = to)  # facilitate custom print function
 }
 
 rm_attributes <- function(x) {
@@ -114,19 +114,20 @@ unjoin_rules <- function(r) {
 
 
 # Implement a custom print function so that rewriting functions explain themselves
-#' Print function for 'rule' objects
+#' Print function for 'sketch_rule' objects
 #'
-#' @param x A 'rule' object.
+#' @param x A 'sketch_rule' object.
 #' @param ... (Unused) Optional arguments.
 #'
-#' @method print rule
+#' @method print sketch_rule
 #'
 #' @examples
+#' library(sketch)
 #' rule_1 <- make_rule("+", "Math.add")
 #' print(rule_1)
 #'
 #' @export
-print.rule <- function(x, ...) {
+print.sketch_rule <- function(x, ...) {
   from <- attr(x, 'from')
   to <- attr(x, 'to')
   print(glue::glue("Rule: Rewrite '{from}' to '{to}'."))

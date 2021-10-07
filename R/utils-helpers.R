@@ -9,6 +9,7 @@
 #'
 #' @export
 src <- function(x) {
+    module_cdn_link <- "https://cdn.jsdelivr.net/gh/kcf-jackson/sketch/inst/modules/"
     switch(x,
            # Math
            "mathjs" = "https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.0.2/math.min.js",
@@ -25,11 +26,19 @@ src <- function(x) {
            "tailwind" = "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css",
            # Utility
            "ramda" = "https://cdnjs.cloudflare.com/ajax/libs/ramda/0.25.0/ramda.min.js",
+           "pako" = "https://cdn.jsdelivr.net/npm/pako@2.0.4/dist/pako.min.js",
            # Modules
            "dom" = system.file("modules/dom.js", package = "sketch"),
            "io" = system.file("modules/io.js", package = "sketch"),
            "websocket" = system.file("modules/websocket.js", package = "sketch"),
            "testthat" = system.file("modules/testthat.js", package = "sketch"),
+           "purrr" = system.file("modules/purrr.js", package = "sketch"),
+           # Modules CDN
+           "cdn-dom" = paste0(module_cdn_link, "dom.js"),
+           "cdn-io" = paste0(module_cdn_link, "io.js"),
+           "cdn-websocket" = paste0(module_cdn_link, "websocket.js"),
+           "cdn-testthat" = paste0(module_cdn_link, "testthat.js"),
+           "cdn-purrr" = paste0(module_cdn_link, "purrr.js"),
            stop(glue::glue("Library '{x}' does not exist."))
     )
 }
@@ -58,7 +67,8 @@ license_info <- function(x) {
            "fontawesome" = list(license = "MIT", url = "https://fontawesome.com/v4.7.0/license/"),
            "ionicons" = list(license = "MIT", url = "https://unpkg.com/browse/ionicons@5.2.3/LICENSE"),
            "tailwind" = list(license = "MIT", url = "https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE"),
-           "ramda" = list(license = "MIT", url = "https://github.com/ramda/ramda/blob/master/LICENSE.txt")
+           "ramda" = list(license = "MIT", url = "https://github.com/ramda/ramda/blob/master/LICENSE.txt"),
+           "pako" = list(license = "MIT", url = "https://github.com/nodeca/pako/blob/master/LICENSE")
     )
 }
 
@@ -113,8 +123,33 @@ dataURI <- base64enc::dataURI
 
 
 line_separator <- function(x = "-") {
-    paste0(rep(x, getOption("width")), collapse = "")
+    paste0(rep(x, getOption("width")), collapse = "")   # nocov
 }
 yellow <- function(x) paste0("\033[33m", x, "\033[39m")
 # red <- function(x) paste0("\033[31m", x, "\033[39m")
 green <- function(x) paste0("\033[32m", x, "\033[39m")  # nocov
+
+
+
+#' A helper function to enable debugger option
+#'
+#' @param x TRUE / FALSE; whether to attach a debugging console to
+#' the sketch application.
+#' @param from_local TRUE / FALSE; whether to load the debugger console
+#' from the local package. If FALSE, the console will be loaded from
+#' a Content Delivery Network (CDN) link.
+#'
+#' @note Use `from_local=TRUE` for self-contained applications, and
+#' `from_local=FALSE` for reduced file size.
+#'
+#' @examples
+#' # This function is designed to be used in the configuration header, e.g.
+#' # config(debug = local(TRUE), rules = basic_rules(), deparsers = basic_deparsers())
+#'
+#' local(TRUE)
+#'
+#' @export
+local <- function(x, from_local = TRUE) {
+    attr(x, "local") <- from_local
+    x
+}

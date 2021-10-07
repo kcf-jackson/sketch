@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         config: 
           - {os: windows-latest, r: 'release'}
@@ -60,6 +60,7 @@ jobs:
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
+          install.packages("curl", type = "source", repos = "https://cloud.r-project.org/")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       

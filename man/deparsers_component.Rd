@@ -17,6 +17,7 @@
 \alias{deparse_return}
 \alias{deparse_assignment}
 \alias{deparse_assignment_auto}
+\alias{deparse_next}
 \alias{deparse_try}
 \alias{deparse_tryCatch}
 \alias{deparse_throw}
@@ -27,19 +28,29 @@
 \alias{deparse_R6Class}
 \alias{deparse_new}
 \alias{deparse_typeof}
+\alias{deparse_export}
+\alias{deparse_async_await}
 \alias{deparse_let}
 \alias{deparse_const}
+\alias{deparse_var}
 \alias{deparse_dataURI}
 \alias{deparse_ifelse}
 \alias{deparse_lambda}
 \alias{deparse_pipe}
+\alias{deparse_assignment_pipe}
 \alias{deparse_raw_string}
+\alias{deparse_formula}
 \alias{deparse_add}
 \alias{deparse_subtract}
 \alias{deparse_extract}
 \alias{deparse_extractAssign}
 \alias{deparse_extract2}
 \alias{deparse_extract2Assign}
+\alias{deparse_html_tags}
+\alias{deparse_d3_attr}
+\alias{deparse_d3_style}
+\alias{deparse_macro}
+\alias{deparse_data}
 \title{Deparsers (specialised)}
 \usage{
 deparse_sym(ast, ...)
@@ -72,6 +83,8 @@ deparse_assignment(ast, ...)
 
 deparse_assignment_auto(ast, ...)
 
+deparse_next(ast, ...)
+
 deparse_try(ast, ...)
 
 deparse_tryCatch(ast, ...)
@@ -92,9 +105,15 @@ deparse_new(ast, ...)
 
 deparse_typeof(ast, ...)
 
+deparse_export(ast, ...)
+
+deparse_async_await(ast, ...)
+
 deparse_let(ast, ...)
 
 deparse_const(ast, ...)
+
+deparse_var(ast, ...)
 
 deparse_dataURI(ast, ...)
 
@@ -104,7 +123,11 @@ deparse_lambda(ast, ...)
 
 deparse_pipe(ast, ...)
 
+deparse_assignment_pipe(ast, ...)
+
 deparse_raw_string(ast, ...)
+
+deparse_formula(ast, ...)
 
 deparse_add(ast, ...)
 
@@ -117,6 +140,16 @@ deparse_extractAssign(ast, ...)
 deparse_extract2(ast, ...)
 
 deparse_extract2Assign(ast, ...)
+
+deparse_html_tags(ast, ...)
+
+deparse_d3_attr(ast, ...)
+
+deparse_d3_style(ast, ...)
+
+deparse_macro(ast, ...)
+
+deparse_data(ast, ...)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -158,6 +191,8 @@ Deparser for assignments
 
 Deparser for assignments (automatic variable declaration)
 
+Deparser for the "next" keyword
+
 Deparser for the "try" keyword
 
 Deparser for the "tryCatch" keyword
@@ -178,9 +213,15 @@ Deparser for the "new" operator
 
 Deparser for the "typeof" operator
 
+Deparser for the "export" operator
+
+Deparser for the ""async" and "await" operators
+
 Deparser for the "let" operator
 
 Deparser for the "const" operator
+
+Deparser for the "var" operator
 
 Deparser for the "dataURI" operator
 
@@ -190,7 +231,11 @@ Deparser for the "lambda" operator
 
 Deparser for the "pipe" operator
 
+Deparser for the "assignment pipe" operator
+
 Deparser for the raw string operator
+
+Deparser for formula
 
 Deparser for the "add" operator
 
@@ -203,4 +248,23 @@ Deparser for the "extractAssign" operator
 Deparser for the "extract2" operator
 
 Deparser for the "extract2Assign" operator
+
+Deparser for the HTML tags
+
+Deparser for the d3.js `attr` function
+
+Deparser for the d3.js `style` function
+
+Deparser for '.macro'
+
+Deparser for '.data'
+}
+\note{
+At the moment, the '.macro' / `deparse_macro` function must be
+used with the `compile_exprs` call. This is currently an experimental
+feature.
+
+At the moment, the '.data' / `deparse_data` function must be
+used with the `compile_exprs` call. This is currently an experimental
+feature.
 }

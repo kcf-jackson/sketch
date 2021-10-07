@@ -60,7 +60,7 @@ jobs:
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
-          install.packages("curl", type = "source")
+          install.packages("curl", type = "source", repos = "https://cloud.r-project.org/")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       

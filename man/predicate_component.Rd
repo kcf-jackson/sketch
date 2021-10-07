@@ -33,6 +33,7 @@
 \alias{is_call_ifelse}
 \alias{is_call_lambda}
 \alias{is_call_pipe}
+\alias{is_call_assignment_pipe}
 \alias{is_call_raw_string}
 \alias{is_call_formula}
 \alias{is_call_add}
@@ -44,6 +45,8 @@
 \alias{is_html_tags}
 \alias{is_d3_attr}
 \alias{is_d3_style}
+\alias{is_macro}
+\alias{is_data}
 \title{Predicate for symbols, i.e. symbols or syntactic literals}
 \usage{
 is_sym(ast)
@@ -108,6 +111,8 @@ is_call_lambda(ast)
 
 is_call_pipe(ast)
 
+is_call_assignment_pipe(ast)
+
 is_call_raw_string(ast)
 
 is_call_formula(ast)
@@ -129,6 +134,10 @@ is_html_tags(ast)
 is_d3_attr(ast)
 
 is_d3_style(ast)
+
+is_macro(ast)
+
+is_data(ast)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -196,6 +205,8 @@ Predicate for the "lambda" operator
 
 Predicate for the "pipe" operator
 
+Predicate for the "assignment pipe" operator
+
 Predicate for the raw string operator
 
 Predicate for formula
@@ -217,4 +228,8 @@ Predicate for the HTML tags
 Predicate for the d3.js `attr` function
 
 Predicate for the d3.js `style` function
+
+Predicate for '.macro'
+
+Predicate for '.data'
 }

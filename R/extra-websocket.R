@@ -223,7 +223,7 @@ websocket <- R6::R6Class("websocket", public = list(
 ))
 
 
-#' Read one or more lines from the Terminal
+#' Read one or more lines from the console for the first successful parse
 #'
 #' @description \code{read_multilines} reads one or more lines from
 #' the terminal (in interactive use).
@@ -236,8 +236,20 @@ websocket <- R6::R6Class("websocket", public = list(
 #'
 #' This can only be used in an interactive session.
 #'
+#' @examples
+#' \dontrun{
+#' # In an interactive session
+#' read_multilines()
+#' 1 + 2  # expect immediate success
+#'
+#' read_multilines()
+#' 1 +
+#' 2 +
+#' 3  # expect success here
+#' }
+#'
 #' @export
-read_multilines <- function(prompt) {  # nocov start
+read_multilines <- function(prompt = "") {  # nocov start
     success_parse <- function(x) {
         is.null(purrr::safely(rlang::parse_exprs)(x)$error)
     }

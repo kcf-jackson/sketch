@@ -1,0 +1,6 @@
+#! config(debug = TRUE)
+#! load_script("test_testthat_app.R")
+console::log("This is app 2.")
+console::log("The value of x in app 1 is: " %+% x)
+console::log("If you see the value from app 1, it means app 1 is loaded properly.")
+console::log("===============")

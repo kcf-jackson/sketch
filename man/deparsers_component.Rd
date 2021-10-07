@@ -37,6 +37,7 @@
 \alias{deparse_ifelse}
 \alias{deparse_lambda}
 \alias{deparse_pipe}
+\alias{deparse_assignment_pipe}
 \alias{deparse_raw_string}
 \alias{deparse_formula}
 \alias{deparse_add}
@@ -48,6 +49,8 @@
 \alias{deparse_html_tags}
 \alias{deparse_d3_attr}
 \alias{deparse_d3_style}
+\alias{deparse_macro}
+\alias{deparse_data}
 \title{Deparsers (specialised)}
 \usage{
 deparse_sym(ast, ...)
@@ -120,6 +123,8 @@ deparse_lambda(ast, ...)
 
 deparse_pipe(ast, ...)
 
+deparse_assignment_pipe(ast, ...)
+
 deparse_raw_string(ast, ...)
 
 deparse_formula(ast, ...)
@@ -141,6 +146,10 @@ deparse_html_tags(ast, ...)
 deparse_d3_attr(ast, ...)
 
 deparse_d3_style(ast, ...)
+
+deparse_macro(ast, ...)
+
+deparse_data(ast, ...)
 }
 \arguments{
 \item{ast}{A language object.}
@@ -222,6 +231,8 @@ Deparser for the "lambda" operator
 
 Deparser for the "pipe" operator
 
+Deparser for the "assignment pipe" operator
+
 Deparser for the raw string operator
 
 Deparser for formula
@@ -243,4 +254,17 @@ Deparser for the HTML tags
 Deparser for the d3.js `attr` function
 
 Deparser for the d3.js `style` function
+
+Deparser for '.macro'
+
+Deparser for '.data'
+}
+\note{
+At the moment, the '.macro' / `deparse_macro` function must be
+used with the `compile_exprs` call. This is currently an experimental
+feature.
+
+At the moment, the '.data' / `deparse_data` function must be
+used with the `compile_exprs` call. This is currently an experimental
+feature.
 }

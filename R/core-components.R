@@ -957,6 +957,30 @@ deparse_pipe <- function(ast, ...) {
   }
 }
 
+#' Predicate for the "assignment pipe" operator
+#' @rdname predicate_component
+is_call_assignment_pipe <- function(ast) {
+  is_call(ast, "assignment_pipe")
+}
+
+#' Deparser for the "assignment pipe" operator
+#' @rdname deparsers_component
+deparse_assignment_pipe <- function(ast, ...) {
+  if (rlang::is_symbol(ast[[3]])) {
+    arg <- deparse_js(ast[[2]], ...)
+    fname <- deparse_js(ast[[3]], ...)
+    glue::glue("{arg} = {fname}({arg})")
+  } else {
+    lhs <- deparse_js(ast[[2]], ...)
+    new_ast <- ast[[3]] %>%
+      as.list() %>%
+      append(ast[[2]], 1) %>%
+      as.call()
+    rhs <- deparse_js(new_ast, ...)
+    glue::glue("{lhs} = {rhs}")
+  }
+}
+
 
 # Template literal in JavaScript
 # Deparser for the raw string operator "r" -----------------------------------------
@@ -1002,7 +1026,9 @@ deparse_formula <- function(ast, ...) {
 # replace_dot_variable :: ast -> ast
 replace_dot_variable <- function(ast) {
   if (is_call(ast)) {
-    for (i in seq_along(ast)) {
+    # traverse the Left Child for "." and all elements otherwise
+    s <- if (is_call(ast, ".")) 2 else seq_along(ast)
+    for (i in s) {
       ast[[i]] <- replace_dot_variable(ast[[i]])
     }
     return(ast)
@@ -1028,8 +1054,9 @@ begin_with_dot <- function(x) {
 # Get all the symbols at the leaf nodes
 get_all_symbols <- function(ast, res = list()) {
   if (is_call(ast)) {
-    for (i in seq_along(ast)) {
-        if (i == 1 && rlang::is_symbol(ast[[i]])) next  # See note below.
+    # traverse the Left Child for "." and all elements otherwise
+    s <- if (is_call(ast, ".")) 2 else seq_along(ast)
+    for (i in s) {
         res <- append(res, get_all_symbols(ast[[i]], res))
     }
     return(res)
@@ -1048,7 +1075,7 @@ get_all_symbols <- function(ast, res = list()) {
 # own leaves, and it needs to be processed as well.
 
 
-# === Library functions and Exceptions ======================
+# === Library functions and Exceptions =======================
 # R module --------------------------------------------------
 #' Predicate for the "add" operator
 #' @rdname predicate_component
@@ -1291,3 +1318,85 @@ deparse_d3_attr <- function(ast, ...) {
 #' Deparser for the d3.js `style` function
 #' @rdname deparsers_component
 deparse_d3_style <- deparse_d3_attr
+
+# Macro ------------------------------------------------------
+# Macro for inline expansion
+# Usage: .macro(f, x, y)
+# `f` is a function that takes `x`, `y` as arguments and return a character.
+
+#' Predicate for '.macro'
+#' @rdname predicate_component
+is_macro <- function(ast) {
+  is_call(ast, ".macro")
+}
+
+#' Deparser for '.macro'
+#' @rdname deparsers_component
+#' @note At the moment, the '.macro' / `deparse_macro` function must be
+#' used with the `compile_exprs` call. This is currently an experimental
+#' feature.
+deparse_macro <- function(ast, ...) {
+  if (length(ast) <= 1) {
+    stop("The .macro function must have at least 1 argument.")
+  }
+  call_name <- deparse1(ast[[1]])
+  fun_name <- deparse1(ast[[2]])
+  fun_args <- deparse_raw_args(ast[-(1:2)])
+  fun <- get(fun_name, mode = "function",
+             envir = find_compile_exprs_env())
+  do.call(fun, fun_args, quote = TRUE)
+}
+
+find_compile_exprs_env <- function() {
+  call_stack <- rlang::trace_back(globalenv())
+  env_ind <- call_stack$call %>%
+    purrr::map_lgl(~rlang::is_call(.x, "compile_exprs")) %>%
+    rev() %>%
+    which()
+  # Set default to the caller environment of `deparse_macro`
+  env_ind <- ifelse(purrr::is_empty(env_ind), 2, env_ind - 1)
+  rlang::caller_env(env_ind)
+}
+
+# deparse_raw_args :: ast -> [ast]
+deparse_raw_args <- function(ast, ...) {
+  ast_list <- as.list(ast)
+  nm <- names(ast_list)
+  if (is.null(nm)) return(ast_list)
+
+  purrr::map2(nm, ast_list, function(x, y) {
+    yc <- deparse1(y)
+    ifelse(x == "", yc, glue::glue("{x} = {yc}"))
+  }) %>%
+    purrr::map(parse_expr)
+}
+
+
+#' Predicate for '.data'
+#' @rdname predicate_component
+is_data <- function(ast) {
+  is_call(ast, ".data")
+}
+
+#' Deparser for '.data'
+#' @rdname deparsers_component
+#' @note At the moment, the '.data' / `deparse_data` function must be
+#' used with the `compile_exprs` call. This is currently an experimental
+#' feature.
+deparse_data <- function(ast, ...) {
+  if (length(ast) <= 1) {
+    stop("The .data function must have at least 1 argument.")
+  }
+  call_name <- deparse1(ast[[1]])
+  fun_args <- list(x = get(deparse1(ast[[2]]),
+                           envir = find_compile_exprs_env()))
+
+  options <- as.list(ast[-(1:2)])
+  # Set default for 'auto_unbox' to TRUE as it is the most common case
+  if (!"auto_unbox" %in% names(options)) {
+    fun_args %<>% append(list(auto_unbox = TRUE))
+  }
+
+  fun_args %<>% append(options)
+  do.call(jsonlite::toJSON, fun_args)
+}

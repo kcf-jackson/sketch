@@ -65,6 +65,7 @@ basic_deparsers <- function() {
     "list"    = make_deparser(is_call_list, deparse_list),
     # Keywords
     "pipe" = make_deparser(is_call_pipe, deparse_pipe),
+    "assignment_pipe" = make_deparser(is_call_assignment_pipe, deparse_assignment_pipe),
     "lambda" = make_deparser(is_call_lambda, deparse_lambda),
     "ifelse" = make_deparser(is_call_ifelse, deparse_ifelse),
     "dataURI" = make_deparser(is_call_dataURI, deparse_dataURI),
@@ -165,13 +166,19 @@ dp_dom <- function() {
   list("dom" = make_deparser(is_html_tags, deparse_html_tags))
 }
 
-#' Shorthand notation for the 'dom' module
+#' Shorthand notation for the 'd3' library
 #' @rdname list-of-deparsers
 dp_d3 <- function() {
   list("d3_attr" = make_deparser(is_d3_attr, deparse_d3_attr),
        "d3_style" = make_deparser(is_d3_style, deparse_d3_style))
 }
 
+#' Macro
+#' @rdname list-of-deparsers
+dp_macro <- function() {
+  list("macro" = make_deparser(is_macro, deparse_macro),
+       "data" = make_deparser(is_data, deparse_data))
+}
 
 
 #' Constructor function to combine low-level deparsers
@@ -191,7 +198,8 @@ dp <- function(...) {
     "r" = dp_r_support,
     "auto" = dp_auto,
     "dom" = dp_dom,
-    "d3" = dp_d3
+    "d3" = dp_d3,
+    "macro" = dp_macro
   )
   res <- current_support[c(...)] %>%
     purrr::reduce(`%<%`)

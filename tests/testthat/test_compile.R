@@ -79,6 +79,10 @@ testthat::test_that("Test transpilation with basic rules and deparsers (exprs)",
     # Test formula
     unit_test("~.x * .y + fun(.z)", "function(dot_x, dot_y, dot_z) { return dot_x * dot_y + fun(dot_z) }")
     unit_test("~x * .y + fun(z)", "function(dot_y) { return x * dot_y + fun(z) }")
+    unit_test("~.x$y(.z)", "function(dot_x, dot_z) { return dot_x.y(dot_z) }")
+    unit_test("~.a$b(.c$d(e$f))", "function(dot_a, dot_c) { return dot_a.b(dot_c.d(e.f)) }")
+    unit_test("~.a$.b(.c$.d(.e$.f))", "function(dot_a, dot_c, dot_e) { return dot_a..b(dot_c..d(dot_e..f)) }")
+    unit_test("~.x(.z)", "function(dot_x, dot_z) { return dot_x(dot_z) }")
     unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
     unit_test("map(obj, ~.x$id == id)", "map(obj, function(dot_x) { return dot_x.id == id })")
     unit_test("res$map(~.x)", "res.map(function(dot_x) { return dot_x })")
@@ -185,6 +189,12 @@ testthat::test_that("Test transpilation with default rules and deparsers (exprs)
     unit_test("f(x) %>% b(arg2 = 2)", "b(f(x), 2)")
     unit_test("f(x=4) %>% b", "b(f(4))")
     unit_test("f(x=4) %>% b()", "b(f(4))")
+
+    # Test assignment pipe operator
+    unit_test("x %<>% b", "x = b(x)")
+    unit_test("x %<>% b()", "x = b(x)")
+    unit_test("x %<>% b(arg2 = 2)", "x = b(x, 2)")
+    unit_test("x %<>% b(arg2 = 2, arg3 = 3)", "x = b(x, 2, 3)")
 
     # Test function definition
     unit_test("function(x, y) {}", "function(x, y) {\n    \n}")
@@ -400,6 +410,91 @@ testthat::test_that("Test R6Class", {
     file_ref <- system.file("test_files/test_R6_3.js", package = "sketch")
     temp <- compile_r(file, tempfile())
     testthat::expect_equal(read_file(temp), read_file(file_ref))
+})
+
+testthat::test_that("Test macro", {
+    test_macro_predicate <- purrr::compose(is_macro, parse_expr)
+    test_macro_deparse <- purrr::compose(deparse_macro, parse_expr)
+
+    unit_test <- purrr::partial(test_equal, f = test_macro_predicate, silent = T)
+    unit_test_2 <- purrr::partial(test_equal, f = test_macro_deparse, silent = T)
+    transform <- function(x, y) glue::glue("{deparse1(x)}:{deparse1(y)}")
+
+    input <- '.macro(transform, arg1, arg2)'
+    expected <- 'arg1:arg2'
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+
+    input <- '.macro(transform, a = arg1, b = arg2)'
+    expected <- 'a = arg1:b = arg2'
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+
+    hi <- function() "hi"
+    input <- '.macro(hi)'
+    expected <- "hi"
+    testthat::expect_equal(test_macro_predicate(input), TRUE)
+    testthat::expect_equal(test_macro_deparse(input), expected)
+})
+
+testthat::test_that("Test macro - top level", {
+    g <- function() {
+        f <- function(x) as.character(eval(x))
+        compile_exprs(".macro(f, 12)", deparsers = dp("basic", "macro"))
+    }
+    testthat::expect_equal(g(), "12")
+
+    h <- function() {
+        f <- function(x) as.character(eval(x) + 1)
+        g <- function() {
+            compile_exprs(".macro(f, 12)", deparsers = dp("basic", "macro"))
+        }
+        g()
+    }
+    testthat::expect_equal(h(), "13")
+})
+
+
+testthat::test_that("Test data (passing)", {
+    test_data_predicate <- purrr::compose(is_data, parse_expr)
+    test_data_deparse <- purrr::compose(deparse_data, parse_expr)
+
+    unit_test <- purrr::partial(test_equal, f = test_data_predicate, silent = T)
+    unit_test_2 <- purrr::partial(test_equal, f = test_data_deparse, silent = T)
+    x <- 100
+
+    input <- '.data(x)'
+    expected <- jsonlite::toJSON(100, auto_unbox = TRUE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(deparse_data(parse_expr(input)), expected)
+
+    input <- '.data(x, auto_unbox = F)'
+    expected <- jsonlite::toJSON(100, auto_unbox = FALSE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(test_data_deparse(input), expected)
+
+    x <- 1:3
+    input <- '.data(x)'
+    expected <- jsonlite::toJSON(x, auto_unbox = TRUE)
+    testthat::expect_equal(test_data_predicate(input), TRUE)
+    testthat::expect_equal(test_data_deparse(input), expected)
+})
+
+testthat::test_that("Test data - top level", {
+    g <- function() {
+        x <- 100
+        compile_exprs(".data(x)", deparsers = dp("basic", "macro"))
+    }
+    testthat::expect_equal(g(), "100")
+
+    h <- function() {
+        x <- 101
+        g <- function() {
+            compile_exprs(".data(x)", deparsers = dp("basic", "macro"))
+        }
+        g()
+    }
+    testthat::expect_equal(h(), "101")
 })
 
 

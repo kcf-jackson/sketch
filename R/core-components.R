@@ -1349,12 +1349,22 @@ deparse_macro <- function(ast, ...) {
 
 find_compile_exprs_env <- function() {
   call_stack <- rlang::trace_back(globalenv())
-  env_ind <- call_stack$call %>%
-    purrr::map_lgl(~rlang::is_call(.x, "compile_exprs")) %>%
-    rev() %>%
-    which()
+  env_flag <- call_stack$call %>%
+    purrr::map_lgl(~rlang::is_call(.x, "compile_exprs"))
+
+  rev_main_road <- call_stack$parent %>% rev() %>% cummin()
+  rev_keep <- !duplicated(rev_main_road)
+  env_df <- data.frame(
+    call_number = rev(rev_main_road),
+    keep = rev(rev_keep),
+    target = env_flag
+  )
+  env_df <- env_df[env_df$keep, ]
+
   # Set default to the caller environment of `deparse_macro`
-  env_ind <- ifelse(purrr::is_empty(env_ind), 2, env_ind - 1)
+  env_ind <- env_df$target %>% rev() %>% which()
+  env_ind <- ifelse(purrr::is_empty(env_ind), 2, env_ind)
+
   rlang::caller_env(env_ind)
 }
 

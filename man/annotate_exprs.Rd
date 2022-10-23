@@ -10,5 +10,5 @@ annotate_exprs(x)
 \item{x}{A character string; the input to parse.}
 }
 \description{
-Parse and annotate expressions
+Parse and annotate expressions with lines and columns tracking.
 }

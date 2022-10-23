@@ -7,11 +7,14 @@
 source_map(ast)
 }
 \arguments{
-\item{ast}{The compiled AST.}
+\item{ast}{The compiled AST. The JavaScript AST compiled from the R AST.}
 }
 \value{
 A (list of) source map.
 }
 \description{
 Convert a compiled AST into a source map
+}
+\note{
+This feature is experimental.
 }

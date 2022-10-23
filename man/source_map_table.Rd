@@ -7,11 +7,14 @@
 source_map_table(x)
 }
 \arguments{
-\item{x}{A source map.}
+\item{x}{A source map. The output from `source_map`.}
 }
 \value{
 A data frame.
 }
 \description{
 Display the source map in a table
+}
+\note{
+This feature is experimental.
 }

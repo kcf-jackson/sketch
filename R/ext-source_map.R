@@ -4,10 +4,18 @@
 #                text: {original: Char, target: Char}]
 
 #' Create a source map (.map) file
+#'
+#' @param source_file A character string; the input R file.
+#' @param target_file A character string; the corresponding JavaScript file.
+#' @param ... Additional arguments to pass to `rewrite_annotated_exprs`.
+#'
+#' @note This feature is experimental.
+#
+# @examples
 source_map_from_files <- function(source_file, target_file, ...) {
     input <- paste(readLines(source_file), collapse = "\n")
     src_maps <- annotate_exprs(input) %>%
-        purrr::map(deparse_js, ...) %>%
+        purrr::map(rewrite_annotated_exprs, ...) %>%
         purrr::map(source_map) %>%
         # Sanitise the source map
         purrr::map(function(src_map) {
@@ -41,10 +49,12 @@ source_map_from_files <- function(source_file, target_file, ...) {
 
 #' Convert a compiled AST into a source map
 #'
-#' @param ast The compiled AST.
+#' @param ast The compiled AST. The JavaScript AST compiled from the R AST.
 #'
 #' @return A (list of) source map.
 #'
+#' @note This feature is experimental.
+#
 # @export
 #
 # @examples
@@ -76,10 +86,12 @@ source_map <- function(ast) {
 
 #' Deparse a compiled AST
 #'
-#' @param ast The compiled AST.
+#' @param ast The compiled AST. The JavaScript AST compiled from the R AST.
 #'
 #' @return A character string. The compiled string.
 #'
+#' @note This feature is experimental.
+#
 # @export
 #
 # @examples
@@ -92,10 +104,12 @@ deparse_js_ast <- function(ast) {
 
 #' Display the source map in a table
 #'
-#' @param x A source map.
+#' @param x A source map. The output from `source_map`.
 #'
 #' @return  A data frame.
 #'
+#' @note This feature is experimental.
+#
 # @export
 source_map_table <- function(x) {
     res <- x %>%
@@ -116,10 +130,12 @@ source_map_table <- function(x) {
 
 #' Verify a source map
 #'
-#' @param ast The compiled AST.
-#' @param src_map The source map.
+#' @param ast The compiled AST. The JavaScript AST compiled from the R AST.
+#' @param src_map The source map. The output from `source_map`.
 #'
 #' @return A data frame; a source map table expanded by the 'pass_test' column.
+#'
+#' @note This feature is experimental.
 verify_source_map <- function(ast, src_map) {
     output_str <- deparse_js_ast(ast)
     src_map_table <- source_map_table(src_map)

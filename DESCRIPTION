@@ -22,7 +22,8 @@ Imports:
     base64enc,
     jsonlite,
     shiny,
-    methods
+    methods,
+    V8
 Suggests: 
     testthat,
     covr,

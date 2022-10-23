@@ -7,11 +7,14 @@
 deparse_js_ast(ast)
 }
 \arguments{
-\item{ast}{The compiled AST.}
+\item{ast}{The compiled AST. The JavaScript AST compiled from the R AST.}
 }
 \value{
 A character string. The compiled string.
 }
 \description{
 Deparse a compiled AST
+}
+\note{
+This feature is experimental.
 }

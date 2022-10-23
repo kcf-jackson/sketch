@@ -7,13 +7,16 @@
 verify_source_map(ast, src_map)
 }
 \arguments{
-\item{ast}{The compiled AST.}
+\item{ast}{The compiled AST. The JavaScript AST compiled from the R AST.}
 
-\item{src_map}{The source map.}
+\item{src_map}{The source map. The output from `source_map`.}
 }
 \value{
 A data frame; a source map table expanded by the 'pass_test' column.
 }
 \description{
 Verify a source map
+}
+\note{
+This feature is experimental.
 }

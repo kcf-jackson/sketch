@@ -6,6 +6,16 @@
 \usage{
 source_map_from_files(source_file, target_file, ...)
 }
+\arguments{
+\item{source_file}{A character string; the input R file.}
+
+\item{target_file}{A character string; the corresponding JavaScript file.}
+
+\item{...}{Additional arguments to pass to `rewrite_annotated_exprs`.}
+}
 \description{
 Create a source map (.map) file
+}
+\note{
+This feature is experimental.
 }

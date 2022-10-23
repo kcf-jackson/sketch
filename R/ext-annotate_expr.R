@@ -1,12 +1,13 @@
 #' Parse and annotate expressions
 #'
+#' @description Parse and annotate expressions with lines and columns tracking.
 #' @param x A character string; the input to parse.
 #
 # @examples
 # x <- annotate_exprs("a <- f(g(x), g(x)); b <- 2;")
-# x[[1]]
-# x[[1]][[3]][[2]]
-# x[[1]][[3]][[3]]
+# x[[1]]   # first statement
+# x[[1]][[3]][[2]]   # first g(x)
+# x[[1]][[3]][[3]]   # second g(x)
 annotate_exprs <- function(x) {
     deparse2 <- \(x) deparse1(x, collapse = "\n")
     normalise_expr <- \(x) deparse2(parse(text = x, keep.source = FALSE)[[1]])
@@ -47,7 +48,7 @@ annotate_exprs <- function(x) {
     }
 
     # Main
-    px <- parse(text = x)
+    px <- parse(text = x, keep.source = TRUE)
     envir <- new.env()
     envir$parse_table <- getParseTable(px)
     purrr::map(px, add_annotation)

@@ -30,3 +30,4 @@ Suggests:
     knitr,
     rmarkdown,
 BugReports: https://github.com/kcf-jackson/sketch
+VignetteBuilder: knitr

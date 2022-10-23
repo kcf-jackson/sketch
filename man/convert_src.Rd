@@ -7,9 +7,9 @@
 convert_src(x, processors = default_processors())
 }
 \arguments{
-\item{x}{A character string; the header line (without the prefix #!).}
+\item{x}{A character string; the header line (without the prefix '#!'/'#|').}
 
-\item{processors}{A list of handlers for processing the '#!' header.}
+\item{processors}{A list of handlers for processing the '#!'/'#|' header.}
 }
 \value{
 A 'shiny.tag' object.

@@ -1,4 +1,4 @@
-#! config(rules = basic_rules(), deparsers = dp("basic"))
+#| config(rules = basic_rules(), deparsers = dp("basic"))
 
 #' @export
 equal <- function(x, y) {

@@ -9,6 +9,12 @@ testthat::test_that("Test 'testthat' helper functions", {
     testthat::expect_true(has_websocket(temp))
     write("#! load_library('dom')", temp)
     testthat::expect_false(has_websocket(temp))
+
+    temp <- tempfile()
+    write("#| load_library('websocket')", temp)
+    testthat::expect_true(has_websocket(temp))
+    write("#| load_library('dom')", temp)
+    testthat::expect_false(has_websocket(temp))
 })
 
 testthat::test_that("Test 'testthat' report", {

@@ -1,7 +1,7 @@
 #' Process assets in headers
 #'
 #' @description Take a 'sketch' R file as input, extract and process the
-#' resources links as provided by the user with the '#!' header.
+#' resources links as provided by the user with the '#!'/'#|' header.
 #'
 #' @param file Character string; the file path.
 #' @param ... (Optional) List of processors to pass to \link{convert_src}.
@@ -26,10 +26,10 @@ assets <- function(file, ..., trace = FALSE) {
 
 # extract_headers :: char -> [char]
 extract_headers <- function(file) {
-    is_header <- Vectorize(function(x) substr(x, 1, 2) == "#!")
+    is_header <- Vectorize(function(x) substr(x, 1, 2) %in% c("#!", "#|"))
     readLines(file) %>%
         filter(is_header) %>%
-        purrr::map_chr(~substring(.x, 3))  # Remove #!
+        purrr::map_chr(~substring(.x, 3))  # Remove "#!" / "#|"
 }
 
 # process_headers :: [char] -> asset_list

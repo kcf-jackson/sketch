@@ -2,10 +2,10 @@
 % Please edit documentation in R/ext-source_map.R
 \name{source_map_from_files}
 \alias{source_map_from_files}
-\title{Create a source map for a file}
+\title{Create a source map (.map) file}
 \usage{
 source_map_from_files(source_file, target_file, ...)
 }
 \description{
-Create a source map for a file
+Create a source map (.map) file
 }

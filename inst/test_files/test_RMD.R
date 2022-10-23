@@ -1,4 +1,4 @@
-#! load_library("p5")
+#| load_library("p5")
 
 setup <- function() {
     createCanvas(300, 300)

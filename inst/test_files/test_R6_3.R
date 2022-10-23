@@ -1,4 +1,4 @@
-#! config(debug = TRUE)
+#| config(debug = TRUE)
 
 a <- R6Class(
     'test',

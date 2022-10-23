@@ -1,5 +1,5 @@
-#! load_library("p5")
-#! load_script("test_sketch_2.R")
+#| load_library("p5")
+#| load_script("test_sketch_2.R")
 
 setup <- function() {
     createCanvas(300, 300)

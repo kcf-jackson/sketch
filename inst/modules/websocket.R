@@ -1,4 +1,4 @@
-#! config(rules = basic_rules(), deparsers = default_deparsers())
+#| config(rules = basic_rules(), deparsers = default_deparsers())
 ws <- WebSocket$new("ws://localhost:9454")
 
 ws$onopen <- function() {

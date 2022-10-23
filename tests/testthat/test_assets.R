@@ -11,7 +11,7 @@ testthat::test_that("Convert asset to shiny.tag", {
     path <- system.file("test_files/test_json.json", package = "sketch")
     x <- tempfile()
     if (.Platform$OS.type == 'windows') {
-        x <- normalizePath(x, winslash = "/")
+        x <- normalizePath(x, winslash = "/", mustWork = FALSE)
     }
     testthat::expect_identical(
         convert_src(glue::glue("load_data('{path}', cache = '{x}')")),

@@ -178,9 +178,9 @@ subst <- function(ast, pattern, replacement) {
     # Handle reference to source code, as "srcref" is not a language object,
     # but it appears in function definitions. For more information, see
     # https://stat.ethz.ch/R-manual/R-devel/library/base/html/srcfile.html
-    if (class(ast) == "srcref") {  # nocov start
+    if (inherits(ast, "srcref")) {  # nocov start
       return(ast)
-    }                              # nocov end
+    }                               # nocov end
 
     # Other cases should return error for now.
     stop("The line should not be reached, please submit an issue with the input on github. Thanks!")  # nocov

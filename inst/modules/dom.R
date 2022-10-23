@@ -1,4 +1,4 @@
-#! config(rules = basic_rules(), deparsers = default_deparsers())
+#| config(rules = basic_rules(), deparsers = default_deparsers())
 
 # A simple interface to manipulate DOM elements in browser
 

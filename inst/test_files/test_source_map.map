@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "sources": [
+    "test_source_map.R"
+  ],
+  "names": [
+    "Addition",
+    "Throw an error",
+    "Addition 2"
+  ],
+  "mappings": "AACAA;AACAC;AACAC",
+  "file": "test_source_map.js"
+}

@@ -1,6 +1,6 @@
 #' Convert an asset link into a 'shiny.tag' object
-#' @param x A character string; the header line (without the prefix #!).
-#' @param processors A list of handlers for processing the '#!' header.
+#' @param x A character string; the header line (without the prefix '#!'/'#|').
+#' @param processors A list of handlers for processing the '#!'/'#|' header.
 #' @return A 'shiny.tag' object.
 # convert_src :: char -> [header_processor] -> shiny.tag
 # where header_processor := (predicate, process)
@@ -21,7 +21,7 @@ make_processor <- function(pred, fun) {
     list(predicate = pred, process = fun)
 }
 
-#' A list of handlers for processing the '#!' header
+#' A list of handlers for processing the '#!'/'#|' header
 #' @note This is used as input to \link{assets}.
 #' @examples
 #' default_processors()

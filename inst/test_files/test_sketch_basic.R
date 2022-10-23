@@ -1,2 +1,2 @@
-#! load_library("p5")
+#| load_library("p5")
 x <- sin(10)

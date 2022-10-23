@@ -416,8 +416,8 @@ testthat::test_that("Test macro", {
     test_macro_predicate <- purrr::compose(is_macro, parse_expr)
     test_macro_deparse <- purrr::compose(deparse_macro, parse_expr)
 
-    unit_test <- purrr::partial(test_equal, f = test_macro_predicate, silent = T)
-    unit_test_2 <- purrr::partial(test_equal, f = test_macro_deparse, silent = T)
+    unit_test <- purrr::partial(test_equal, f = test_macro_predicate, silent = TRUE)
+    unit_test_2 <- purrr::partial(test_equal, f = test_macro_deparse, silent = TRUE)
     transform <- function(x, y) glue::glue("{deparse1(x)}:{deparse1(y)}")
 
     input <- '.macro(transform, arg1, arg2)'
@@ -459,8 +459,8 @@ testthat::test_that("Test data (passing)", {
     test_data_predicate <- purrr::compose(is_data, parse_expr)
     test_data_deparse <- purrr::compose(deparse_data, parse_expr)
 
-    unit_test <- purrr::partial(test_equal, f = test_data_predicate, silent = T)
-    unit_test_2 <- purrr::partial(test_equal, f = test_data_deparse, silent = T)
+    unit_test <- purrr::partial(test_equal, f = test_data_predicate, silent = TRUE)
+    unit_test_2 <- purrr::partial(test_equal, f = test_data_deparse, silent = TRUE)
     x <- 100
 
     input <- '.data(x)'
@@ -507,7 +507,7 @@ testthat::test_that("Test transpilation with d3 deparsers", {
     )
     remove_ws <- function(x) { gsub("[ \t\n\r\v\f]", "", x) }
     test_fun <- purrr::compose(remove_ws, basic_d3)
-    unit_test <- purrr::partial(test_equal, f = test_fun, silent = T)
+    unit_test <- purrr::partial(test_equal, f = test_fun, silent = TRUE)
 
     input <- 'd3::select("body")$append("circle")$d3_attr(cx = 100, tag = "tag")'
     expected <- 'd3.select("body").append("circle").attr("cx",100).attr("tag","tag")'

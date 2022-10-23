@@ -9,7 +9,7 @@
 #' @docType package
 #'
 #' @importFrom magrittr %>% %T>% %<>%
-#' @importFrom utils head tail read.csv
+#' @importFrom utils head tail read.csv getParseData
 #' @importFrom methods formalArgs
 #' @importFrom stats setNames
 NULL

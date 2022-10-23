@@ -15,7 +15,7 @@ assets(file, ..., trace = FALSE)
 }
 \description{
 Take a 'sketch' R file as input, extract and process the
-resources links as provided by the user with the '#!' header.
+resources links as provided by the user with the '#!'/'#|' header.
 }
 \examples{
 file <- system.file("test_files/test_RMD.R", package = "sketch")

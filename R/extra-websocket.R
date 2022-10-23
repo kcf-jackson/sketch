@@ -129,7 +129,7 @@ websocket <- R6::R6Class("websocket", public = list(
     new_app = function(preamble = list(library = c(), script = c(), data = c()), ...) {  # nocov start
           preamble_to_string <- function(preamble) {
               list(names(preamble), preamble) %>%
-                  purrr::pmap(~glue::glue('#! load_{..1}("{..2}")')) %>%
+                  purrr::pmap(~glue::glue('#| load_{..1}("{..2}")')) %>%
                   unlist()
           }
 

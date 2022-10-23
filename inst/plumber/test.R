@@ -1,4 +1,4 @@
-#! load_library("dom")
+#| load_library("dom")
 
 # Submit button
 submit <- dom("button", list(id = "submit", innerText = "submit"))

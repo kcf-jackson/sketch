@@ -18,8 +18,8 @@
 #' }
 test_sketch <- function(app_script, test_script, port = 9454, ...) {
     # helpers
-    load_library <- function(path) glue::glue("#! load_library(\"{path}\")")
-    # load_script <- function(path) glue::glue("#! load_script(\"{path}\")")
+    load_library <- function(path) glue::glue("#| load_library(\"{path}\")")
+    # load_script <- function(path) glue::glue("#| load_script(\"{path}\")")
     command <- function(x) {
         message <- list(type = "command", message = x)
         jsonlite::toJSON(message, auto_unbox = TRUE)

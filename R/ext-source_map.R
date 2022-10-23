@@ -13,6 +13,12 @@
 #
 # @examples
 source_map_from_files <- function(source_file, target_file, ...) {
+    escape_winslash <- function(x) {
+        ifelse(.Platform$OS.type == 'windows',
+               gsub(x, pattern = "\\", replacement = "\\\\", fixed = TRUE),
+               x)
+    }
+
     input <- paste(readLines(source_file), collapse = "\n")
     src_maps <- annotate_exprs(input) %>%
         purrr::map(rewrite_annotated_exprs, ...) %>%
@@ -21,7 +27,7 @@ source_map_from_files <- function(source_file, target_file, ...) {
         purrr::map(function(src_map) {
             for (i in seq_along(src_map)) {
                 src_map[[i]]$text <- NULL
-                src_map[[i]]$source <- source_file
+                src_map[[i]]$source <- escape_winslash(source_file)
             }
             src_map
         })
@@ -35,7 +41,7 @@ source_map_from_files <- function(source_file, target_file, ...) {
     ctx <- V8::v8()
     ctx$source(system.file("assets/source_map.js", package = "sketch"))
     res <- ctx$eval(glue::glue(
-        "sourceMap.fromJSON('{target_file}', JSON.parse('{src_map_json}'))"
+        "sourceMap.fromJSON('{escape_winslash(target_file)}', JSON.parse('{src_map_json}'))"
     ))
     temp_file <- file.path(tempdir(),
                            gsub(basename(source_file),

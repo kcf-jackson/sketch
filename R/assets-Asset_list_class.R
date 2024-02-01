@@ -23,7 +23,13 @@ is.asset_list <- function(x) {
 
 # Concatenate two "asset_list"
 # c.asset_list :: asset_list -> asset_list -> asset_list
-c.asset_list <- function(x, y) {
+c.asset_list <- function(...) {
+    args <- list(...)
+    if (length(args) != 2) {
+        stop("Only two 'asset_list' can be concatenated at a time.")
+    }
+    x <- args[[1]]
+    y <- args[[2]]
     asset_list(
         head = c(ahead(x), ahead(y)),
         body = c(abody(y), abody(x))

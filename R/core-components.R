@@ -53,7 +53,7 @@ is_call <- rlang::is_call
 #' Deparser for calls
 #' @rdname deparsers_component
 deparse_call <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   fun <- sym_ls[1]
   args <- paste0(sym_ls[-1], collapse = ", ")
   paste0(fun, "(", args, ")")
@@ -136,7 +136,7 @@ deparse_wrap <- function(ast, ...) {
 
 deparse_wrap_sb <- function(ast, ...) {
   # case "[" and "[["
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   sym <- sym_ls[1]
   paste0(
     sym_ls[2],
@@ -148,7 +148,7 @@ deparse_wrap_sb <- function(ast, ...) {
 
 deparse_wrap_rb <- function(ast, ...) {
   # Case '('
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   sym <- sym_ls[1]
   paste0(
     sym,
@@ -168,7 +168,7 @@ deparse_wrap_cb <- function(ast, ...) {
     )   # `gsub` is fine here since '\n' in quoted string becomes '\\n'
   }
 
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   sym <- sym_ls[1]
   paste(
     sym,
@@ -208,7 +208,7 @@ is_call_for <- function(ast) is_call(ast, "for")
 #' Deparser for the 'for' keyword
 #' @rdname deparsers_component
 deparse_for <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   paste(
     sym_ls[1], # for
     glue::glue("(let {sym_ls[2]} of {sym_ls[3]})"),
@@ -225,7 +225,7 @@ is_call_if <- function(ast) is_call(ast, "if")
 #' Deparser for the 'if' keyword
 #' @rdname deparsers_component
 deparse_if <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   has_else <- function(x) length(x) == 4
   out <- paste(
     sym_ls[1], # if
@@ -249,7 +249,7 @@ is_call_while <- function(ast) is_call(ast, "while")
 #' Deparser for the 'while' keyword
 #' @rdname deparsers_component
 deparse_while <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   paste(
     sym_ls[1], # while
     glue::glue("({sym_ls[2]})"), # test-condition
@@ -267,7 +267,7 @@ is_call_function <- function(ast) is_call(ast, "function")
 #' @rdname deparsers_component
 deparse_function <- function(ast, ...) {
   deparse_arg <- function(alist0, ...) {
-    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist1 <- purrr::map(as.list(alist0), deparse_js, ...)
     alist2 <- purrr::map2_chr(
       .x = names(alist1), .y = alist1,
       function(x, y) {
@@ -293,7 +293,7 @@ deparse_function <- function(ast, ...) {
 #' @rdname deparsers_component
 deparse_function_with_return <- function(ast, ...) {
   deparse_arg <- function(alist0, ...) {
-    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist1 <- purrr::map(as.list(alist0), deparse_js, ...)
     alist2 <- purrr::map2_chr(
       .x = names(alist1), .y = alist1,
       function(x, y) {
@@ -389,7 +389,7 @@ is_call_return <- function(ast) is_call(ast, "return")
 #' Deparser for return
 #' @rdname deparsers_component
 deparse_return <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   glue::glue("return {sym_ls[[2]]}")
 }
 
@@ -421,7 +421,7 @@ is_call_assignment_auto <- function(ast) {
 #' Deparser for assignments (automatic variable declaration)
 #' @rdname deparsers_component
 deparse_assignment_auto <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   if (!is_call(ast, "<<-")) {
     return(glue::glue("var {sym_ls[[2]]} = {sym_ls[[3]]}"))
   }
@@ -540,7 +540,7 @@ deparse_list <- function(ast, ...) {
 # This function is not in `deparse_list`, because it needs to be reused
 # by `deparse_df`
 deparse_list_arg <- function(list0, err_msg, ...) {
-  list1 <- purrr::map_chr(list0, deparse_js, ...)
+  list1 <- purrr::map_chr(as.list(list0), deparse_js, ...)
   labels <- names(list1)
 
   if (is.null(labels)) {   # all labels are missing
@@ -594,7 +594,7 @@ is_call_df_summarise <- function(ast) is_call(ast, "R.summarise")
 #' Deparser for the "summarise" operators
 #' @rdname deparsers_component
 deparse_df_summarise <- function(ast, ...) {
-  args <- purrr::map_chr(ast, deparse_js, ...)
+  args <- purrr::map_chr(as.list(ast), deparse_js, ...)
   fname <- args[[1]]
   df_arg <- args[[2]]
   fun_args <- args[-c(1:2)]
@@ -661,7 +661,7 @@ deparse_R6Class <- function(ast, ...) {
 
 get_constructor_arg <- function(ast, ...) {
   deparse_arg <- function(alist0, ...) {
-    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist1 <- purrr::map(as.list(alist0), deparse_js, ...)
     alist2 <- purrr::map2_chr(
       .x = names(alist1), .y = alist1,
       function(x, y) {
@@ -684,7 +684,7 @@ get_constructor_arg <- function(ast, ...) {
 
 get_constructor_arg_no_default <- function(ast, ...) {
   deparse_arg <- function(alist0, ...) {
-    alist1 <- purrr::map(alist0, deparse_js, ...)
+    alist1 <- purrr::map(as.list(alist0), deparse_js, ...)
     alist2 <- names(alist1)
     paste(alist2, collapse = ", ")
   }
@@ -711,7 +711,7 @@ deparse_public_list <- function(ast, ...) {
     stop("All (public) variables / methods of an R6 object must be named.")
   }
 
-  rhs <- purrr::map_chr(args, deparse_js, ...)
+  rhs <- purrr::map_chr(as.list(args), deparse_js, ...)
   purrr::map2_chr(
     public_vars, rhs, function(x, y) {
       glue::glue("self.<x> = <y>", .open = "<", .close = ">")
@@ -732,7 +732,7 @@ deparse_private_list <- function(ast, ...) {
   }
 
   # Reference: http://crockford.com/javascript/private.html
-  rhs <- args %>%
+  rhs <- as.list(args) %>%
     purrr::map_chr(deparse_js, ...)
 
   purrr::map2_chr(
@@ -819,7 +819,7 @@ is_call_let <- function(ast) is_call(ast, "let")
 #' @rdname deparsers_component
 deparse_let <- function(ast, ...) {
   deparse_arg <- function(list0) {
-    list1 <- purrr::map_chr(list0, deparse_js, ...)
+    list1 <- purrr::map_chr(as.list(list0), deparse_js, ...)
     labels <- names(list1)
     if (is.null(labels)) {
       paste(list1, collapse = ", ")
@@ -902,7 +902,7 @@ is_call_ifelse <- function(ast) is_call(ast, "ifelse")
 #' Deparser for the "ifelse" operator
 #' @rdname deparsers_component
 deparse_ifelse <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   glue::glue("{sym_ls[2]} ? {sym_ls[3]} : {sym_ls[4]}")
 }
 
@@ -915,7 +915,7 @@ is_call_lambda <- function(ast) is_call(ast, "lambda")
 #' Deparser for the "lambda" operator
 #' @rdname deparsers_component
 deparse_lambda <- function(ast, ...) {
-  sym_ls <- purrr::map_chr(ast, deparse_js, ...)
+  sym_ls <- purrr::map_chr(as.list(ast), deparse_js, ...)
   l <- length(sym_ls)
   args <- sym_ls[-c(1, l)]
   body <- sym_ls[[l]]
@@ -1123,7 +1123,7 @@ is_call_extract <- function(ast) is_call(ast, "R.extract")
 #' @rdname deparsers_component
 deparse_extract <- function(ast, ...) {
   obj <- deparse_js(ast[[2]], ...)
-  ind <- purrr::map_chr(ast[-c(1,2)], deparse_js, ...)
+  ind <- purrr::map_chr(as.list(ast[-c(1,2)]), deparse_js, ...)
   ind <- replace_empty_index(ind, obj)
   if (length(ind) > 1) {
     ind <- paste(ind, collapse = ", ")
@@ -1154,7 +1154,7 @@ deparse_extractAssign <- function(ast, ...) {
   obj <- deparse_js(ast[[2]][[2]], ...)
   val <- deparse_js(ast[[3]], ...)
   # browser()
-  ind <- purrr::map_chr(ast[[2]][-c(1,2)], deparse_js, ...)
+  ind <- purrr::map_chr(as.list(ast[[2]][-c(1,2)]), deparse_js, ...)
   ind <- replace_empty_index(ind, obj)
   if (length(ind) > 1) {
     ind <- paste(ind, collapse = ", ")
@@ -1247,7 +1247,7 @@ deparse_html_tags <- function(ast, ...) {
   # No named element
   args <- ast[-1]
   if (is.null(names(args))) {
-    args_str <- args %>%
+    args_str <- as.list(args) %>%
       purrr::map_chr(deparse_js, ...) %>%
       paste0(collapse = ", ")
     return(glue::glue("dom(\"{tag}\", {{}}, {args_str})"))
@@ -1263,7 +1263,7 @@ deparse_html_tags <- function(ast, ...) {
     return(glue::glue("dom(\"{tag}\", {named_args})"))
   }
 
-  unnamed_args <- args[!named] %>%
+  unnamed_args <- as.list(args[!named]) %>%
     purrr::map_chr(deparse_js, ...) %>%
     paste0(collapse = ", ")
   return(glue::glue("dom(\"{tag}\", {named_args}, {unnamed_args})"))
@@ -1304,7 +1304,7 @@ deparse_d3_attr <- function(ast, ...) {
   rhs <- ast[-1]
   args <- rhs
   arg_names <- names(args)
-  arg_chr <- purrr::map_chr(args, deparse_js, ...)
+  arg_chr <- purrr::map_chr(as.list(args), deparse_js, ...)
   if (is.null(arg_names) || any(arg_names == "")) {
     stop("All attributes / styles of a SVG element must be named.")
   }

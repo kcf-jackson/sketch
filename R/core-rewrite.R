@@ -145,7 +145,7 @@ subst <- function(ast, pattern, replacement) {
         ast[[2]] <- subst(ast[[2]], pattern, replacement)
         return(ast)
       }
-      return(as.call(purrr::map(ast, ~subst(.x, pattern, replacement))))
+      return(as.call(purrr::map(as.list(ast), ~subst(.x, pattern, replacement))))
     }
 
     if (rlang::is_symbol(ast)) {
@@ -170,7 +170,7 @@ subst <- function(ast, pattern, replacement) {
     }
 
     if (rlang::is_pairlist(ast)) {
-      ast2 <- as.pairlist(purrr::map(ast, ~subst(.x, pattern, replacement)))
+      ast2 <- as.pairlist(purrr::map(as.list(ast), ~subst(.x, pattern, replacement)))
       names(ast2) <- names(ast)
       return(ast2)
     }

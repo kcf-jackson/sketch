@@ -7,7 +7,7 @@
 to_shiny_tag(src, ...)
 }
 \arguments{
-\item{x}{A character string; the link / path to the JS / CSS / R script / CSV file.}
+\item{src}{A character string; the link / path to the JS / CSS / R script / CSV file.}
 }
 \description{
 Load JavaScript / CSS / 'sketch' R / CSV file

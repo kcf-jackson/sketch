@@ -30,7 +30,7 @@ annotate_exprs <- function(x) {
         # Since attributes cannot be set on a symbol, only calls have
         # location information attached to them.
         if (rlang::is_call(expr)) {
-            expr <- as.call(purrr::map(expr, add_annotation))
+            expr <- as.call(purrr::map(as.list(expr), add_annotation))
             attributes(expr) <- get_location(expr)
             attr(expr, "used") <- NULL
         }
@@ -51,5 +51,5 @@ annotate_exprs <- function(x) {
     px <- parse(text = x, keep.source = TRUE)
     envir <- new.env()
     envir$parse_table <- getParseTable(px)
-    purrr::map(px, add_annotation)
+    purrr::map(as.list(px), add_annotation)
 }

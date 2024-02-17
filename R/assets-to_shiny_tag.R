@@ -113,7 +113,7 @@ load_data <- function(x, cache = tempfile(), ...) {
 #=====================================================================
 #' Load JavaScript / CSS / 'sketch' R / CSV file
 #'
-#' @param x A character string; the link / path to the JS / CSS / R script / CSV file.
+#' @param src A character string; the link / path to the JS / CSS / R script / CSV file.
 # #' @param renderer function; the function to render the 'shiny.tag' object.
 # #' Use `htmltools::doRenderTags` for RMD, and `identity` for `html_template`.
 #'

@@ -12,7 +12,7 @@ rewrite_annotated_exprs <- deparse_js
 compile_sym <- deparse_sym
 
 compile_call <- function(ast, ...) {
-    sym_ls <- purrr::map(ast, rewrite_annotated_exprs, ...)
+    sym_ls <- purrr::map(as.list(ast), rewrite_annotated_exprs, ...)
     fun <- sym_ls[[1]]
     if (length(sym_ls) == 2) {
         args <- sym_ls[-1]

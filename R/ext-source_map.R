@@ -103,7 +103,7 @@ source_map <- function(ast) {
 # @examples
 deparse_js_ast <- function(ast) {
     if (!is.list(ast)) return(ast)
-    ast %>%
+    as.list(ast) %>%
         purrr::map_chr(deparse_js_ast) %>%
         paste(collapse = "")
 }
